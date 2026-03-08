@@ -1,14 +1,39 @@
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Lock, Mail } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const { signIn, signUp, user } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  if (user) {
+    navigate("/blog");
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder — will integrate with Lovable Cloud
-    alert("Login non ancora attivo. Attiva Lovable Cloud per l'autenticazione.");
+    setError("");
+    setMessage("");
+    setLoading(true);
+
+    if (isSignUp) {
+      const { error } = await signUp(email, password);
+      if (error) setError(error.message);
+      else setMessage("Controlla la tua email per confermare la registrazione.");
+    } else {
+      const { error } = await signIn(email, password);
+      if (error) setError(error.message);
+      else navigate("/blog");
+    }
+    setLoading(false);
   };
 
   return (
@@ -16,7 +41,7 @@ const Login = () => {
       <div className="editorial-container max-w-md w-full mx-auto">
         <div className="text-center mb-10">
           <h1 className="editorial-heading mb-4">
-            <span className="italic text-primary">Accedi</span>
+            <span className="italic text-primary">{isSignUp ? "Registrati" : "Accedi"}</span>
           </h1>
           <p className="font-body text-muted-foreground">
             Area riservata ai collaboratori per la pubblicazione di articoli.
@@ -24,6 +49,17 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-body">
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="p-3 rounded-md bg-secondary/20 text-secondary text-sm font-body">
+              {message}
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-body font-medium mb-2">Email</label>
             <div className="relative">
@@ -48,6 +84,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
                 className="w-full pl-10 pr-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="••••••••"
               />
@@ -56,14 +93,21 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity"
+            disabled={loading}
+            className="w-full py-3 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            Accedi
+            {loading ? "Caricamento..." : isSignUp ? "Registrati" : "Accedi"}
           </button>
         </form>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Non hai un account? Contatta l'amministratore del progetto.
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          {isSignUp ? "Hai già un account?" : "Non hai un account?"}{" "}
+          <button
+            onClick={() => { setIsSignUp(!isSignUp); setError(""); setMessage(""); }}
+            className="text-primary hover:underline font-medium"
+          >
+            {isSignUp ? "Accedi" : "Registrati"}
+          </button>
         </p>
       </div>
     </div>
