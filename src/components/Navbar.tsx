@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -13,6 +14,7 @@ const navLinks = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
@@ -34,12 +36,21 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <Link
-            to="/login"
-            className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Accedi
-          </Link>
+          {user ? (
+            <button
+              onClick={() => signOut()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-sm font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+            >
+              <LogOut size={14} /> Esci
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Accedi
+            </Link>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -63,13 +74,22 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <Link
-            to="/login"
-            onClick={() => setOpen(false)}
-            className="block px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium text-center"
-          >
-            Accedi
-          </Link>
+          {user ? (
+            <button
+              onClick={() => { signOut(); setOpen(false); }}
+              className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
+            >
+              Esci
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium text-center"
+            >
+              Accedi
+            </Link>
+          )}
         </div>
       )}
     </nav>
