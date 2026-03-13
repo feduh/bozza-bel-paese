@@ -31,7 +31,7 @@ const Footer = () => (
         </div>
       </div>
       <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Arti Vive. Tutti i diritti riservati.
+        © {new Date().getFullYear()} Il Bel Paese. Tutti i diritti riservati.
       </div>
     </div>
   </footer>

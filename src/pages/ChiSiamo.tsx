@@ -6,7 +6,7 @@ const ChiSiamo = () => (
       </h1>
       <div className="space-y-6 editorial-body text-muted-foreground">
         <p>
-          <strong className="text-foreground">Arti Vive</strong> nasce dalla volontà di creare un archivio dinamico delle realtà artistiche italiane — dai collettivi nomadi che attraversano le piazze, agli spazi culturali radicati nei quartieri, fino alle esperienze ormai scomparse ma fondamentali per la storia culturale del paese.
+          <strong className="text-foreground">Il Bel Paese</strong> nasce dalla volontà di creare un archivio dinamico delle realtà artistiche italiane — dai collettivi nomadi che attraversano le piazze, agli spazi culturali radicati nei quartieri, fino alle esperienze ormai scomparse ma fondamentali per la storia culturale del paese.
         </p>
         <p>
           Siamo un gruppo di ricercatori, artisti e appassionati di cultura che crede nel valore della documentazione e della memoria collettiva. Il nostro progetto è partecipativo: chiunque può contribuire segnalando realtà, condividendo storie e arricchendo la mappa.
