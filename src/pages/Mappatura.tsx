@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { artRealities, regions, disciplines as allDisciplines, type ArtReality } from "@/data/mockData";
 import { MapPin, Compass, Archive, List, Map, ArrowRight, X } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { supabase } from "@/integrations/supabase/client";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -13,28 +13,68 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-const typeConfig: Record<ArtReality["type"], { label: string; icon: typeof MapPin; colorClass: string }> = {
+type RealityType = "nomade" | "con-sede" | "scomparsa";
+
+type Reality = {
+  id: string;
+  name: string;
+  type: RealityType;
+  city: string;
+  region: string;
+  description: string;
+  year_founded: number;
+  year_closed: number | null;
+  lat: number;
+  lng: number;
+  website: string | null;
+  tags: string[];
+};
+
+const typeConfig: Record<RealityType, { label: string; icon: typeof MapPin; colorClass: string }> = {
   nomade: { label: "Nomade", icon: Compass, colorClass: "bg-primary/10 text-primary border-primary/20" },
   "con-sede": { label: "Con sede", icon: MapPin, colorClass: "bg-secondary/10 text-secondary border-secondary/20" },
   scomparsa: { label: "Scomparsa", icon: Archive, colorClass: "bg-muted text-muted-foreground border-border" },
 };
 
 const Mappatura = () => {
+  const [realities, setRealities] = useState<Reality[]>([]);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"list" | "map">("list");
-  const [typeFilter, setTypeFilter] = useState<"all" | ArtReality["type"]>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | RealityType>("all");
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    const fetchRealities = async () => {
+      const { data: realitiesData } = await supabase.from("realities").select("*");
+      const { data: tagsData } = await supabase.from("reality_tags").select("*");
+
+      if (realitiesData) {
+        const mapped = realitiesData.map((r) => ({
+          ...r,
+          type: r.type as RealityType,
+          tags: tagsData?.filter((t) => t.reality_id === r.id).map((t) => t.tag) ?? [],
+        }));
+        setRealities(mapped);
+      }
+      setLoading(false);
+    };
+    fetchRealities();
+  }, []);
+
+  const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
+  const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
+
   const filtered = useMemo(() => {
-    return artRealities.filter((r) => {
+    return realities.filter((r) => {
       if (typeFilter !== "all" && r.type !== typeFilter) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
-      if (disciplineFilter !== "all" && !r.disciplines.includes(disciplineFilter)) return false;
+      if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
       if (search && !r.name.toLowerCase().includes(search.toLowerCase()) && !r.city.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [typeFilter, regionFilter, disciplineFilter, search]);
+  }, [realities, typeFilter, regionFilter, disciplineFilter, search]);
 
   const hasFilters = typeFilter !== "all" || regionFilter !== "all" || disciplineFilter !== "all" || search !== "";
 
@@ -44,6 +84,14 @@ const Mappatura = () => {
     setDisciplineFilter("all");
     setSearch("");
   };
+
+  if (loading) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-muted-foreground font-body">Caricamento...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="py-20">
@@ -88,7 +136,6 @@ const Mappatura = () => {
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-4">
-          {/* Type */}
           {(
             [["all", "Tutte le tipologie"], ["nomade", "Nomadi"], ["con-sede", "Con sede"], ["scomparsa", "Scomparse"]] as const
           ).map(([val, label]) => (
@@ -152,7 +199,7 @@ const Mappatura = () => {
                       <Icon size={12} /> {config.label}
                     </span>
                     <span className="text-xs text-muted-foreground font-body">
-                      {r.yearFounded}{r.yearClosed ? ` – ${r.yearClosed}` : " – oggi"}
+                      {r.year_founded}{r.year_closed ? ` – ${r.year_closed}` : " – oggi"}
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
