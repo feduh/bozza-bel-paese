@@ -5,7 +5,7 @@ const Footer = () => (
     <div className="editorial-container">
       <div className="grid md:grid-cols-3 gap-8">
         <div>
-          <h3 className="font-display text-lg font-bold text-primary mb-3">Arti Vive</h3>
+          <h3 className="font-display text-lg font-bold text-primary mb-3">Il Bel Paese</h3>
           <p className="font-body text-sm text-muted-foreground leading-relaxed">
             Mappatura delle realtà artistiche italiane: nomadi, con sede e scomparse.
           </p>
