@@ -50,15 +50,123 @@ export type Database = {
         }
         Relationships: []
       }
+      realities: {
+        Row: {
+          city: string
+          contact_email: string | null
+          created_at: string
+          description: string
+          history: string
+          id: string
+          image_url: string | null
+          lat: number
+          lng: number
+          name: string
+          region: string
+          type: Database["public"]["Enums"]["reality_type"]
+          updated_at: string
+          website: string | null
+          year_closed: number | null
+          year_founded: number
+        }
+        Insert: {
+          city: string
+          contact_email?: string | null
+          created_at?: string
+          description?: string
+          history?: string
+          id?: string
+          image_url?: string | null
+          lat: number
+          lng: number
+          name: string
+          region: string
+          type: Database["public"]["Enums"]["reality_type"]
+          updated_at?: string
+          website?: string | null
+          year_closed?: number | null
+          year_founded: number
+        }
+        Update: {
+          city?: string
+          contact_email?: string | null
+          created_at?: string
+          description?: string
+          history?: string
+          id?: string
+          image_url?: string | null
+          lat?: number
+          lng?: number
+          name?: string
+          region?: string
+          type?: Database["public"]["Enums"]["reality_type"]
+          updated_at?: string
+          website?: string | null
+          year_closed?: number | null
+          year_founded?: number
+        }
+        Relationships: []
+      }
+      reality_tags: {
+        Row: {
+          id: string
+          reality_id: string
+          tag: string
+        }
+        Insert: {
+          id?: string
+          reality_id: string
+          tag: string
+        }
+        Update: {
+          id?: string
+          reality_id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reality_tags_reality_id_fkey"
+            columns: ["reality_id"]
+            isOneToOne: false
+            referencedRelation: "realities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      reality_type: "nomade" | "con-sede" | "scomparsa"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -185,6 +293,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      reality_type: ["nomade", "con-sede", "scomparsa"],
+    },
   },
 } as const
