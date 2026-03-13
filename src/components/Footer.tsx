@@ -5,7 +5,7 @@ const Footer = () => (
     <div className="editorial-container">
       <div className="grid md:grid-cols-3 gap-8">
         <div>
-          <h3 className="font-display text-lg font-bold text-primary mb-3">Arti Vive</h3>
+          <h3 className="font-display text-lg font-bold text-primary mb-3">Il Bel Paese</h3>
           <p className="font-body text-sm text-muted-foreground leading-relaxed">
             Mappatura delle realtà artistiche italiane: nomadi, con sede e scomparse.
           </p>
@@ -31,7 +31,7 @@ const Footer = () => (
         </div>
       </div>
       <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Arti Vive. Tutti i diritti riservati.
+        © {new Date().getFullYear()} Il Bel Paese. Tutti i diritti riservati.
       </div>
     </div>
   </footer>

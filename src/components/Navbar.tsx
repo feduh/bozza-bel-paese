@@ -20,7 +20,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="editorial-container flex items-center justify-between h-16">
         <Link to="/" className="font-display text-xl font-bold text-primary tracking-tight">
-          Arti Vive
+          Il Bel Paese
         </Link>
 
         {/* Desktop */}
