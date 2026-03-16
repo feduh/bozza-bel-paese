@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Menu, X, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
@@ -13,8 +14,18 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    const check = async () => {
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      setIsAdmin(!!data);
+    };
+    check();
+  }, [user]);
 
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
@@ -37,12 +48,22 @@ const Navbar = () => {
             </Link>
           ))}
           {user ? (
-            <button
-              onClick={() => signOut()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-sm font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
-            >
-              <LogOut size={14} /> Esci
-            </button>
+            <div className="flex items-center gap-4">
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-body font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <Shield size={12} /> Admin
+                </Link>
+              )}
+              <button
+                onClick={() => signOut()}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-sm font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+              >
+                <LogOut size={14} /> Esci
+              </button>
+            </div>
           ) : (
             <Link
               to="/login"
@@ -75,12 +96,23 @@ const Navbar = () => {
             </Link>
           ))}
           {user ? (
-            <button
-              onClick={() => { signOut(); setOpen(false); }}
-              className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
-            >
-              Esci
-            </button>
+            <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setOpen(false)}
+                  className="block font-body text-sm font-medium text-primary uppercase"
+                >
+                  ⚙ Admin
+                </Link>
+              )}
+              <button
+                onClick={() => { signOut(); setOpen(false); }}
+                className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
+              >
+                Esci
+              </button>
+            </>
           ) : (
             <Link
               to="/login"

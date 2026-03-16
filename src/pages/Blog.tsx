@@ -36,8 +36,19 @@ const Blog = () => {
     e.preventDefault();
     if (!user) return;
     setSubmitting(true);
+
+    // Get display_name from profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", user.id)
+      .single();
+
+    const authorName = profile?.display_name || formData.author_name || user.email || "Anonimo";
+
     const { error } = await supabase.from("blog_posts").insert({
       ...formData,
+      author_name: authorName,
       user_id: user.id,
     });
     if (!error) {
