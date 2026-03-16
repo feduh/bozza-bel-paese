@@ -33,6 +33,7 @@ const App = () => (
               <Route path="/realta/:id" element={<RealityDetail />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/admin" element={<Admin />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
