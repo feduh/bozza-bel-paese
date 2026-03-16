@@ -12,6 +12,7 @@ import CosaFacciamo from "./pages/CosaFacciamo";
 import Mappatura from "./pages/Mappatura";
 import Blog from "./pages/Blog";
 import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
