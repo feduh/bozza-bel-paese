@@ -96,12 +96,23 @@ const Navbar = () => {
             </Link>
           ))}
           {user ? (
-            <button
-              onClick={() => { signOut(); setOpen(false); }}
-              className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
-            >
-              Esci
-            </button>
+            <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setOpen(false)}
+                  className="block font-body text-sm font-medium text-primary uppercase"
+                >
+                  ⚙ Admin
+                </Link>
+              )}
+              <button
+                onClick={() => { signOut(); setOpen(false); }}
+                className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
+              >
+                Esci
+              </button>
+            </>
           ) : (
             <Link
               to="/login"
