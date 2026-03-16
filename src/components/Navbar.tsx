@@ -14,8 +14,18 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    const check = async () => {
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      setIsAdmin(!!data);
+    };
+    check();
+  }, [user]);
 
   return (
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
