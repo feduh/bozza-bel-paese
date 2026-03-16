@@ -48,12 +48,22 @@ const Navbar = () => {
             </Link>
           ))}
           {user ? (
-            <button
-              onClick={() => signOut()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-sm font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
-            >
-              <LogOut size={14} /> Esci
-            </button>
+            <div className="flex items-center gap-4">
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-body font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <Shield size={12} /> Admin
+                </Link>
+              )}
+              <button
+                onClick={() => signOut()}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-sm font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+              >
+                <LogOut size={14} /> Esci
+              </button>
+            </div>
           ) : (
             <Link
               to="/login"
