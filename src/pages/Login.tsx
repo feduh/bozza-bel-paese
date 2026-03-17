@@ -81,14 +81,7 @@ const Login = () => {
             disabled={loading}
             className="w-full py-3 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {loading ? "Caricamento..." : isRegister ? "Registrati" : "Accedi"}
-          </button>
-          <button
-            type="button"
-            onClick={() => { setIsRegister(!isRegister); setError(""); }}
-            className="w-full py-2 text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {isRegister ? "Hai già un account? Accedi" : "Crea account admin (temporaneo)"}
+            {loading ? "Caricamento..." : "Accedi"}
           </button>
         </form>
       </div>
