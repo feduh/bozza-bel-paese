@@ -8,7 +8,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const [isRegister, setIsRegister] = useState(false);
+  const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
   if (user) {
@@ -20,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = isRegister ? await signUp(email, password) : await signIn(email, password);
     if (error) setError(error.message);
     else navigate("/blog");
     setLoading(false);
@@ -81,7 +82,14 @@ const Login = () => {
             disabled={loading}
             className="w-full py-3 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {loading ? "Caricamento..." : "Accedi"}
+            {loading ? "Caricamento..." : isRegister ? "Registrati" : "Accedi"}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setIsRegister(!isRegister); setError(""); }}
+            className="w-full py-2 text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {isRegister ? "Hai già un account? Accedi" : "Crea account admin (temporaneo)"}
           </button>
         </form>
       </div>
