@@ -20,7 +20,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = isRegister ? await signUp(email, password) : await signIn(email, password);
+    const { error } = await signIn(email, password);
     if (error) setError(error.message);
     else navigate("/blog");
     setLoading(false);
