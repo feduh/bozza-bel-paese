@@ -8,7 +8,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const [isRegister, setIsRegister] = useState(false);
+  const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
   if (user) {
@@ -20,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = isRegister ? await signUp(email, password) : await signIn(email, password);
     if (error) setError(error.message);
     else navigate("/blog");
     setLoading(false);
