@@ -35,7 +35,7 @@ describe("Login", () => {
 
   it("renders login form with email and password fields", () => {
     renderLogin();
-    expect(screen.getByText("Accedi")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Accedi");
     expect(screen.getByPlaceholderText("tu@esempio.it")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("••••••••")).toBeInTheDocument();
   });
