@@ -1,17 +1,10 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Compass, Archive, List, Map, ArrowRight, X } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import { supabase } from "@/integrations/supabase/client";
+import MapFallback from "@/components/MapFallback";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+const LazyMap = lazy(() => import("@/components/LazyMap"));
 
 type RealityType = "nomade" | "con-sede" | "scomparsa";
 
@@ -84,6 +77,29 @@ const Mappatura = () => {
     setDisciplineFilter("all");
     setSearch("");
   };
+
+  const mapMarkers = useMemo(
+    () =>
+      filtered.map((r) => ({
+        id: r.id,
+        lat: r.lat,
+        lng: r.lng,
+        name: r.name,
+        city: r.city,
+        popupContent: (
+          <div className="font-body">
+            <strong className="font-display">{r.name}</strong>
+            <br />
+            <span className="text-xs">{r.city}, {r.region}</span>
+            <br />
+            <a href={`/realta/${r.id}`} className="text-xs text-blue-600 underline">
+              Vai alla scheda →
+            </a>
+          </div>
+        ),
+      })),
+    [filtered]
+  );
 
   if (loading) {
     return (
@@ -224,32 +240,15 @@ const Mappatura = () => {
         {/* Map view */}
         {view === "map" && (
           <div className="rounded-lg overflow-hidden border border-border h-[600px]">
-            <MapContainer
-              center={[41.8719, 12.5674]}
-              zoom={6}
-              scrollWheelZoom={true}
-              style={{ height: "100%", width: "100%" }}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            <Suspense fallback={<MapFallback height="600px" />}>
+              <LazyMap
+                center={[41.8719, 12.5674]}
+                zoom={6}
+                markers={mapMarkers}
+                scrollWheelZoom={true}
+                height="600px"
               />
-              {filtered.map((r) => (
-                <Marker key={r.id} position={[r.lat, r.lng]}>
-                  <Popup>
-                    <div className="font-body">
-                      <strong className="font-display">{r.name}</strong>
-                      <br />
-                      <span className="text-xs">{r.city}, {r.region}</span>
-                      <br />
-                      <a href={`/realta/${r.id}`} className="text-xs text-blue-600 underline">
-                        Vai alla scheda →
-                      </a>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
+            </Suspense>
           </div>
         )}
       </div>

@@ -1,17 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
 import { MapPin, Calendar, ArrowLeft, Globe, Compass, Archive } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import { supabase } from "@/integrations/supabase/client";
+import MapFallback from "@/components/MapFallback";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+const LazyMap = lazy(() => import("@/components/LazyMap"));
 
 type RealityType = "nomade" | "con-sede" | "scomparsa";
 
@@ -86,12 +79,21 @@ const RealityDetail = () => {
             <section>
               <h2 className="font-display text-2xl font-semibold mb-4">Posizione</h2>
               <div className="rounded-lg overflow-hidden border border-border h-[400px]">
-                <MapContainer center={[reality.lat, reality.lng]} zoom={14} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
-                  <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Marker position={[reality.lat, reality.lng]}>
-                    <Popup>{reality.name}<br />{reality.city}</Popup>
-                  </Marker>
-                </MapContainer>
+                <Suspense fallback={<MapFallback height="400px" />}>
+                  <LazyMap
+                    center={[reality.lat, reality.lng]}
+                    zoom={14}
+                    markers={[
+                      {
+                        id: reality.id,
+                        lat: reality.lat,
+                        lng: reality.lng,
+                        name: reality.name,
+                        popupContent: <>{reality.name}<br />{reality.city}</>,
+                      },
+                    ]}
+                  />
+                </Suspense>
               </div>
             </section>
           </div>
