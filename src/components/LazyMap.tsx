@@ -2,13 +2,6 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
-
 type MarkerData = {
   id: string;
   lat: number;
@@ -16,6 +9,10 @@ type MarkerData = {
   name: string;
   city?: string;
   popupContent?: React.ReactNode;
+  /** CSS color (e.g. hsl(var(--primary))) */
+  color?: string;
+  /** If true, renders as outline-only (white interior) */
+  outline?: boolean;
 };
 
 type LazyMapProps = {
@@ -26,6 +23,22 @@ type LazyMapProps = {
   height?: string;
 };
 
+const buildIcon = (color: string, outline: boolean) => {
+  const fill = outline ? "#ffffff" : color;
+  const html = `<span style="
+    display:block;width:18px;height:18px;border-radius:9999px;
+    background:${fill};border:3px solid ${color};
+    box-shadow:0 1px 4px rgba(0,0,0,0.35);
+  "></span>`;
+  return L.divIcon({
+    html,
+    className: "ilbelpaese-marker",
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    popupAnchor: [0, -9],
+  });
+};
+
 const LazyMap = ({ center, zoom, markers, scrollWheelZoom = false, height = "100%" }: LazyMapProps) => {
   return (
     <MapContainer center={center} zoom={zoom} scrollWheelZoom={scrollWheelZoom} style={{ height, width: "100%" }}>
@@ -34,7 +47,11 @@ const LazyMap = ({ center, zoom, markers, scrollWheelZoom = false, height = "100
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {markers.map((m) => (
-        <Marker key={m.id} position={[m.lat, m.lng]}>
+        <Marker
+          key={m.id}
+          position={[m.lat, m.lng]}
+          icon={buildIcon(m.color ?? "hsl(270 60% 58%)", !!m.outline)}
+        >
           <Popup>{m.popupContent ?? m.name}</Popup>
         </Marker>
       ))}
