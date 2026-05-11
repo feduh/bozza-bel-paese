@@ -1,17 +1,25 @@
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
-import { MapPin, Compass, Archive, List, Map, ArrowRight, X } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { MapPin, List, Map, ArrowRight, X, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
+import {
+  type DbRealityType,
+  type RealityStatus,
+  type Bucket,
+  bucketLabels,
+  matchesBucket,
+  getCategory,
+  categoryConfig,
+} from "@/lib/realityCategory";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
-
-type RealityType = "nomade" | "con-sede" | "scomparsa";
 
 type Reality = {
   id: string;
   name: string;
-  type: RealityType;
+  type: DbRealityType;
+  status: RealityStatus;
   city: string;
   region: string;
   description: string;
@@ -23,20 +31,18 @@ type Reality = {
   tags: string[];
 };
 
-const typeConfig: Record<RealityType, { label: string; icon: typeof MapPin; colorClass: string }> = {
-  nomade: { label: "Nomade", icon: Compass, colorClass: "bg-primary/10 text-primary border-primary/20" },
-  "con-sede": { label: "Con sede", icon: MapPin, colorClass: "bg-secondary/10 text-secondary border-secondary/20" },
-  scomparsa: { label: "Scomparsa", icon: Archive, colorClass: "bg-muted text-muted-foreground border-border" },
-};
-
 const Mappatura = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialBucket = (searchParams.get("sezione") as Bucket | null) ?? null;
+
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<"list" | "map">("list");
-  const [typeFilter, setTypeFilter] = useState<"all" | RealityType>("all");
+  const [view, setView] = useState<"list" | "map">("map");
+  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(initialBucket ?? "all");
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchRealities = async () => {
@@ -46,7 +52,8 @@ const Mappatura = () => {
       if (realitiesData) {
         const mapped = realitiesData.map((r) => ({
           ...r,
-          type: r.type as RealityType,
+          type: r.type as DbRealityType,
+          status: ((r as { status?: string }).status ?? "attivo") as RealityStatus,
           tags: tagsData?.filter((t) => t.reality_id === r.id).map((t) => t.tag) ?? [],
         }));
         setRealities(mapped);
@@ -56,23 +63,43 @@ const Mappatura = () => {
     fetchRealities();
   }, []);
 
+  // Sync URL ↔ state
+  useEffect(() => {
+    if (bucketFilter === "all") {
+      if (searchParams.get("sezione")) {
+        searchParams.delete("sezione");
+        setSearchParams(searchParams, { replace: true });
+      }
+    } else if (searchParams.get("sezione") !== bucketFilter) {
+      searchParams.set("sezione", bucketFilter);
+      setSearchParams(searchParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bucketFilter]);
+
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
 
   const filtered = useMemo(() => {
     return realities.filter((r) => {
-      if (typeFilter !== "all" && r.type !== typeFilter) return false;
+      if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
-      if (search && !r.name.toLowerCase().includes(search.toLowerCase()) && !r.city.toLowerCase().includes(search.toLowerCase())) return false;
+      if (
+        search &&
+        !r.name.toLowerCase().includes(search.toLowerCase()) &&
+        !r.city.toLowerCase().includes(search.toLowerCase())
+      )
+        return false;
       return true;
     });
-  }, [realities, typeFilter, regionFilter, disciplineFilter, search]);
+  }, [realities, bucketFilter, regionFilter, disciplineFilter, search]);
 
-  const hasFilters = typeFilter !== "all" || regionFilter !== "all" || disciplineFilter !== "all" || search !== "";
+  const hasFilters =
+    bucketFilter !== "all" || regionFilter !== "all" || disciplineFilter !== "all" || search !== "";
 
   const clearFilters = () => {
-    setTypeFilter("all");
+    setBucketFilter("all");
     setRegionFilter("all");
     setDisciplineFilter("all");
     setSearch("");
@@ -80,24 +107,34 @@ const Mappatura = () => {
 
   const mapMarkers = useMemo(
     () =>
-      filtered.map((r) => ({
-        id: r.id,
-        lat: r.lat,
-        lng: r.lng,
-        name: r.name,
-        city: r.city,
-        popupContent: (
-          <div className="font-body">
-            <strong className="font-display">{r.name}</strong>
-            <br />
-            <span className="text-xs">{r.city}, {r.region}</span>
-            <br />
-            <a href={`/realta/${r.id}`} className="text-xs text-blue-600 underline">
-              Vai alla scheda →
-            </a>
-          </div>
-        ),
-      })),
+      filtered.map((r) => {
+        const cat = getCategory(r.type, r.status);
+        const cfg = categoryConfig[cat];
+        return {
+          id: r.id,
+          lat: r.lat,
+          lng: r.lng,
+          name: r.name,
+          city: r.city,
+          color: cfg.markerColor,
+          outline: cfg.outline,
+          popupContent: (
+            <div className="font-body">
+              <strong className="font-display">{r.name}</strong>
+              <br />
+              <span className="text-xs">
+                {r.city}, {r.region}
+              </span>
+              <br />
+              <span className="text-[10px] uppercase tracking-wide opacity-70">{cfg.label}</span>
+              <br />
+              <a href={`/realta/${r.id}`} className="text-xs text-primary underline">
+                Vai alla scheda →
+              </a>
+            </div>
+          ),
+        };
+      }),
     [filtered]
   );
 
@@ -117,21 +154,47 @@ const Mappatura = () => {
             <span className="italic text-primary">Mappatura</span> delle realtà
           </h1>
           <p className="editorial-body text-muted-foreground">
-            Esplora le realtà artistiche italiane. Filtra per tipologia, regione o disciplina.
+            Esplora la scena indipendente italiana. Filtra per sezione, regione o media artistico.
           </p>
+        </div>
+
+        {/* Section dropdown (3 main categories) */}
+        <div className="mb-6 relative inline-block">
+          <button
+            onClick={() => setBucketMenuOpen((o) => !o)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card font-body text-sm font-medium hover:border-primary/40 transition-colors"
+          >
+            Sezione: {bucketFilter === "all" ? "Tutte" : bucketLabels[bucketFilter]}
+            <ChevronDown size={14} />
+          </button>
+          {bucketMenuOpen && (
+            <div className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+              {([
+                ["all", "Tutte"],
+                ["spazi", bucketLabels["spazi"]],
+                ["spazi-senza-spazi", bucketLabels["spazi-senza-spazi"]],
+                ["spazi-che-furono", bucketLabels["spazi-che-furono"]],
+              ] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => {
+                    setBucketFilter(val);
+                    setBucketMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-2 text-sm font-body hover:bg-muted ${
+                    bucketFilter === val ? "bg-muted text-primary font-medium" : ""
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* View toggle + Search */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex rounded-lg border border-border overflow-hidden">
-            <button
-              onClick={() => setView("list")}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
-                view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <List size={16} /> Elenco
-            </button>
             <button
               onClick={() => setView("map")}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
@@ -139,6 +202,14 @@ const Mappatura = () => {
               }`}
             >
               <Map size={16} /> Mappa
+            </button>
+            <button
+              onClick={() => setView("list")}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
+                view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <List size={16} /> Elenco
             </button>
           </div>
           <input
@@ -150,22 +221,7 @@ const Mappatura = () => {
           />
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-4">
-          {(
-            [["all", "Tutte le tipologie"], ["nomade", "Nomadi"], ["con-sede", "Con sede"], ["scomparsa", "Scomparse"]] as const
-          ).map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setTypeFilter(val)}
-              className={`px-4 py-1.5 rounded-full text-xs font-body font-medium border transition-all ${
-                typeFilter === val ? "bg-primary text-primary-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/40"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* Region + Discipline filters */}
         <div className="flex flex-wrap gap-3 mb-6">
           <select
             value={regionFilter}
@@ -182,7 +238,7 @@ const Mappatura = () => {
             onChange={(e) => setDisciplineFilter(e.target.value)}
             className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="all">Tutte le discipline</option>
+            <option value="all">Tutti i media artistici</option>
             {allDisciplines.map((d) => (
               <option key={d} value={d}>{d}</option>
             ))}
@@ -194,16 +250,47 @@ const Mappatura = () => {
           )}
         </div>
 
+        {/* Legend */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground">
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> Spazi
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> Spazi senza spazi
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
+            <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
+            Spazi che furono
+          </span>
+        </div>
+
         <p className="text-sm text-muted-foreground mb-6 font-body">
           {filtered.length} realtà trovate
         </p>
+
+        {/* Map view */}
+        {view === "map" && (
+          <div className="rounded-lg overflow-hidden border border-border h-[600px]">
+            <Suspense fallback={<MapFallback height="600px" />}>
+              <LazyMap
+                center={[41.8719, 12.5674]}
+                zoom={6}
+                markers={mapMarkers}
+                scrollWheelZoom={true}
+                height="600px"
+              />
+            </Suspense>
+          </div>
+        )}
 
         {/* List view */}
         {view === "list" && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((r) => {
-              const config = typeConfig[r.type];
-              const Icon = config.icon;
+              const cat = getCategory(r.type, r.status);
+              const cfg = categoryConfig[cat];
+              const Icon = cfg.icon;
               return (
                 <Link
                   to={`/realta/${r.id}`}
@@ -211,11 +298,11 @@ const Mappatura = () => {
                   className="group p-6 rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${config.colorClass}`}>
-                      <Icon size={12} /> {config.label}
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${cfg.badgeClass}`}>
+                      <Icon size={12} /> {cfg.label}
                     </span>
                     <span className="text-xs text-muted-foreground font-body">
-                      {r.year_founded}{r.year_closed ? ` – ${r.year_closed}` : " – oggi"}
+                      {r.year_founded}{r.year_closed ? ` – ${r.year_closed}` : r.status === "attivo" ? " – oggi" : ""}
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
@@ -234,21 +321,6 @@ const Mappatura = () => {
                 Nessuna realtà trovata con i filtri selezionati.
               </div>
             )}
-          </div>
-        )}
-
-        {/* Map view */}
-        {view === "map" && (
-          <div className="rounded-lg overflow-hidden border border-border h-[600px]">
-            <Suspense fallback={<MapFallback height="600px" />}>
-              <LazyMap
-                center={[41.8719, 12.5674]}
-                zoom={6}
-                markers={mapMarkers}
-                scrollWheelZoom={true}
-                height="600px"
-              />
-            </Suspense>
           </div>
         )}
       </div>
