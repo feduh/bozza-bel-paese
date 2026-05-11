@@ -1,18 +1,16 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, Calendar, ArrowLeft, Globe, Compass, Archive } from "lucide-react";
+import { MapPin, ArrowLeft, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
+import {
+  type DbRealityType,
+  type RealityStatus,
+  getCategory,
+  categoryConfig,
+} from "@/lib/realityCategory";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
-
-type RealityType = "nomade" | "con-sede" | "scomparsa";
-
-const typeLabels: Record<RealityType, { label: string; icon: typeof MapPin; colorClass: string }> = {
-  nomade: { label: "Nomade", icon: Compass, colorClass: "bg-primary/10 text-primary border-primary/20" },
-  "con-sede": { label: "Con sede", icon: MapPin, colorClass: "bg-secondary/10 text-secondary border-secondary/20" },
-  scomparsa: { label: "Scomparsa", icon: Archive, colorClass: "bg-muted text-muted-foreground border-border" },
-};
 
 const RealityDetail = () => {
   const { id } = useParams();
@@ -46,7 +44,9 @@ const RealityDetail = () => {
     );
   }
 
-  const config = typeLabels[reality.type as RealityType];
+  const status = (reality.status ?? "attivo") as RealityStatus;
+  const category = getCategory(reality.type as DbRealityType, status);
+  const config = categoryConfig[category];
   const Icon = config.icon;
 
   return (
@@ -58,7 +58,7 @@ const RealityDetail = () => {
 
         <div className="mb-10">
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${config.colorClass}`}>
+            <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${config.badgeClass}`}>
               <Icon size={12} /> {config.label}
             </span>
             <span className="text-sm text-muted-foreground flex items-center gap-1">
@@ -90,6 +90,8 @@ const RealityDetail = () => {
                         lng: reality.lng,
                         name: reality.name,
                         popupContent: <>{reality.name}<br />{reality.city}</>,
+                        color: config.markerColor,
+                        outline: config.outline,
                       },
                     ]}
                   />
@@ -114,7 +116,7 @@ const RealityDetail = () => {
                 )}
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Stato</dt>
-                  <dd className="font-medium">{reality.year_closed ? "Non attiva" : "Attiva"}</dd>
+                  <dd className="font-medium">{status === "archiviato" ? "Archiviata" : "Attiva"}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Città</dt>
