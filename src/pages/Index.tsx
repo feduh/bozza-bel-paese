@@ -69,7 +69,7 @@ const Index = () => {
           {[
             { num: "150+", label: "Realtà mappate" },
             { num: "18", label: "Regioni coperte" },
-            { num: "45", label: "Realtà scomparse" },
+            { num: "45", label: "Spazi che furono" },
             { num: "30+", label: "Articoli pubblicati" },
           ].map((s) => (
             <div key={s.label}>
