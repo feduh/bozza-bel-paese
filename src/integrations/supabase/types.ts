@@ -102,6 +102,7 @@ export type Database = {
           lng: number
           name: string
           region: string
+          status: string
           type: Database["public"]["Enums"]["reality_type"]
           updated_at: string
           website: string | null
@@ -120,6 +121,7 @@ export type Database = {
           lng: number
           name: string
           region: string
+          status?: string
           type: Database["public"]["Enums"]["reality_type"]
           updated_at?: string
           website?: string | null
@@ -138,6 +140,7 @@ export type Database = {
           lng?: number
           name?: string
           region?: string
+          status?: string
           type?: Database["public"]["Enums"]["reality_type"]
           updated_at?: string
           website?: string | null
