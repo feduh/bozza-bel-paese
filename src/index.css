@@ -113,3 +113,99 @@
     @apply text-lg leading-relaxed;
   }
 }
+
+/* ============ Map styling (Il Bel Paese) ============ */
+.ibp-map {
+  background: hsl(var(--card));
+}
+.ibp-map .leaflet-tile-pane {
+  /* Subtly desaturate the basemap so colored markers pop */
+  filter: saturate(0.78) contrast(0.96);
+}
+.ibp-map .leaflet-control-zoom a {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem !important;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.ibp-map .leaflet-control-zoom a:hover {
+  background: hsl(var(--muted));
+  color: hsl(var(--primary));
+}
+.ibp-map .leaflet-control-attribution {
+  background: hsl(var(--card) / 0.85);
+  color: hsl(var(--muted-foreground));
+  font-family: var(--font-body);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Markers */
+.ibp-marker-wrap { background: transparent !important; border: none !important; }
+.ibp-marker {
+  position: relative;
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+.ibp-marker__core {
+  position: absolute;
+  inset: 8px;
+  border-radius: 9999px;
+  background: var(--mc);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.ibp-marker--solid .ibp-marker__halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--mc);
+  opacity: 0.28;
+  animation: ibp-pulse 2.4s ease-out infinite;
+}
+.ibp-marker--ghost .ibp-marker__core {
+  background: hsl(var(--background));
+  border: 2px solid var(--mc);
+}
+.ibp-marker--ghost .ibp-marker__ring {
+  position: absolute;
+  inset: 2px;
+  border-radius: 9999px;
+  border: 1.5px dashed var(--mc);
+  opacity: 0.7;
+}
+.ibp-marker:hover .ibp-marker__core {
+  transform: scale(1.18);
+  transition: transform 0.18s ease;
+}
+
+@keyframes ibp-pulse {
+  0%   { transform: scale(0.7); opacity: 0.45; }
+  70%  { transform: scale(1.6); opacity: 0;    }
+  100% { transform: scale(1.6); opacity: 0;    }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ibp-marker--solid .ibp-marker__halo { animation: none; opacity: 0.35; }
+}
+
+/* Popup */
+.ibp-map .leaflet-popup-content-wrapper {
+  background: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  border-radius: 0.625rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
+  border: 1px solid hsl(var(--border));
+}
+.ibp-map .leaflet-popup-content {
+  margin: 12px 14px;
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+.ibp-map .leaflet-popup-tip {
+  background: hsl(var(--popover));
+  border: 1px solid hsl(var(--border));
+}
