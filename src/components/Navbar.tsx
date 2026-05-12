@@ -9,7 +9,7 @@ const navLinks = [
   { to: "/chi-siamo", label: "Chi Siamo" },
   { to: "/cosa-facciamo", label: "Cosa Facciamo" },
   { to: "/mappatura", label: "Mappatura" },
-  { to: "/blog", label: "Blog" },
+  { to: "/magazine", label: "Magazine" },
 ];
 
 const Navbar = () => {

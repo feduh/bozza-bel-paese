@@ -17,7 +17,7 @@ const Footer = () => (
               { to: "/chi-siamo", label: "Chi Siamo" },
               { to: "/cosa-facciamo", label: "Cosa Facciamo" },
               { to: "/mappatura", label: "Mappatura" },
-              { to: "/blog", label: "Blog" },
+              { to: "/magazine", label: "Magazine" },
             ].map((l) => (
               <Link key={l.to} to={l.to} className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 {l.label}

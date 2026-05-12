@@ -19,9 +19,15 @@ export type Database = {
           author_name: string
           category: string
           content: string
+          counterpart_id: string | null
+          cover_image_url: string | null
           created_at: string
           excerpt: string
           id: string
+          is_point_counterpoint: boolean
+          published_at: string
+          slug: string
+          stance: string | null
           title: string
           updated_at: string
           user_id: string
@@ -30,9 +36,15 @@ export type Database = {
           author_name: string
           category: string
           content?: string
+          counterpart_id?: string | null
+          cover_image_url?: string | null
           created_at?: string
           excerpt: string
           id?: string
+          is_point_counterpoint?: boolean
+          published_at?: string
+          slug: string
+          stance?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -41,14 +53,28 @@ export type Database = {
           author_name?: string
           category?: string
           content?: string
+          counterpart_id?: string | null
+          cover_image_url?: string | null
           created_at?: string
           excerpt?: string
           id?: string
+          is_point_counterpoint?: boolean
+          published_at?: string
+          slug?: string
+          stance?: string | null
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_counterpart_id_fkey"
+            columns: ["counterpart_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

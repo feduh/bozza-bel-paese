@@ -11,6 +11,7 @@ import ChiSiamo from "./pages/ChiSiamo";
 import CosaFacciamo from "./pages/CosaFacciamo";
 import Mappatura from "./pages/Mappatura";
 import Blog from "./pages/Blog";
+import MagazinePost from "./pages/MagazinePost";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,8 @@ const App = () => (
               <Route path="/mappatura" element={<Mappatura />} />
               <Route path="/realta/:id" element={<RealityDetail />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/magazine" element={<Blog />} />
+              <Route path="/magazine/:slug" element={<MagazinePost />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<Admin />} />
             </Route>
