@@ -4,30 +4,49 @@ const ChiSiamo = () => (
       <h1 className="editorial-heading mb-8">
         Chi <span className="italic text-primary">Siamo</span>
       </h1>
+
       <div className="space-y-6 editorial-body text-muted-foreground">
         <p>
-          <strong className="text-foreground">Il Bel Paese</strong> nasce dalla volontà di creare un archivio dinamico delle realtà artistiche italiane — dai collettivi nomadi che attraversano le piazze, agli spazi culturali radicati nei quartieri, fino alle esperienze ormai scomparse ma fondamentali per la storia culturale del paese.
+          <strong className="text-foreground">Il Bel Paese</strong> è la prima piattaforma di mappatura, promozione e ricerca che <strong className="text-foreground">legittima le realtà artistiche e progettuali indipendenti italiane</strong>.
         </p>
         <p>
-          Siamo un gruppo di ricercatori, artisti e appassionati di cultura che crede nel valore della documentazione e della memoria collettiva. Il nostro progetto è partecipativo: chiunque può contribuire segnalando realtà, condividendo storie e arricchendo la mappa.
+          Attraverso una vetrina dinamica e un archivio storico, il progetto mette a sistema queste esperienze per favorire la creazione di reti e <strong className="text-foreground">ridurre la distanza tra la scena indipendente e il sistema istituzionale</strong>.
         </p>
         <p>
-          Il progetto è nato nel 2024 come iniziativa indipendente e si è rapidamente trasformato in una piattaforma di riferimento per chi vuole conoscere, esplorare e preservare il tessuto artistico italiano.
+          Crediamo che le realtà indipendenti — gli spazi fisici, quelli senza sede, e quelli che non esistono più — siano un patrimonio culturale collettivo che merita riconoscimento, memoria e strumenti per dialogare con il resto del sistema dell'arte.
         </p>
       </div>
 
       <div className="mt-16 grid md:grid-cols-2 gap-8">
         <div className="p-8 rounded-lg bg-card border border-border">
-          <h3 className="font-display text-xl font-semibold mb-3">La nostra missione</h3>
+          <h3 className="font-display text-xl font-semibold mb-3">Mission</h3>
           <p className="font-body text-muted-foreground">
-            Rendere visibile e accessibile la ricchezza delle esperienze artistiche italiane, costruendo ponti tra passato e presente.
+            Legittimare, mettere in rete e dare voce alle realtà artistiche indipendenti italiane attraverso mappatura, promozione e ricerca.
           </p>
         </div>
         <div className="p-8 rounded-lg bg-card border border-border">
-          <h3 className="font-display text-xl font-semibold mb-3">La nostra visione</h3>
+          <h3 className="font-display text-xl font-semibold mb-3">Visione</h3>
           <p className="font-body text-muted-foreground">
-            Un'Italia in cui ogni realtà artistica, grande o piccola, viene riconosciuta e raccontata come parte del patrimonio culturale collettivo.
+            Un ecosistema in cui scena indipendente e mondo istituzionale dialogano alla pari, riconoscendosi come parti dello stesso paesaggio culturale.
           </p>
+        </div>
+      </div>
+
+      <div className="mt-16">
+        <h2 className="editorial-subheading mb-8">
+          Per <span className="italic text-primary">chi</span>
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { title: "Realtà indipendenti", desc: "Spazi, collettivi, progetti itineranti e archivi che cercano visibilità e connessioni." },
+            { title: "Ricercatori e curatori", desc: "Studiosi, critici e operatori culturali che hanno bisogno di dati e contesto." },
+            { title: "Istituzioni e partner", desc: "Enti, accademie e organizzazioni che vogliono dialogare con la scena indipendente." },
+          ].map((p) => (
+            <div key={p.title} className="p-6 rounded-lg bg-card border border-border">
+              <h4 className="font-display text-lg font-semibold mb-2">{p.title}</h4>
+              <p className="font-body text-sm text-muted-foreground">{p.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
