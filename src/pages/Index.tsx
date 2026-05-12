@@ -48,7 +48,7 @@ const Index = () => {
             {[
               { icon: MapPin, title: "Mappatura", desc: "Una cartografia delle realtà artistiche su tutto il territorio nazionale, categorizzate per tipologia e stato.", link: "/mappatura" },
               { icon: Users, title: "Comunità", desc: "Connettiamo artisti, curatori e appassionati per creare una rete di condivisione e supporto reciproco.", link: "/chi-siamo" },
-              { icon: BookOpen, title: "Racconti", desc: "Storie, interviste e approfondimenti sulle realtà che animano o hanno animato la scena artistica italiana.", link: "/blog" },
+              { icon: BookOpen, title: "Racconti", desc: "Storie, interviste e approfondimenti sulle realtà che animano o hanno animato la scena artistica italiana.", link: "/magazine" },
             ].map((item) => (
               <Link key={item.title} to={item.link} className="group p-8 rounded-lg bg-card border border-border hover:border-primary/30 transition-all hover:shadow-lg">
                 <item.icon className="text-primary mb-4" size={28} />
