@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -24,35 +24,58 @@ type LazyMapProps = {
 };
 
 const buildIcon = (color: string, outline: boolean) => {
-  const fill = outline ? "#ffffff" : color;
-  const html = `<span style="
-    display:block;width:18px;height:18px;border-radius:9999px;
-    background:${fill};border:3px solid ${color};
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  "></span>`;
+  // Active spaces: filled dot with soft glow halo + thin white ring (legibility on map)
+  // Archived ("spazi che furono"): hollow dot with dashed-style colored ring
+  const html = outline
+    ? `<span class="ibp-marker ibp-marker--ghost" style="--mc:${color}">
+         <span class="ibp-marker__ring"></span>
+         <span class="ibp-marker__core"></span>
+       </span>`
+    : `<span class="ibp-marker ibp-marker--solid" style="--mc:${color}">
+         <span class="ibp-marker__halo"></span>
+         <span class="ibp-marker__core"></span>
+       </span>`;
+
   return L.divIcon({
     html,
-    className: "ilbelpaese-marker",
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
-    popupAnchor: [0, -9],
+    className: "ibp-marker-wrap",
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
   });
 };
 
 const LazyMap = ({ center, zoom, markers, scrollWheelZoom = false, height = "100%" }: LazyMapProps) => {
   return (
-    <MapContainer center={center} zoom={zoom} scrollWheelZoom={scrollWheelZoom} style={{ height, width: "100%" }}>
+    <MapContainer
+      center={center}
+      zoom={zoom}
+      scrollWheelZoom={scrollWheelZoom}
+      zoomControl={false}
+      style={{ height, width: "100%" }}
+      className="ibp-map"
+    >
+      {/* Editorial-style basemap — soft, low-contrast so colored points pop */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={19}
       />
+      {/* Labels on top so markers stay the visual focus */}
+      <TileLayer
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={19}
+      />
+      <ZoomControl position="bottomright" />
       {markers.map((m) => (
         <Marker
           key={m.id}
           position={[m.lat, m.lng]}
           icon={buildIcon(m.color ?? "hsl(270 60% 58%)", !!m.outline)}
         >
-          <Popup>{m.popupContent ?? m.name}</Popup>
+          <Popup className="ibp-popup">{m.popupContent ?? m.name}</Popup>
         </Marker>
       ))}
     </MapContainer>
