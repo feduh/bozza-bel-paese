@@ -73,7 +73,9 @@ const Admin = () => {
       email,
       password,
       role,
-      realityId: role === "author" ? realityId : undefined,
+      authorType: role === "author" ? authorType : undefined,
+      realityId: role === "author" && authorType === "reality" ? realityId : undefined,
+      affiliation: role === "author" && authorType === "external" ? affiliation : undefined,
     });
     if (!parsed.success) {
       setErrs(fieldErrors(parsed.error));
@@ -89,6 +91,7 @@ const Admin = () => {
         display_name: parsed.data.displayName,
         role: parsed.data.role,
         reality_id: parsed.data.realityId ?? null,
+        affiliation: parsed.data.affiliation ?? null,
       },
     });
 
@@ -97,12 +100,14 @@ const Admin = () => {
     } else if (data?.error) {
       setError(data.error);
     } else {
-      setMessage(`✅ ${data.message}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`);
+      setMessage(`✅ ${data.message ?? "Account creato"}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`);
       setEmail("");
       setPassword("");
       setDisplayName("");
       setRole("author");
+      setAuthorType("reality");
       setRealityId("");
+      setAffiliation("");
       fetchProfiles();
     }
     setSubmitting(false);
