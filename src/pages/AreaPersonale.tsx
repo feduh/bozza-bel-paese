@@ -25,6 +25,7 @@ type Profile = {
   social_instagram: string | null;
   social_twitter: string | null;
   reality_id: string | null;
+  affiliation: string | null;
 };
 
 type MyPost = {
