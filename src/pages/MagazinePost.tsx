@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, User, ArrowLeft, Swords } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 
@@ -21,6 +22,7 @@ type Post = {
 };
 
 const MagazinePost = () => {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [counterpart, setCounterpart] = useState<Post | null>(null);
@@ -76,9 +78,9 @@ const MagazinePost = () => {
   if (!post) {
     return (
       <div className="py-20 text-center">
-        <p className="font-body text-muted-foreground mb-6">Articolo non trovato.</p>
+        <p className="font-body text-muted-foreground mb-6">{t("magazine.notFound")}</p>
         <Link to="/magazine" className="text-primary underline font-body">
-          Torna al magazine
+          {t("magazine.back")}
         </Link>
       </div>
     );
@@ -110,7 +112,7 @@ const MagazinePost = () => {
           to="/magazine"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-body mb-8"
         >
-          <ArrowLeft size={14} /> Torna al magazine
+          <ArrowLeft size={14} /> {t("magazine.back")}
         </Link>
 
         <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -139,7 +141,7 @@ const MagazinePost = () => {
           </span>
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
-            {new Date(post.published_at).toLocaleDateString("it-IT", {
+            {new Date(post.published_at).toLocaleDateString(i18n.language === "en" ? "en-GB" : "it-IT", {
               day: "numeric",
               month: "long",
               year: "numeric",
@@ -168,7 +170,7 @@ const MagazinePost = () => {
           <div className="mt-16 pt-10 border-t border-border">
             <div className="flex items-center gap-2 mb-4 text-xs uppercase tracking-widest font-bold text-muted-foreground">
               <Swords size={14} className="text-primary" />
-              {post.stance === "point" ? "Leggi la replica" : "Leggi la tesi iniziale"}
+              {post.stance === "point" ? t("magazine.readReply") : t("magazine.readThesis")}
             </div>
             <Link
               to={`/magazine/${counterpart.slug}`}

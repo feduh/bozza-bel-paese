@@ -1,0 +1,199 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "all": "All",
+    "language": "Language",
+    "theme": {
+      "light": "Light theme",
+      "dark": "Dark theme",
+      "toggle": "Toggle theme"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "what": "What We Do",
+    "map": "Map",
+    "magazine": "Magazine",
+    "admin": "Admin",
+    "login": "Sign in",
+    "logout": "Sign out"
+  },
+  "footer": {
+    "tagline": "Mapping Italy's artistic realities: nomadic, settled and vanished.",
+    "navigation": "Navigation",
+    "contacts": "Contact",
+    "rights": "All rights reserved."
+  },
+  "home": {
+    "title": "We map Italy's",
+    "titleAccent": "artistic realities",
+    "lead": "A living archive of collectives, spaces and movements — nomadic, rooted or vanished — that shaped the Italian cultural landscape.",
+    "ctaMap": "Explore the map",
+    "ctaAbout": "Discover the project",
+    "sectionTitle": "Preserve, map,",
+    "sectionTitleAccent": "tell",
+    "discover": "Discover",
+    "features": {
+      "mapping": {
+        "title": "Mapping",
+        "desc": "A cartography of artistic realities across Italy, categorised by type and status."
+      },
+      "community": {
+        "title": "Community",
+        "desc": "We connect artists, curators and enthusiasts to build a network of sharing and mutual support."
+      },
+      "stories": {
+        "title": "Stories",
+        "desc": "Articles, interviews and insights into the realities that animate — or once animated — the Italian art scene."
+      }
+    },
+    "stats": {
+      "mapped": "Realities mapped",
+      "regions": "Regions covered",
+      "vanished": "Spaces that were",
+      "articles": "Articles published"
+    }
+  },
+  "about": {
+    "title": "About",
+    "titleAccent": "Us",
+    "seoDesc": "Il Bel Paese: the first mapping, promotion and research platform that legitimises Italys independent artistic realities.",
+    "p1_html": "<strong>Il Bel Paese</strong> is the first mapping, promotion and research platform that <strong>legitimises independent Italian artistic and project-based realities</strong>.",
+    "p2_html": "Through a dynamic showcase and a historical archive, the project systematises these experiences to foster networks and <strong>shorten the distance between the independent scene and the institutional system</strong>.",
+    "p3": "We believe independent realities — physical spaces, those without a venue, and those no longer in existence — are a collective cultural heritage that deserves recognition, memory and tools to dialogue with the rest of the art system.",
+    "missionTitle": "Mission",
+    "missionDesc": "To legitimise, network and give voice to Italys independent artistic realities through mapping, promotion and research.",
+    "visionTitle": "Vision",
+    "visionDesc": "An ecosystem where independent scene and institutional world meet as equals, recognising one another as part of the same cultural landscape.",
+    "forTitle": "For",
+    "forTitleAccent": "whom",
+    "audiences": {
+      "indie": {
+        "title": "Independent realities",
+        "desc": "Spaces, collectives, itinerant projects and archives looking for visibility and connections."
+      },
+      "researchers": {
+        "title": "Researchers & curators",
+        "desc": "Scholars, critics and cultural workers who need data and context."
+      },
+      "institutions": {
+        "title": "Institutions & partners",
+        "desc": "Bodies, academies and organisations wanting to engage with the independent scene."
+      }
+    }
+  },
+  "what": {
+    "title": "What We",
+    "titleAccent": "Do",
+    "intro": "Our work unfolds across three pillars — mapping, promotion and research — designed to legitimise the independent scene and connect it with the institutional system.",
+    "intro_html": "Our work unfolds across three pillars — <strong>mapping</strong>, <strong>promotion</strong> and <strong>research</strong> — designed to legitimise the independent scene and connect it with the institutional system.",
+    "seoDesc": "Mapping, promotion and research: the three pillars through which Il Bel Paese legitimises the Italian independent art scene.",
+    "pillars": {
+      "mapping": {
+        "title": "Mapping",
+        "desc": "We identify and categorise Italys independent artistic realities into three families: Spaces (with a physical venue), Spaces without a space (itinerant, digital, nomadic) and Spaces that were (historical archive of concluded experiences)."
+      },
+      "promotion": {
+        "title": "Promotion",
+        "desc": "We give visibility to mapped realities through a dynamic showcase, an editorial magazine and the Point / Counter Point section, where different voices debate the themes of the independent scene."
+      },
+      "research": {
+        "title": "Research",
+        "desc": "We conduct research, gather data and produce content to read and tell the transformations of the Italian art scene."
+      }
+    },
+    "methodTitle": "How we do it",
+    "methodSteps": {
+      "listen": "We listen",
+      "map": "We map",
+      "tell": "We tell",
+      "update": "We update"
+    },
+    "methodDescs": {
+      "listen": "We identify realities through tip-offs, field research and direct dialogue with the scene.",
+      "map": "We verify, geolocate and categorise each experience according to shared criteria.",
+      "tell": "We publish profiles, articles and debates to give context and visibility.",
+      "update": "Annual review of the status of mapped realities to keep the data alive."
+    },
+    "whyTitle": "Why",
+    "whyText": "Because independent realities often fly under the radar of institutions, official databases and funding routes. Documenting them, telling their stories and connecting them means restoring the legitimacy they deserve and enriching the country cultural heritage.",
+    "ctaTitle": "Want to contribute?",
+    "ctaText": "If you represent an independent artistic reality, are a researcher or an institutional partner, write to us to join the map or the magazine.",
+    "ctaButton": "Write to us",
+    "howIntro": "How",
+    "howSuffix": "we do it",
+    "how": {
+      "showcase": {
+        "title": "Dynamic showcase",
+        "desc": "Up-to-date profiles, filters by region, medium and type, community-sourced submissions."
+      },
+      "archive": {
+        "title": "Historical archive",
+        "desc": "Memory of concluded realities, recovered through testimonies and documents."
+      },
+      "magazine": {
+        "title": "Editorial magazine",
+        "desc": "Articles, interviews and the Point / Counter Point format with editors-in-chief as scientific guarantee."
+      },
+      "update": {
+        "title": "Lets update",
+        "desc": "Annual review of the status of mapped realities to keep the data alive."
+      }
+    }
+  },
+  "map": {
+    "title": "Mapping",
+    "titleSuffix": "of realities",
+    "lead": "Explore the Italian independent scene. Filter by section, region or artistic medium.",
+    "section": "Section",
+    "view": {
+      "map": "Map",
+      "list": "List"
+    },
+    "search": "Search by name or city...",
+    "filterRegion": "All regions",
+    "filterMedia": "All artistic media",
+    "clearFilters": "Clear filters",
+    "results": "{{count}} realities found",
+    "empty": "No realities match the selected filters.",
+    "buckets": {
+      "spazi": "Spaces",
+      "spazi-senza-spazi": "Spaces without a space",
+      "spazi-che-furono": "Spaces that were"
+    }
+  },
+  "magazine": {
+    "title": "The",
+    "titleAccent": "Magazine",
+    "lead": "Articles, interviews, investigations and debates on the Italian independent art scene.",
+    "back": "Back to magazine",
+    "notFound": "Article not found.",
+    "readReply": "Read the reply",
+    "readThesis": "Read the initial thesis"
+  },
+  "reality": {
+    "back": "Back to map",
+    "notFound": "Reality not found",
+    "history": "History",
+    "location": "Location",
+    "info": "Information",
+    "founded": "Founded",
+    "closed": "Closed",
+    "status": "Status",
+    "city": "City",
+    "region": "Region",
+    "website": "Website",
+    "visit": "Visit",
+    "disciplines": "Disciplines",
+    "active": "Active",
+    "archived": "Archived"
+  }
+}

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, List, Map, ArrowRight, X, ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
@@ -9,7 +10,6 @@ import {
   type DbRealityType,
   type RealityStatus,
   type Bucket,
-  bucketLabels,
   matchesBucket,
   getCategory,
   categoryConfig,
@@ -34,6 +34,7 @@ type Reality = {
 };
 
 const Mappatura = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialBucket = (searchParams.get("sezione") as Bucket | null) ?? null;
 
@@ -152,10 +153,10 @@ const Mappatura = () => {
       <div className="editorial-container">
         <div className="max-w-3xl mb-10">
           <h1 className="editorial-heading mb-6">
-            <span className="italic text-primary">Mappatura</span> delle realtà
+            <span className="italic text-primary">{t("map.title")}</span> {t("map.titleSuffix")}
           </h1>
           <p className="editorial-body text-muted-foreground">
-            Esplora la scena indipendente italiana. Filtra per sezione, regione o media artistico.
+            {t("map.lead")}
           </p>
         </div>
 
@@ -165,28 +166,23 @@ const Mappatura = () => {
             onClick={() => setBucketMenuOpen((o) => !o)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card font-body text-sm font-medium hover:border-primary/40 transition-colors"
           >
-            Sezione: {bucketFilter === "all" ? "Tutte" : bucketLabels[bucketFilter]}
+            {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
             <ChevronDown size={14} />
           </button>
           {bucketMenuOpen && (
             <div className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
-              {([
-                ["all", "Tutte"],
-                ["spazi", bucketLabels["spazi"]],
-                ["spazi-senza-spazi", bucketLabels["spazi-senza-spazi"]],
-                ["spazi-che-furono", bucketLabels["spazi-che-furono"]],
-              ] as const).map(([val, label]) => (
+              {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
                 <button
                   key={val}
                   onClick={() => {
-                    setBucketFilter(val);
+                    setBucketFilter(val as "all" | Bucket);
                     setBucketMenuOpen(false);
                   }}
                   className={`block w-full text-left px-4 py-2 text-sm font-body hover:bg-muted ${
                     bucketFilter === val ? "bg-muted text-primary font-medium" : ""
                   }`}
                 >
-                  {label}
+                  {val === "all" ? t("common.all") : t(`map.buckets.${val}`)}
                 </button>
               ))}
             </div>
@@ -202,7 +198,7 @@ const Mappatura = () => {
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Map size={16} /> Mappa
+              <Map size={16} /> {t("map.view.map")}
             </button>
             <button
               onClick={() => setView("list")}
@@ -210,14 +206,14 @@ const Mappatura = () => {
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
-              <List size={16} /> Elenco
+              <List size={16} /> {t("map.view.list")}
             </button>
           </div>
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cerca per nome o città..."
+            placeholder={t("map.search")}
             className="flex-1 px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
@@ -229,7 +225,7 @@ const Mappatura = () => {
             onChange={(e) => setRegionFilter(e.target.value)}
             className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="all">Tutte le regioni</option>
+            <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
               <option key={r} value={r}>{r}</option>
             ))}
@@ -239,14 +235,14 @@ const Mappatura = () => {
             onChange={(e) => setDisciplineFilter(e.target.value)}
             className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="all">Tutti i media artistici</option>
+            <option value="all">{t("map.filterMedia")}</option>
             {allDisciplines.map((d) => (
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
           {hasFilters && (
             <button onClick={clearFilters} className="inline-flex items-center gap-1 px-4 py-2 text-xs font-body text-destructive hover:underline">
-              <X size={14} /> Rimuovi filtri
+              <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
         </div>
@@ -254,20 +250,20 @@ const Mappatura = () => {
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground">
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> Spazi
+            <span className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> Spazi senza spazi
+            <span className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
           </span>
           <span className="flex items-center gap-2">
             <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
             <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
-            Spazi che furono
+            {t("map.buckets.spazi-che-furono")}
           </span>
         </div>
 
         <p className="text-sm text-muted-foreground mb-6 font-body">
-          {filtered.length} realtà trovate
+          {t("map.results", { count: filtered.length })}
         </p>
 
         {/* Map view */}
@@ -312,14 +308,14 @@ const Mappatura = () => {
                   </p>
                   <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{r.description}</p>
                   <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    Scopri <ArrowRight size={14} />
+                    {t("home.discover")} <ArrowRight size={14} />
                   </span>
                 </Link>
               );
             })}
             {filtered.length === 0 && (
               <div className="col-span-full text-center py-16 text-muted-foreground font-body">
-                Nessuna realtà trovata con i filtri selezionati.
+                {t("map.empty")}
               </div>
             )}
           </div>
