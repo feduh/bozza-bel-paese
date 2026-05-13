@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, password, display_name, role } = parseResult.data;
+    const { email, password, display_name, role, reality_id } = parseResult.data;
 
     // Admin client to create user
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
@@ -143,10 +143,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create profile
+    // Create profile (with reality_id for authors)
     const { error: profileError } = await adminClient.from("profiles").insert({
       user_id: newUser.user.id,
       display_name,
+      reality_id: role === "author" ? reality_id ?? null : null,
     });
 
     if (profileError) {
@@ -167,7 +168,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         user: { id: newUser.user.id, email: newUser.user.email },
-        message: `Collaboratore ${display_name} creato con successo`,
+        message: `${role === "author" ? "Autore" : "Collaboratore"} ${display_name} creato con successo`,
       }),
       {
         status: 200,
