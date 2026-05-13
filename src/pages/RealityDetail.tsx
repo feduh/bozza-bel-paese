@@ -16,6 +16,7 @@ import {
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
 const RealityDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [reality, setReality] = useState<any>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -41,8 +42,8 @@ const RealityDetail = () => {
   if (!reality) {
     return (
       <div className="py-20 text-center editorial-container">
-        <h1 className="editorial-heading mb-4">Realtà non trovata</h1>
-        <Link to="/mappatura" className="text-primary hover:underline">Torna alla mappatura</Link>
+        <h1 className="editorial-heading mb-4">{t("reality.notFound")}</h1>
+        <Link to="/mappatura" className="text-primary hover:underline">{t("reality.back")}</Link>
       </div>
     );
   }
@@ -81,7 +82,7 @@ const RealityDetail = () => {
       />
       <div className="editorial-container">
         <Link to="/mappatura" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8">
-          <ArrowLeft size={16} /> Torna alla mappatura
+          <ArrowLeft size={16} /> {t("reality.back")}
         </Link>
 
         <div className="mb-10">
@@ -100,12 +101,12 @@ const RealityDetail = () => {
         <div className="grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-10">
             <section>
-              <h2 className="font-display text-2xl font-semibold mb-4">Storia</h2>
+              <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.history")}</h2>
               <p className="font-body text-muted-foreground leading-relaxed">{reality.history}</p>
             </section>
 
             <section>
-              <h2 className="font-display text-2xl font-semibold mb-4">Posizione</h2>
+              <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.location")}</h2>
               <div className="rounded-lg overflow-hidden border border-border h-[400px]">
                 <Suspense fallback={<MapFallback height="400px" />}>
                   <LazyMap
