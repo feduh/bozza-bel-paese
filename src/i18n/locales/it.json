@@ -198,5 +198,21 @@
     "disciplines": "Discipline",
     "active": "Attiva",
     "archived": "Archiviata"
+  },
+  "validation": {
+    "required": "Campo obbligatorio",
+    "nameMin": "Inserisci almeno 2 caratteri",
+    "email": "Indirizzo email non valido",
+    "url": "URL non valido (deve iniziare con http:// o https://)",
+    "number": "Inserisci un numero valido",
+    "integer": "Inserisci un numero intero",
+    "passwordMin": "La password deve avere almeno 8 caratteri",
+    "yearMin": "Anno troppo lontano nel passato",
+    "yearMax": "L'anno non può essere nel futuro",
+    "yearClosedAfter": "L'anno di chiusura deve essere successivo alla fondazione",
+    "coords": "Coordinate non valide",
+    "latRange": "Latitudine fuori intervallo (-90, 90)",
+    "lngRange": "Longitudine fuori intervallo (-180, 180)",
+    "fixErrors": "Correggi gli errori segnalati per continuare"
   }
 }
