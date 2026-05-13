@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, List, Map, ArrowRight, X, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
+import SEO from "@/components/SEO";
 import {
   type DbRealityType,
   type RealityStatus,

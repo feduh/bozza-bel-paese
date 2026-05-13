@@ -28,6 +28,11 @@ const how = [
 
 const CosaFacciamo = () => (
   <div className="py-20">
+    <SEO
+      title="Cosa facciamo"
+      description="Mappatura, promozione e ricerca: i tre pilastri con cui Il Bel Paese legittima la scena artistica indipendente italiana."
+      canonicalPath="/cosa-facciamo"
+    />
     <div className="editorial-container">
       <div className="max-w-3xl mb-16">
         <h1 className="editorial-heading mb-6">
