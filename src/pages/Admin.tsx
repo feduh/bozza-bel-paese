@@ -21,11 +21,8 @@ type Profile = {
 };
 
 const Admin = () => {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const { t } = useTranslation();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [checking, setChecking] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
 
@@ -40,28 +37,18 @@ const Admin = () => {
   const [error, setError] = useState("");
   const [errs, setErrs] = useState<FieldErrors>({});
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) { navigate("/login"); return; }
-
-    const checkAdmin = async () => {
-      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-      if (!data) { navigate("/"); return; }
-      setIsAdmin(true);
-      setChecking(false);
-    };
-    checkAdmin();
-  }, [user, authLoading, navigate]);
-
   const fetchProfiles = async () => {
-    const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
     setProfiles((data as Profile[]) ?? []);
     setLoadingProfiles(false);
   };
 
   useEffect(() => {
-    if (isAdmin) fetchProfiles();
-  }, [isAdmin]);
+    fetchProfiles();
+  }, []);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,12 +87,6 @@ const Admin = () => {
     }
     setSubmitting(false);
   };
-
-  if (authLoading || checking) {
-    return <div className="py-20 text-center text-muted-foreground font-body">Verifica permessi...</div>;
-  }
-
-  if (!isAdmin) return null;
 
   return (
     <div className="py-20">
