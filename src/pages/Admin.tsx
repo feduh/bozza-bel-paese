@@ -31,7 +31,9 @@ const Admin = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [role, setRole] = useState<"author" | "moderator">("author");
+  const [authorType, setAuthorType] = useState<"reality" | "external" | "none">("reality");
   const [realityId, setRealityId] = useState("");
+  const [affiliation, setAffiliation] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
