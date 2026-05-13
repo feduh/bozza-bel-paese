@@ -198,5 +198,21 @@
     "disciplines": "Disciplines",
     "active": "Active",
     "archived": "Archived"
+  },
+  "validation": {
+    "required": "Required field",
+    "nameMin": "Enter at least 2 characters",
+    "email": "Invalid email address",
+    "url": "Invalid URL (must start with http:// or https://)",
+    "number": "Enter a valid number",
+    "integer": "Enter an integer",
+    "passwordMin": "Password must be at least 8 characters",
+    "yearMin": "Year is too far in the past",
+    "yearMax": "Year cannot be in the future",
+    "yearClosedAfter": "Closing year must be after the founding year",
+    "coords": "Invalid coordinates",
+    "latRange": "Latitude out of range (-90, 90)",
+    "lngRange": "Longitude out of range (-180, 180)",
+    "fixErrors": "Please fix the highlighted errors to continue"
   }
 }
