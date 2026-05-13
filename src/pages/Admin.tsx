@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { UserPlus, Users, Shield, Eye, EyeOff, MapPinPlus } from "lucide-react";
 import RealityForm from "@/components/RealityForm";
+import FieldError from "@/components/FieldError";
+import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 type Profile = {
   id: string;
@@ -20,6 +23,7 @@ type Profile = {
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -34,6 +38,7 @@ const Admin = () => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [errs, setErrs] = useState<FieldErrors>({});
 
   useEffect(() => {
     if (authLoading) return;
@@ -60,12 +65,25 @@ const Admin = () => {
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setError("");
     setMessage("");
+    setErrs({});
 
+    const parsed = inviteSchema(t).safeParse({ displayName, email, password, role });
+    if (!parsed.success) {
+      setErrs(fieldErrors(parsed.error));
+      setError(t("validation.fixErrors"));
+      return;
+    }
+
+    setSubmitting(true);
     const { data, error: fnError } = await supabase.functions.invoke("invite-collaborator", {
-      body: { email, password, display_name: displayName, role },
+      body: {
+        email: parsed.data.email,
+        password: parsed.data.password,
+        display_name: parsed.data.displayName,
+        role: parsed.data.role,
+      },
     });
 
     if (fnError) {
@@ -73,7 +91,7 @@ const Admin = () => {
     } else if (data?.error) {
       setError(data.error);
     } else {
-      setMessage(`✅ ${data.message}. Credenziali: ${email} / ${password}`);
+      setMessage(`✅ ${data.message}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`);
       setEmail("");
       setPassword("");
       setDisplayName("");

@@ -1,14 +1,20 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Loader2, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { realitySchema, fieldErrors, type FieldErrors } from "@/lib/validation";
+import FieldError from "@/components/FieldError";
 
 type RealityType = "con-sede" | "nomade" | "scomparsa";
 type ConfirmedStatus = "pendente" | "confermato" | "storico";
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring";
+const inputErrCls = "border-destructive focus:ring-destructive";
 
 const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
+  const { t } = useTranslation();
+
   const [name, setName] = useState("");
   const [type, setType] = useState<RealityType>("con-sede");
   const [country, setCountry] = useState("Italia");
@@ -34,6 +40,11 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [errs, setErrs] = useState<FieldErrors>({});
+
+  const cls = (k: string) => `${inputCls} ${errs[k] ? inputErrCls : ""}`;
+  const aria = (k: string) =>
+    errs[k] ? { "aria-invalid": true as const, "aria-describedby": `err-${k}` } : {};
 
   const runGeocode = async () => {
     if (!address || !city) return;
@@ -62,43 +73,51 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setError("");
     setSuccess("");
+    setErrs({});
 
-    if (!lat || !lng) {
-      setError("Coordinate mancanti: avvia la geocodifica o inseriscile manualmente.");
-      setSubmitting(false);
+    const parsed = realitySchema(t).safeParse({
+      name, type, country, city, address, zipCode, region,
+      lat, lng, yearFounded, yearClosed, website, contactEmail,
+      description, history, ig, fb, linkedin, confirmedStatus,
+    });
+
+    if (!parsed.success) {
+      setErrs(fieldErrors(parsed.error));
+      setError(t("validation.fixErrors"));
       return;
     }
 
+    setSubmitting(true);
+    const v = parsed.data;
     const { error: insertError } = await supabase.from("realities").insert({
-      name,
-      type,
-      country,
-      city,
-      address,
-      zip_code: zipCode || null,
-      region,
-      lat: parseFloat(lat),
-      lng: parseFloat(lng),
-      year_founded: parseInt(yearFounded, 10),
-      year_closed: yearClosed ? parseInt(yearClosed, 10) : null,
-      website: website || null,
-      contact_email: contactEmail || null,
-      description,
-      history,
-      ig_link: ig || null,
-      fb_link: fb || null,
-      linkedin_link: linkedin || null,
-      confirmed_status: confirmedStatus,
-      status: confirmedStatus === "storico" ? "archiviato" : "attivo",
+      name: v.name,
+      type: v.type,
+      country: v.country,
+      city: v.city,
+      address: v.address,
+      zip_code: v.zipCode || null,
+      region: v.region ?? "",
+      lat: v.lat,
+      lng: v.lng,
+      year_founded: v.yearFounded,
+      year_closed: v.yearClosed ?? null,
+      website: v.website ?? null,
+      contact_email: v.contactEmail ?? null,
+      description: v.description ?? "",
+      history: v.history ?? "",
+      ig_link: v.ig ?? null,
+      fb_link: v.fb ?? null,
+      linkedin_link: v.linkedin ?? null,
+      confirmed_status: v.confirmedStatus,
+      status: v.confirmedStatus === "storico" ? "archiviato" : "attivo",
     });
 
     if (insertError) {
       setError(insertError.message);
     } else {
-      setSuccess(`✅ Realtà "${name}" salvata.`);
+      setSuccess(`✅ Realtà "${v.name}" salvata.`);
       setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
       setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
       setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
@@ -109,37 +128,42 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {error && <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">{error}</div>}
-      {success && <div className="p-3 rounded-md bg-secondary/10 text-foreground text-sm border border-secondary/20">{success}</div>}
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      {error && <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm" role="alert">{error}</div>}
+      {success && <div className="p-3 rounded-md bg-secondary/10 text-foreground text-sm border border-secondary/20" role="status">{success}</div>}
 
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Nome *</label>
-          <input required value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+          <input value={name} onChange={(e) => setName(e.target.value)} className={cls("name")} {...aria("name")} />
+          <FieldError id="err-name" message={errs.name} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Tipo *</label>
-          <select value={type} onChange={(e) => setType(e.target.value as RealityType)} className={inputCls}>
+          <select value={type} onChange={(e) => setType(e.target.value as RealityType)} className={cls("type")} {...aria("type")}>
             <option value="con-sede">Spazio (con sede)</option>
             <option value="nomade">Spazio senza spazio (itinerante)</option>
             <option value="scomparsa">Spazio che fu</option>
           </select>
+          <FieldError id="err-type" message={errs.type} />
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Paese</label>
-          <input value={country} onChange={(e) => setCountry(e.target.value)} className={inputCls} />
+          <input value={country} onChange={(e) => setCountry(e.target.value)} className={cls("country")} {...aria("country")} />
+          <FieldError id="err-country" message={errs.country} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Città *</label>
-          <input required value={city} onChange={(e) => setCity(e.target.value)} onBlur={runGeocode} className={inputCls} />
+          <input value={city} onChange={(e) => setCity(e.target.value)} onBlur={runGeocode} className={cls("city")} {...aria("city")} />
+          <FieldError id="err-city" message={errs.city} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Indirizzo *</label>
-          <input required value={address} onChange={(e) => setAddress(e.target.value)} onBlur={runGeocode} className={inputCls} />
+          <input value={address} onChange={(e) => setAddress(e.target.value)} onBlur={runGeocode} className={cls("address")} {...aria("address")} />
+          <FieldError id="err-address" message={errs.address} />
         </div>
       </div>
 
@@ -157,19 +181,21 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
         <div className="grid md:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs text-muted-foreground mb-1">CAP</label>
-            <input value={zipCode} onChange={(e) => setZipCode(e.target.value)} className={inputCls} />
+            <input value={zipCode} onChange={(e) => setZipCode(e.target.value)} className={cls("zipCode")} {...aria("zipCode")} />
           </div>
           <div>
             <label className="block text-xs text-muted-foreground mb-1">Regione</label>
-            <input value={region} onChange={(e) => setRegion(e.target.value)} className={inputCls} />
+            <input value={region} onChange={(e) => setRegion(e.target.value)} className={cls("region")} {...aria("region")} />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">Lat</label>
-            <input value={lat} onChange={(e) => setLat(e.target.value)} className={inputCls} />
+            <label className="block text-xs text-muted-foreground mb-1">Lat *</label>
+            <input value={lat} onChange={(e) => setLat(e.target.value)} className={cls("lat")} {...aria("lat")} />
+            <FieldError id="err-lat" message={errs.lat} />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">Lng</label>
-            <input value={lng} onChange={(e) => setLng(e.target.value)} className={inputCls} />
+            <label className="block text-xs text-muted-foreground mb-1">Lng *</label>
+            <input value={lng} onChange={(e) => setLng(e.target.value)} className={cls("lng")} {...aria("lng")} />
+            <FieldError id="err-lng" message={errs.lng} />
           </div>
         </div>
       </div>
@@ -177,52 +203,61 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Anno di fondazione *</label>
-          <input required type="number" value={yearFounded} onChange={(e) => setYearFounded(e.target.value)} className={inputCls} />
+          <input type="number" value={yearFounded} onChange={(e) => setYearFounded(e.target.value)} className={cls("yearFounded")} {...aria("yearFounded")} />
+          <FieldError id="err-yearFounded" message={errs.yearFounded} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Anno di chiusura</label>
-          <input type="number" value={yearClosed} onChange={(e) => setYearClosed(e.target.value)} className={inputCls} />
+          <input type="number" value={yearClosed} onChange={(e) => setYearClosed(e.target.value)} className={cls("yearClosed")} {...aria("yearClosed")} />
+          <FieldError id="err-yearClosed" message={errs.yearClosed} />
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium mb-2">Descrizione</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={cls("description")} {...aria("description")} />
+        <FieldError id="err-description" message={errs.description} />
       </div>
       <div>
         <label className="block text-sm font-medium mb-2">Storia</label>
-        <textarea value={history} onChange={(e) => setHistory(e.target.value)} rows={3} className={inputCls} />
+        <textarea value={history} onChange={(e) => setHistory(e.target.value)} rows={3} className={cls("history")} {...aria("history")} />
+        <FieldError id="err-history" message={errs.history} />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Sito web</label>
-          <input value={website} onChange={(e) => setWebsite(e.target.value)} className={inputCls} />
+          <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://..." className={cls("website")} {...aria("website")} />
+          <FieldError id="err-website" message={errs.website} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Email di contatto</label>
-          <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className={inputCls} />
+          <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className={cls("contactEmail")} {...aria("contactEmail")} />
+          <FieldError id="err-contactEmail" message={errs.contactEmail} />
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Instagram</label>
-          <input value={ig} onChange={(e) => setIg(e.target.value)} placeholder="https://instagram.com/..." className={inputCls} />
+          <input value={ig} onChange={(e) => setIg(e.target.value)} placeholder="https://instagram.com/..." className={cls("ig")} {...aria("ig")} />
+          <FieldError id="err-ig" message={errs.ig} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Facebook</label>
-          <input value={fb} onChange={(e) => setFb(e.target.value)} placeholder="https://facebook.com/..." className={inputCls} />
+          <input value={fb} onChange={(e) => setFb(e.target.value)} placeholder="https://facebook.com/..." className={cls("fb")} {...aria("fb")} />
+          <FieldError id="err-fb" message={errs.fb} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">LinkedIn</label>
-          <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="https://linkedin.com/..." className={inputCls} />
+          <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="https://linkedin.com/..." className={cls("linkedin")} {...aria("linkedin")} />
+          <FieldError id="err-linkedin" message={errs.linkedin} />
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium mb-2">Stato di conferma</label>
-        <select value={confirmedStatus} onChange={(e) => setConfirmedStatus(e.target.value as ConfirmedStatus)} className={inputCls}>
+        <select value={confirmedStatus} onChange={(e) => setConfirmedStatus(e.target.value as ConfirmedStatus)} className={cls("confirmedStatus")} {...aria("confirmedStatus")}>
           <option value="pendente">Pendente</option>
           <option value="confermato">Confermato</option>
           <option value="storico">Storico</option>
