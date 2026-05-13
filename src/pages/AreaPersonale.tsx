@@ -232,6 +232,24 @@ const AreaPersonale = () => {
                     className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                   />
                 </div>
+                {!profile.reality_id && (
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">
+                      Affiliazione
+                      <span className="text-xs font-normal text-muted-foreground ml-2">
+                        (es. università, istituzione, indipendente)
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      value={profile.affiliation ?? ""}
+                      onChange={(e) => setProfile({ ...profile, affiliation: e.target.value })}
+                      placeholder="es. Università di Bologna, MAXXI, ricercatore indipendente…"
+                      maxLength={120}
+                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+                )}
                 <div className="grid md:grid-cols-3 gap-4">
                   <Field label="Sito web" value={profile.website ?? ""} onChange={(v) => setProfile({ ...profile, website: v })} placeholder="https://…" />
                   <Field label="Instagram" value={profile.social_instagram ?? ""} onChange={(v) => setProfile({ ...profile, social_instagram: v })} />
