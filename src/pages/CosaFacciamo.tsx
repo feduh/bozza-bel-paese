@@ -1,4 +1,5 @@
 import { MapPin, Megaphone, Search, ArrowRight } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const pillars = [
   {

@@ -1,10 +1,24 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
 import heroImage from "@/assets/hero-art.jpg";
+import SEO from "@/components/SEO";
 
 const Index = () => {
   return (
     <div>
+      <SEO
+        title="Il Bel Paese — Mappatura delle realtà artistiche italiane"
+        description="Archivio vivo di collettivi, spazi e movimenti artistici indipendenti italiani: nomadi, radicati o scomparsi."
+        canonicalPath="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Il Bel Paese",
+          url: "https://il-bel-paese.lovable.app",
+          description: "Mappatura delle realtà artistiche italiane indipendenti.",
+          inLanguage: "it-IT",
+        }}
+      />
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
