@@ -140,18 +140,18 @@ const Magazine = () => {
   return (
     <div className="py-20">
       <SEO
-        title="Magazine — Il Bel Paese"
-        description="Articoli, interviste, inchieste e dibattiti sulla scena artistica indipendente italiana."
+        title={t("magazine.title") + " " + t("magazine.titleAccent")}
+        description={t("magazine.lead")}
         canonicalPath="/magazine"
       />
       <div className="editorial-container">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div className="max-w-3xl">
             <h1 className="editorial-heading mb-4">
-              Il <span className="italic text-primary">Magazine</span>
+              {t("magazine.title")} <span className="italic text-primary">{t("magazine.titleAccent")}</span>
             </h1>
             <p className="editorial-body text-muted-foreground">
-              Articoli, interviste, inchieste e dibattiti sulla scena artistica indipendente italiana.
+              {t("magazine.lead")}
             </p>
           </div>
           {user && (
