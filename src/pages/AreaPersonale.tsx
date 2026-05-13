@@ -200,6 +200,11 @@ const AreaPersonale = () => {
                       {reality.name}
                     </span>
                   )}
+                  {!reality && profile.affiliation && (
+                    <span className="text-xs font-body px-2.5 py-1 rounded-full bg-accent/10 text-accent-foreground border border-accent/20">
+                      {profile.affiliation}
+                    </span>
+                  )}
                 </div>
               </div>
               <form onSubmit={handleProfileSave} className="space-y-4">
