@@ -209,3 +209,28 @@
   background: hsl(var(--popover));
   border: 1px solid hsl(var(--border));
 }
+
+/* Cluster bubbles — coerenti con la palette del progetto */
+.ibp-cluster-wrap { background: transparent !important; border: none !important; }
+.ibp-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: hsl(var(--primary) / 0.18);
+  border: 2px solid hsl(var(--primary));
+  color: hsl(var(--primary));
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 12px -4px hsl(var(--primary) / 0.45);
+  backdrop-filter: blur(2px);
+  transition: transform 0.18s ease;
+}
+.ibp-cluster:hover { transform: scale(1.08); }
+.leaflet-marker-icon.ibp-cluster-wrap { z-index: 600 !important; }
+/* Override default leaflet.markercluster look */
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large,
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+  background: transparent !important;
+}

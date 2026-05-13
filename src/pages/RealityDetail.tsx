@@ -4,6 +4,7 @@ import { MapPin, ArrowLeft, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
+import { RealityDetailSkeleton } from "@/components/skeletons";
 import {
   type DbRealityType,
   type RealityStatus,
@@ -33,7 +34,7 @@ const RealityDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="py-20 text-center"><p className="text-muted-foreground font-body">Caricamento...</p></div>;
+    return <RealityDetailSkeleton />;
   }
 
   if (!reality) {
@@ -109,13 +110,14 @@ const RealityDetail = () => {
                   <LazyMap
                     center={[reality.lat, reality.lng]}
                     zoom={14}
+                    cluster={false}
                     markers={[
                       {
                         id: reality.id,
                         lat: reality.lat,
                         lng: reality.lng,
                         name: reality.name,
-                        popupContent: <>{reality.name}<br />{reality.city}</>,
+                        popupContent: `<strong>${reality.name}</strong><br/><span style="font-size:12px;opacity:.7">${reality.city}</span>`,
                         color: config.markerColor,
                         outline: config.outline,
                       },

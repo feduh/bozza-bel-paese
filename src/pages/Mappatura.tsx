@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, List, Map, ArrowRight, X, ChevronDown } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
@@ -119,21 +120,13 @@ const Mappatura = () => {
           city: r.city,
           color: cfg.markerColor,
           outline: cfg.outline,
-          popupContent: (
-            <div className="font-body">
-              <strong className="font-display">{r.name}</strong>
-              <br />
-              <span className="text-xs">
-                {r.city}, {r.region}
-              </span>
-              <br />
-              <span className="text-[10px] uppercase tracking-wide opacity-70">{cfg.label}</span>
-              <br />
-              <a href={`/realta/${r.id}`} className="text-xs text-primary underline">
-                Vai alla scheda →
-              </a>
-            </div>
-          ),
+          popupContent: `
+            <div style="font-family:var(--font-body)">
+              <strong style="font-family:var(--font-display);font-size:14px">${r.name.replace(/</g, "&lt;")}</strong><br/>
+              <span style="font-size:12px">${r.city}, ${r.region}</span><br/>
+              <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.7">${cfg.label}</span><br/>
+              <a href="/realta/${r.id}" style="font-size:12px;color:hsl(var(--primary));text-decoration:underline">Vai alla scheda →</a>
+            </div>`,
         };
       }),
     [filtered]
@@ -141,8 +134,10 @@ const Mappatura = () => {
 
   if (loading) {
     return (
-      <div className="py-20 text-center">
-        <p className="text-muted-foreground font-body">Caricamento...</p>
+      <div className="py-20 editorial-container">
+        <Skeleton className="h-12 w-2/3 mb-4" />
+        <Skeleton className="h-4 w-1/2 mb-10" />
+        <Skeleton className="h-[600px] w-full rounded-lg" />
       </div>
     );
   }
