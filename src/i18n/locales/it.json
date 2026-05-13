@@ -64,12 +64,65 @@
   },
   "about": {
     "title": "Chi",
-    "titleAccent": "Siamo"
+    "titleAccent": "Siamo",
+    "seoDesc": "Il Bel Paese: la prima piattaforma di mappatura, promozione e ricerca che legittima le realtà artistiche indipendenti italiane.",
+    "p1_html": "<strong>Il Bel Paese</strong> è la prima piattaforma di mappatura, promozione e ricerca che <strong>legittima le realtà artistiche e progettuali indipendenti italiane</strong>.",
+    "p2_html": "Attraverso una vetrina dinamica e un archivio storico, il progetto mette a sistema queste esperienze per favorire la creazione di reti e <strong>ridurre la distanza tra la scena indipendente e il sistema istituzionale</strong>.",
+    "p3": "Crediamo che le realtà indipendenti — gli spazi fisici, quelli senza sede, e quelli che non esistono più — siano un patrimonio culturale collettivo che merita riconoscimento, memoria e strumenti per dialogare con il resto del sistema dellarte.",
+    "missionTitle": "Mission",
+    "missionDesc": "Legittimare, mettere in rete e dare voce alle realtà artistiche indipendenti italiane attraverso mappatura, promozione e ricerca.",
+    "visionTitle": "Visione",
+    "visionDesc": "Un ecosistema in cui scena indipendente e mondo istituzionale dialogano alla pari, riconoscendosi come parti dello stesso paesaggio culturale.",
+    "forTitle": "Per",
+    "forTitleAccent": "chi",
+    "audiences": {
+      "indie": {
+        "title": "Realtà indipendenti",
+        "desc": "Spazi, collettivi, progetti itineranti e archivi che cercano visibilità e connessioni."
+      },
+      "researchers": {
+        "title": "Ricercatori e curatori",
+        "desc": "Studiosi, critici e operatori culturali che hanno bisogno di dati e contesto."
+      },
+      "institutions": {
+        "title": "Istituzioni e partner",
+        "desc": "Enti, accademie e organizzazioni che vogliono dialogare con la scena indipendente."
+      }
+    }
   },
   "what": {
     "title": "Cosa",
     "titleAccent": "Facciamo",
-    "intro": "Il nostro impegno si articola attraverso tre pilastri — mappatura, promozione e ricerca — pensati per legittimare la scena indipendente e metterla in dialogo con il sistema istituzionale."
+    "intro": "Il nostro impegno si articola attraverso tre pilastri — mappatura, promozione e ricerca — pensati per legittimare la scena indipendente e metterla in dialogo con il sistema istituzionale.",
+    "intro_html": "Il nostro impegno si articola attraverso tre pilastri — <strong>mappatura</strong>, <strong>promozione</strong> e <strong>ricerca</strong> — pensati per legittimare la scena indipendente e metterla in dialogo con il sistema istituzionale.",
+    "seoDesc": "Mappatura, promozione e ricerca: i tre pilastri con cui Il Bel Paese legittima la scena artistica indipendente italiana.",
+    "pillars": {
+      "mapping": {
+        "title": "Mappatura",
+        "desc": "Identifichiamo e categorizziamo le realtà artistiche indipendenti italiane in tre famiglie: Spazi (con sede fisica), Spazi senza spazi (itineranti, digitali, nomadi) e Spazi che furono (archivio storico delle esperienze concluse)."
+      },
+      "promotion": {
+        "title": "Promozione",
+        "desc": "Diamo visibilità alle realtà mappate attraverso una vetrina dinamica, un magazine editoriale e la sezione Point / Counter Point, dove voci diverse si confrontano sui temi della scena indipendente."
+      },
+      "research": {
+        "title": "Ricerca",
+        "desc": "Conduciamo ricerche, raccogliamo dati e produciamo contenuti per leggere e raccontare le trasformazioni della scena artistica italiana."
+      }
+    },
+    "methodTitle": "Come lo facciamo",
+    "methodSteps": {
+      "listen": "Ascoltiamo",
+      "map": "Mappiamo",
+      "tell": "Raccontiamo",
+      "update": "Aggiorniamoci"
+    },
+    "methodDescs": {
+      "listen": "Identifichiamo realtà attraverso segnalazioni, ricerca sul campo e dialogo diretto con la scena.",
+      "map": "Verifichiamo, geolocalizziamo e categorizziamo ogni esperienza secondo criteri condivisi.",
+      "tell": "Pubblichiamo schede, articoli e dibattiti per dare contesto e visibilità.",
+      "update": "Verifica annuale dello stato delle realtà mappate per mantenere il dato vivo."
+    }
   },
   "map": {
     "title": "Mappatura",
