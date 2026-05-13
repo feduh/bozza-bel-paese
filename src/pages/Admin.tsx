@@ -18,16 +18,20 @@ type Profile = {
   created_at: string;
 };
 
+type RealityRef = { id: string; name: string; city: string };
+
 const Admin = () => {
   const { t } = useTranslation();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
+  const [realities, setRealities] = useState<RealityRef[]>([]);
 
   // Invite form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [role, setRole] = useState<"user" | "moderator">("user");
+  const [role, setRole] = useState<"author" | "moderator">("author");
+  const [realityId, setRealityId] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -43,8 +47,17 @@ const Admin = () => {
     setLoadingProfiles(false);
   };
 
+  const fetchRealities = async () => {
+    const { data } = await supabase
+      .from("realities")
+      .select("id, name, city")
+      .order("name", { ascending: true });
+    setRealities((data as RealityRef[]) ?? []);
+  };
+
   useEffect(() => {
     fetchProfiles();
+    fetchRealities();
   }, []);
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -53,7 +66,13 @@ const Admin = () => {
     setMessage("");
     setErrs({});
 
-    const parsed = inviteSchema(t).safeParse({ displayName, email, password, role });
+    const parsed = inviteSchema(t).safeParse({
+      displayName,
+      email,
+      password,
+      role,
+      realityId: role === "author" ? realityId : undefined,
+    });
     if (!parsed.success) {
       setErrs(fieldErrors(parsed.error));
       setError(t("validation.fixErrors"));
@@ -67,6 +86,7 @@ const Admin = () => {
         password: parsed.data.password,
         display_name: parsed.data.displayName,
         role: parsed.data.role,
+        reality_id: parsed.data.realityId ?? null,
       },
     });
 
@@ -79,7 +99,8 @@ const Admin = () => {
       setEmail("");
       setPassword("");
       setDisplayName("");
-      setRole("user");
+      setRole("author");
+      setRealityId("");
       fetchProfiles();
     }
     setSubmitting(false);
@@ -165,14 +186,42 @@ const Admin = () => {
                 <label className="block text-sm font-body font-medium mb-2">Ruolo</label>
                 <select
                   value={role}
-                  onChange={(e) => setRole(e.target.value as "user" | "moderator")}
+                  onChange={(e) => {
+                    const v = e.target.value as "author" | "moderator";
+                    setRole(v);
+                    if (v !== "author") setRealityId("");
+                  }}
                   className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
-                  <option value="user">Collaboratore</option>
-                  <option value="moderator">Moderatore</option>
+                  <option value="author">Autore (membro di una realtà)</option>
+                  <option value="moderator">Collaboratore (collettivo)</option>
                 </select>
+                <p className="text-xs text-muted-foreground font-body mt-1">
+                  {role === "author"
+                    ? "Può scrivere articoli (con moderazione) e gestire il proprio profilo."
+                    : "Può editare la mappa, pubblicare direttamente sul Magazine e moderare."}
+                </p>
               </div>
             </div>
+            {role === "author" && (
+              <div>
+                <label className="block text-sm font-body font-medium mb-2">Realtà di appartenenza *</label>
+                <select
+                  value={realityId}
+                  onChange={(e) => setRealityId(e.target.value)}
+                  aria-invalid={!!errs.realityId}
+                  className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.realityId ? "border-destructive" : "border-input"}`}
+                >
+                  <option value="">— Seleziona una realtà —</option>
+                  {realities.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} ({r.city})
+                    </option>
+                  ))}
+                </select>
+                <FieldError id="err-realityId" message={errs.realityId} />
+              </div>
+            )}
             <button
               type="submit"
               disabled={submitting}

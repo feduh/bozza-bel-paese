@@ -8,7 +8,7 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/Layout";
 import RouteFallback from "./components/RouteFallback";
-import { RequireRole } from "./components/RouteGuards";
+import { RequireAuth, RequireRole } from "./components/RouteGuards";
 
 // Eager: Home and 404 — needed for fast first paint and error states
 import Index from "./pages/Index";
@@ -23,6 +23,8 @@ const Blog = lazy(() => import("./pages/Blog"));
 const MagazinePost = lazy(() => import("./pages/MagazinePost"));
 const Login = lazy(() => import("./pages/Login"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AreaPersonale = lazy(() => import("./pages/AreaPersonale"));
+const ArticoloEditor = lazy(() => import("./pages/ArticoloEditor"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +61,30 @@ const App = () => (
                       <RequireRole role="admin">
                         <Admin />
                       </RequireRole>
+                    }
+                  />
+                  <Route
+                    path="/area-personale"
+                    element={
+                      <RequireAuth>
+                        <AreaPersonale />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/area-personale/articolo/nuovo"
+                    element={
+                      <RequireAuth>
+                        <ArticoloEditor />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/area-personale/articolo/:id/modifica"
+                    element={
+                      <RequireAuth>
+                        <ArticoloEditor />
+                      </RequireAuth>
                     }
                   />
                 </Route>

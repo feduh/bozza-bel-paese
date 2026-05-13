@@ -106,7 +106,7 @@
       },
       "promotion": {
         "title": "Promozione",
-        "desc": "Diamo visibilità alle realtà mappate attraverso una vetrina dinamica, un magazine editoriale e la sezione Point / Counter Point, dove voci diverse si confrontano sui temi della scena indipendente."
+        "desc": "Diamo visibilità alle realtà mappate attraverso una vetrina dinamica, un magazine editoriale e uno spazio di risposte aperte dove voci diverse si confrontano sui temi della scena indipendente."
       },
       "research": {
         "title": "Ricerca",
@@ -144,7 +144,7 @@
       },
       "magazine": {
         "title": "Magazine editoriale",
-        "desc": "Articoli, interviste e il format Point / Counter Point con editor in chief come garanzia scientifica."
+        "desc": "Articoli, interviste e il format delle risposte tra autori, con editor in chief come garanzia scientifica."
       },
       "update": {
         "title": "Aggiorniamoci",

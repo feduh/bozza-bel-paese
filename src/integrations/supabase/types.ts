@@ -19,15 +19,14 @@ export type Database = {
           author_name: string
           category: string
           content: string
-          counterpart_id: string | null
           cover_image_url: string | null
           created_at: string
           excerpt: string
           id: string
-          is_point_counterpoint: boolean
           published_at: string
+          reply_to_id: string | null
           slug: string
-          stance: string | null
+          status: string
           title: string
           updated_at: string
           user_id: string
@@ -36,15 +35,14 @@ export type Database = {
           author_name: string
           category: string
           content?: string
-          counterpart_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           excerpt: string
           id?: string
-          is_point_counterpoint?: boolean
           published_at?: string
+          reply_to_id?: string | null
           slug: string
-          stance?: string | null
+          status?: string
           title: string
           updated_at?: string
           user_id: string
@@ -53,23 +51,22 @@ export type Database = {
           author_name?: string
           category?: string
           content?: string
-          counterpart_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string
           id?: string
-          is_point_counterpoint?: boolean
           published_at?: string
+          reply_to_id?: string | null
           slug?: string
-          stance?: string | null
+          status?: string
           title?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "blog_posts_counterpart_id_fkey"
-            columns: ["counterpart_id"]
+            foreignKeyName: "blog_posts_reply_to_id_fkey"
+            columns: ["reply_to_id"]
             isOneToOne: false
             referencedRelation: "blog_posts"
             referencedColumns: ["id"]
@@ -83,6 +80,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          reality_id: string | null
           social_instagram: string | null
           social_twitter: string | null
           updated_at: string
@@ -95,6 +93,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          reality_id?: string | null
           social_instagram?: string | null
           social_twitter?: string | null
           updated_at?: string
@@ -107,13 +106,22 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          reality_id?: string | null
           social_instagram?: string | null
           social_twitter?: string | null
           updated_at?: string
           user_id?: string
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_reality_id_fkey"
+            columns: ["reality_id"]
+            isOneToOne: false
+            referencedRelation: "realities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       realities: {
         Row: {
@@ -257,7 +265,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "author"
       reality_type: "nomade" | "con-sede" | "scomparsa"
     }
     CompositeTypes: {
@@ -386,7 +394,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "author"],
       reality_type: ["nomade", "con-sede", "scomparsa"],
     },
   },

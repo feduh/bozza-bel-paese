@@ -82,14 +82,33 @@ export const realitySchema = (t: TFunction) =>
 export type RealityInput = z.infer<ReturnType<typeof realitySchema>>;
 
 export const inviteSchema = (t: TFunction) =>
-  z.object({
-    displayName: z.string().trim().min(2, t("validation.nameMin")),
-    email: z.string().trim().toLowerCase().email(t("validation.email")),
-    password: z.string().min(8, t("validation.passwordMin")),
-    role: z.enum(["user", "moderator"]),
-  });
+  z
+    .object({
+      displayName: z.string().trim().min(2, t("validation.nameMin")),
+      email: z.string().trim().toLowerCase().email(t("validation.email")),
+      password: z.string().min(8, t("validation.passwordMin")),
+      role: z.enum(["author", "moderator"]),
+      realityId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
+    })
+    .refine(
+      (d) => d.role !== "author" || !!d.realityId,
+      { path: ["realityId"], message: t("validation.required") },
+    );
 
 export type InviteInput = z.infer<ReturnType<typeof inviteSchema>>;
+
+// ---------- article schema ----------
+
+export const articleSchema = (t: TFunction) =>
+  z.object({
+    title: z.string().trim().min(3, t("validation.required")).max(200),
+    category: z.string().trim().min(2, t("validation.required")).max(60),
+    excerpt: z.string().trim().min(10, t("validation.required")).max(500),
+    content: z.string().trim().min(20, t("validation.required")).max(50000),
+    coverImageUrl: optionalUrl(t),
+  });
+
+export type ArticleInput = z.infer<ReturnType<typeof articleSchema>>;
 
 // ---------- error helpers ----------
 

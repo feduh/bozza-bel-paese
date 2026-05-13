@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, LogOut, Shield } from "lucide-react";
+import { Menu, X, LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
@@ -68,6 +68,12 @@ const Navbar = () => {
           </div>
           {user ? (
             <div className="flex items-center gap-3">
+              <Link
+                to="/area-personale"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary/15 text-secondary text-xs font-body font-medium hover:bg-secondary/25 transition-colors"
+              >
+                <UserIcon size={12} /> Area personale
+              </Link>
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -130,6 +136,13 @@ const Navbar = () => {
           })}
           {user ? (
             <>
+              <Link
+                to="/area-personale"
+                onClick={() => setOpen(false)}
+                className="block font-body text-sm font-medium text-secondary uppercase"
+              >
+                ◎ Area personale
+              </Link>
               {isAdmin && (
                 <Link
                   to="/admin"

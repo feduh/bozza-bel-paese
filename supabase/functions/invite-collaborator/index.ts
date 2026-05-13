@@ -46,8 +46,12 @@ const inviteSchema = z.object({
     .trim()
     .min(2, "Il nome deve avere almeno 2 caratteri")
     .max(100, "Il nome può avere al massimo 100 caratteri"),
-  role: z.enum(["user", "moderator"]).default("user"),
-});
+  role: z.enum(["author", "moderator"]).default("author"),
+  reality_id: z.string().uuid().nullable().optional(),
+}).refine(
+  (d) => d.role !== "author" || !!d.reality_id,
+  { message: "Realtà di appartenenza obbligatoria per gli autori", path: ["reality_id"] }
+);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -117,7 +121,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, password, display_name, role } = parseResult.data;
+    const { email, password, display_name, role, reality_id } = parseResult.data;
 
     // Admin client to create user
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
@@ -139,10 +143,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create profile
+    // Create profile (with reality_id for authors)
     const { error: profileError } = await adminClient.from("profiles").insert({
       user_id: newUser.user.id,
       display_name,
+      reality_id: role === "author" ? reality_id ?? null : null,
     });
 
     if (profileError) {
@@ -163,7 +168,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         user: { id: newUser.user.id, email: newUser.user.email },
-        message: `Collaboratore ${display_name} creato con successo`,
+        message: `${role === "author" ? "Autore" : "Collaboratore"} ${display_name} creato con successo`,
       }),
       {
         status: 200,
