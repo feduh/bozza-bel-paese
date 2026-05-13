@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Calendar, User, Plus, X, ArrowRight, Swords } from "lucide-react";
 import SEO from "@/components/SEO";
+import { PostCardSkeletonGrid } from "@/components/skeletons";
 
 type MagazinePost = {
   id: string;
@@ -275,9 +276,7 @@ const Magazine = () => {
         )}
 
         {loading ? (
-          <div className="text-center py-16 text-muted-foreground font-body">
-            Caricamento articoli...
-          </div>
+          <PostCardSkeletonGrid count={6} />
         ) : (
           <>
             {/* Point / Counter Point */}
