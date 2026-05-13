@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { UserPlus, Users, Shield, Eye, EyeOff } from "lucide-react";
+import { UserPlus, Users, Shield, Eye, EyeOff, MapPinPlus } from "lucide-react";
+import RealityForm from "@/components/RealityForm";
 
 type Profile = {
   id: string;
@@ -175,6 +176,17 @@ const Admin = () => {
               {submitting ? "Creazione..." : "Crea account"}
             </button>
           </form>
+        </div>
+
+        {/* Add reality */}
+        <div className="p-8 rounded-lg bg-card border border-border mb-12">
+          <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
+            <MapPinPlus size={20} /> Aggiungi realtà
+          </h2>
+          <p className="text-sm text-muted-foreground font-body mb-6">
+            CAP, regione e coordinate vengono ricavati automaticamente da indirizzo + città (geocodifica OpenStreetMap).
+          </p>
+          <RealityForm />
         </div>
 
         {/* Collaborators list */}
