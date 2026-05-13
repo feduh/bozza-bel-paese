@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Calendar, User, Plus, X, ArrowRight, Swords } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
+import SmartImage from "@/components/SmartImage";
 
 type MagazinePost = {
   id: string;

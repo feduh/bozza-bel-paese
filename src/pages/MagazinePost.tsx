@@ -5,6 +5,7 @@ import { Calendar, User, ArrowLeft, Swords } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
+import SmartImage from "@/components/SmartImage";
 
 type Post = {
   id: string;

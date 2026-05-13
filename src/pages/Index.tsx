@@ -3,6 +3,7 @@ import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroImage from "@/assets/hero-art.jpg";
 import SEO from "@/components/SEO";
+import SmartImage from "@/components/SmartImage";
 
 const Index = () => {
   const { t } = useTranslation();
