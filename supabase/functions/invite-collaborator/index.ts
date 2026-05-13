@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, password, display_name, role, reality_id } = parseResult.data;
+    const { email, password, display_name, role, reality_id, affiliation } = parseResult.data;
 
     // Admin client to create user
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
@@ -141,11 +141,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create profile (with reality_id for authors)
+    // Create profile (reality_id and affiliation are mutually exclusive but both optional)
     const { error: profileError } = await adminClient.from("profiles").insert({
       user_id: newUser.user.id,
       display_name,
       reality_id: role === "author" ? reality_id ?? null : null,
+      affiliation: role === "author" && !reality_id ? affiliation ?? null : null,
     });
 
     if (profileError) {
