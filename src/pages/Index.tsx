@@ -1,21 +1,35 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import heroImage from "@/assets/hero-art.jpg";
 import SEO from "@/components/SEO";
 
 const Index = () => {
+  const { t } = useTranslation();
+  const features = [
+    { icon: MapPin, key: "mapping", link: "/mappatura" },
+    { icon: Users, key: "community", link: "/chi-siamo" },
+    { icon: BookOpen, key: "stories", link: "/magazine" },
+  ] as const;
+  const stats = [
+    { num: "150+", key: "mapped" },
+    { num: "18", key: "regions" },
+    { num: "45", key: "vanished" },
+    { num: "30+", key: "articles" },
+  ] as const;
+
   return (
     <div>
       <SEO
         title="Il Bel Paese — Mappatura delle realtà artistiche italiane"
-        description="Archivio vivo di collettivi, spazi e movimenti artistici indipendenti italiani: nomadi, radicati o scomparsi."
+        description={t("home.lead")}
         canonicalPath="/"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Il Bel Paese",
           url: "https://il-bel-paese.lovable.app",
-          description: "Mappatura delle realtà artistiche italiane indipendenti.",
+          description: t("home.lead"),
           inLanguage: "it-IT",
         }}
       />
@@ -28,24 +42,24 @@ const Index = () => {
         <div className="relative editorial-container">
           <div className="max-w-2xl">
             <h1 className="editorial-heading text-primary-foreground mb-6 leading-tight">
-              Tracciamo le realtà<br />
-              <span className="italic text-accent">artistiche italiane</span>
+              {t("home.title")}<br />
+              <span className="italic text-accent">{t("home.titleAccent")}</span>
             </h1>
             <p className="editorial-body text-primary-foreground/80 mb-8 max-w-lg">
-              Un archivio vivo di collettivi, spazi e movimenti — nomadi, radicati o scomparsi — che hanno plasmato il paesaggio culturale italiano.
+              {t("home.lead")}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/mappatura"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md font-body font-medium hover:opacity-90 transition-opacity"
               >
-                Esplora la mappa <ArrowRight size={18} />
+                {t("home.ctaMap")} <ArrowRight size={18} />
               </Link>
               <Link
                 to="/chi-siamo"
                 className="inline-flex items-center gap-2 px-6 py-3 border border-primary-foreground/30 text-primary-foreground rounded-md font-body font-medium hover:bg-primary-foreground/10 transition-colors"
               >
-                Scopri il progetto
+                {t("home.ctaAbout")}
               </Link>
             </div>
           </div>
@@ -56,20 +70,16 @@ const Index = () => {
       <section className="py-20">
         <div className="editorial-container">
           <h2 className="editorial-subheading text-center mb-16">
-            Preservare, mappare, <span className="italic text-primary">raccontare</span>
+            {t("home.sectionTitle")} <span className="italic text-primary">{t("home.sectionTitleAccent")}</span>
           </h2>
           <div className="grid md:grid-cols-3 gap-10">
-            {[
-              { icon: MapPin, title: "Mappatura", desc: "Una cartografia delle realtà artistiche su tutto il territorio nazionale, categorizzate per tipologia e stato.", link: "/mappatura" },
-              { icon: Users, title: "Comunità", desc: "Connettiamo artisti, curatori e appassionati per creare una rete di condivisione e supporto reciproco.", link: "/chi-siamo" },
-              { icon: BookOpen, title: "Racconti", desc: "Storie, interviste e approfondimenti sulle realtà che animano o hanno animato la scena artistica italiana.", link: "/magazine" },
-            ].map((item) => (
-              <Link key={item.title} to={item.link} className="group p-8 rounded-lg bg-card border border-border hover:border-primary/30 transition-all hover:shadow-lg">
+            {features.map((item) => (
+              <Link key={item.key} to={item.link} className="group p-8 rounded-lg bg-card border border-border hover:border-primary/30 transition-all hover:shadow-lg">
                 <item.icon className="text-primary mb-4" size={28} />
-                <h3 className="font-display text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="font-body text-muted-foreground leading-relaxed">{item.desc}</p>
+                <h3 className="font-display text-xl font-semibold mb-3">{t(`home.features.${item.key}.title`)}</h3>
+                <p className="font-body text-muted-foreground leading-relaxed">{t(`home.features.${item.key}.desc`)}</p>
                 <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                  Scopri <ArrowRight size={14} />
+                  {t("home.discover")} <ArrowRight size={14} />
                 </span>
               </Link>
             ))}
@@ -80,15 +90,10 @@ const Index = () => {
       {/* Stats */}
       <section className="py-16 bg-card border-y border-border">
         <div className="editorial-container grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[
-            { num: "150+", label: "Realtà mappate" },
-            { num: "18", label: "Regioni coperte" },
-            { num: "45", label: "Spazi che furono" },
-            { num: "30+", label: "Articoli pubblicati" },
-          ].map((s) => (
-            <div key={s.label}>
+          {stats.map((s) => (
+            <div key={s.key}>
               <div className="font-display text-3xl md:text-4xl font-bold text-primary">{s.num}</div>
-              <div className="font-body text-sm text-muted-foreground mt-1">{s.label}</div>
+              <div className="font-body text-sm text-muted-foreground mt-1">{t(`home.stats.${s.key}`)}</div>
             </div>
           ))}
         </div>
