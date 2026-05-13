@@ -18,16 +18,20 @@ type Profile = {
   created_at: string;
 };
 
+type RealityRef = { id: string; name: string; city: string };
+
 const Admin = () => {
   const { t } = useTranslation();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
+  const [realities, setRealities] = useState<RealityRef[]>([]);
 
   // Invite form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [role, setRole] = useState<"user" | "moderator">("user");
+  const [role, setRole] = useState<"author" | "moderator">("author");
+  const [realityId, setRealityId] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -43,8 +47,17 @@ const Admin = () => {
     setLoadingProfiles(false);
   };
 
+  const fetchRealities = async () => {
+    const { data } = await supabase
+      .from("realities")
+      .select("id, name, city")
+      .order("name", { ascending: true });
+    setRealities((data as RealityRef[]) ?? []);
+  };
+
   useEffect(() => {
     fetchProfiles();
+    fetchRealities();
   }, []);
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -53,7 +66,13 @@ const Admin = () => {
     setMessage("");
     setErrs({});
 
-    const parsed = inviteSchema(t).safeParse({ displayName, email, password, role });
+    const parsed = inviteSchema(t).safeParse({
+      displayName,
+      email,
+      password,
+      role,
+      realityId: role === "author" ? realityId : undefined,
+    });
     if (!parsed.success) {
       setErrs(fieldErrors(parsed.error));
       setError(t("validation.fixErrors"));
@@ -67,6 +86,7 @@ const Admin = () => {
         password: parsed.data.password,
         display_name: parsed.data.displayName,
         role: parsed.data.role,
+        reality_id: parsed.data.realityId ?? null,
       },
     });
 
@@ -79,7 +99,8 @@ const Admin = () => {
       setEmail("");
       setPassword("");
       setDisplayName("");
-      setRole("user");
+      setRole("author");
+      setRealityId("");
       fetchProfiles();
     }
     setSubmitting(false);
