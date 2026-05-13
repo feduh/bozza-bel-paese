@@ -75,6 +75,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          affiliation: string | null
           avatar_url: string | null
           bio: string
           created_at: string
@@ -88,6 +89,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          affiliation?: string | null
           avatar_url?: string | null
           bio?: string
           created_at?: string
@@ -101,6 +103,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          affiliation?: string | null
           avatar_url?: string | null
           bio?: string
           created_at?: string
