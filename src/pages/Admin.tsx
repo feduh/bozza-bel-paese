@@ -186,14 +186,42 @@ const Admin = () => {
                 <label className="block text-sm font-body font-medium mb-2">Ruolo</label>
                 <select
                   value={role}
-                  onChange={(e) => setRole(e.target.value as "user" | "moderator")}
+                  onChange={(e) => {
+                    const v = e.target.value as "author" | "moderator";
+                    setRole(v);
+                    if (v !== "author") setRealityId("");
+                  }}
                   className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
-                  <option value="user">Collaboratore</option>
-                  <option value="moderator">Moderatore</option>
+                  <option value="author">Autore (membro di una realtà)</option>
+                  <option value="moderator">Collaboratore (collettivo)</option>
                 </select>
+                <p className="text-xs text-muted-foreground font-body mt-1">
+                  {role === "author"
+                    ? "Può scrivere articoli (con moderazione) e gestire il proprio profilo."
+                    : "Può editare la mappa, pubblicare direttamente sul Magazine e moderare."}
+                </p>
               </div>
             </div>
+            {role === "author" && (
+              <div>
+                <label className="block text-sm font-body font-medium mb-2">Realtà di appartenenza *</label>
+                <select
+                  value={realityId}
+                  onChange={(e) => setRealityId(e.target.value)}
+                  aria-invalid={!!errs.realityId}
+                  className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.realityId ? "border-destructive" : "border-input"}`}
+                >
+                  <option value="">— Seleziona una realtà —</option>
+                  {realities.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} ({r.city})
+                    </option>
+                  ))}
+                </select>
+                <FieldError id="err-realityId" message={errs.realityId} />
+              </div>
+            )}
             <button
               type="submit"
               disabled={submitting}
