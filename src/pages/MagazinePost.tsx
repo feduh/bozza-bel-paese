@@ -22,6 +22,7 @@ type Post = {
 };
 
 const MagazinePost = () => {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [counterpart, setCounterpart] = useState<Post | null>(null);
