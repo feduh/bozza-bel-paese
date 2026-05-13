@@ -128,6 +128,7 @@ const AreaPersonale = () => {
         website: profile.website || null,
         social_instagram: profile.social_instagram || null,
         social_twitter: profile.social_twitter || null,
+        affiliation: profile.reality_id ? null : (profile.affiliation || null),
       })
       .eq("user_id", user.id);
     setSavingProfile(false);
