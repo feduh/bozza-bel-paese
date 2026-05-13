@@ -37,7 +37,30 @@
     "titleAccent": "artistiche italiane",
     "lead": "Un archivio vivo di collettivi, spazi e movimenti — nomadi, radicati o scomparsi — che hanno plasmato il paesaggio culturale italiano.",
     "ctaMap": "Esplora la mappa",
-    "ctaAbout": "Scopri il progetto"
+    "ctaAbout": "Scopri il progetto",
+    "sectionTitle": "Preservare, mappare,",
+    "sectionTitleAccent": "raccontare",
+    "discover": "Scopri",
+    "features": {
+      "mapping": {
+        "title": "Mappatura",
+        "desc": "Una cartografia delle realtà artistiche su tutto il territorio nazionale, categorizzate per tipologia e stato."
+      },
+      "community": {
+        "title": "Comunità",
+        "desc": "Connettiamo artisti, curatori e appassionati per creare una rete di condivisione e supporto reciproco."
+      },
+      "stories": {
+        "title": "Racconti",
+        "desc": "Storie, interviste e approfondimenti sulle realtà che animano o hanno animato la scena artistica italiana."
+      }
+    },
+    "stats": {
+      "mapped": "Realtà mappate",
+      "regions": "Regioni coperte",
+      "vanished": "Spazi che furono",
+      "articles": "Articoli pubblicati"
+    }
   },
   "about": {
     "title": "Chi",

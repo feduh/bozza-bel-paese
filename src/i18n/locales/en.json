@@ -37,7 +37,30 @@
     "titleAccent": "artistic realities",
     "lead": "A living archive of collectives, spaces and movements — nomadic, rooted or vanished — that shaped the Italian cultural landscape.",
     "ctaMap": "Explore the map",
-    "ctaAbout": "Discover the project"
+    "ctaAbout": "Discover the project",
+    "sectionTitle": "Preserve, map,",
+    "sectionTitleAccent": "tell",
+    "discover": "Discover",
+    "features": {
+      "mapping": {
+        "title": "Mapping",
+        "desc": "A cartography of artistic realities across Italy, categorised by type and status."
+      },
+      "community": {
+        "title": "Community",
+        "desc": "We connect artists, curators and enthusiasts to build a network of sharing and mutual support."
+      },
+      "stories": {
+        "title": "Stories",
+        "desc": "Articles, interviews and insights into the realities that animate — or once animated — the Italian art scene."
+      }
+    },
+    "stats": {
+      "mapped": "Realities mapped",
+      "regions": "Regions covered",
+      "vanished": "Spaces that were",
+      "articles": "Articles published"
+    }
   },
   "about": {
     "title": "About",
