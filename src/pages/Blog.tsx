@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Calendar, User, Plus, X, ArrowRight, Swords } from "lucide-react";
+import SEO from "@/components/SEO";
 
 type MagazinePost = {
   id: string;
@@ -137,6 +138,11 @@ const Magazine = () => {
 
   return (
     <div className="py-20">
+      <SEO
+        title="Magazine — Il Bel Paese"
+        description="Articoli, interviste, inchieste e dibattiti sulla scena artistica indipendente italiana."
+        canonicalPath="/magazine"
+      />
       <div className="editorial-container">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div className="max-w-3xl">

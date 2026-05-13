@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, User, ArrowLeft, Swords } from "lucide-react";
+import SEO from "@/components/SEO";
 
 type Post = {
   id: string;
@@ -88,6 +89,25 @@ const MagazinePost = () => {
 
   return (
     <article className="py-16">
+      <SEO
+        title={post.title}
+        description={post.excerpt}
+        image={post.cover_image_url ?? undefined}
+        type="article"
+        canonicalPath={`/magazine/${post.slug}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: post.title,
+          description: post.excerpt,
+          image: post.cover_image_url ?? undefined,
+          datePublished: post.published_at,
+          author: { "@type": "Person", name: post.author_name },
+          publisher: { "@type": "Organization", name: "Il Bel Paese" },
+          articleSection: post.category,
+          inLanguage: "it-IT",
+        }}
+      />
       <div className="editorial-container max-w-3xl">
         <Link
           to="/magazine"

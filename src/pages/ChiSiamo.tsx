@@ -1,5 +1,12 @@
+import SEO from "@/components/SEO";
+
 const ChiSiamo = () => (
   <div className="py-20">
+    <SEO
+      title="Chi siamo"
+      description="Il Bel Paese: la prima piattaforma di mappatura, promozione e ricerca che legittima le realtà artistiche indipendenti italiane."
+      canonicalPath="/chi-siamo"
+    />
     <div className="editorial-container max-w-3xl">
       <h1 className="editorial-heading mb-8">
         Chi <span className="italic text-primary">Siamo</span>
