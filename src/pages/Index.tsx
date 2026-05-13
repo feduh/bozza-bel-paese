@@ -3,6 +3,7 @@ import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import heroImage from "@/assets/hero-art.jpg";
 import SEO from "@/components/SEO";
+import SmartImage from "@/components/SmartImage";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -36,7 +37,13 @@ const Index = () => {
       {/* Hero */}
       <section className="relative h-[80vh] min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Arte murale italiana" className="w-full h-full object-cover" loading="lazy" />
+          <SmartImage
+            src={heroImage}
+            alt="Arte murale italiana"
+            priority
+            wrapperClassName="w-full h-full"
+            className="w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent" />
         </div>
         <div className="relative editorial-container">

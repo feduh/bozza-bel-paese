@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Calendar, User, Plus, X, ArrowRight, Swords } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
+import SmartImage from "@/components/SmartImage";
 
 type MagazinePost = {
   id: string;
@@ -344,14 +345,13 @@ const ArticleCard = ({ post }: { post: MagazinePost }) => (
     className="group block rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all overflow-hidden"
   >
     {post.cover_image_url && (
-      <div className="aspect-video overflow-hidden bg-muted">
-        <img
-          src={post.cover_image_url}
-          alt={post.title}
-          loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-      </div>
+      <SmartImage
+        src={post.cover_image_url}
+        alt={post.title}
+        aspect="16/9"
+        wrapperClassName="w-full"
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
     )}
     <div className="p-6">
       <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 mb-4">

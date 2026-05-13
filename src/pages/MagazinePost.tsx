@@ -5,6 +5,7 @@ import { Calendar, User, ArrowLeft, Swords } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
+import SmartImage from "@/components/SmartImage";
 
 type Post = {
   id: string;
@@ -150,11 +151,13 @@ const MagazinePost = () => {
         </div>
 
         {post.cover_image_url && (
-          <img
+          <SmartImage
             src={post.cover_image_url}
             alt={post.title}
-            loading="lazy"
-            className="w-full rounded-lg mb-10 aspect-video object-cover"
+            priority
+            aspect="16/9"
+            wrapperClassName="w-full rounded-lg mb-10"
+            className="w-full h-full object-cover"
           />
         )}
 
