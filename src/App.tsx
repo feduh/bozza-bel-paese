@@ -8,6 +8,7 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/Layout";
 import RouteFallback from "./components/RouteFallback";
+import { RequireRole } from "./components/RouteGuards";
 
 // Eager: Home and 404 — needed for fast first paint and error states
 import Index from "./pages/Index";
@@ -52,7 +53,14 @@ const App = () => (
                   <Route path="/magazine" element={<Blog />} />
                   <Route path="/magazine/:slug" element={<MagazinePost />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/admin" element={<Admin />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <RequireRole role="admin">
+                        <Admin />
+                      </RequireRole>
+                    }
+                  />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

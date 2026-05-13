@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Lock, Mail } from "lucide-react";
+
+type LocationState = { from?: { pathname?: string } } | null;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,11 +12,16 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  if (user) {
-    navigate("/blog");
-    return null;
-  }
+  // Where to bounce after a successful login. Falls back to /blog so the
+  // historical default behaviour is preserved.
+  const from = (location.state as LocationState)?.from?.pathname || "/blog";
+
+  // Redirect already-logged-in users in an effect (avoid setState during render).
+  useEffect(() => {
+    if (user) navigate(from, { replace: true });
+  }, [user, from, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +29,7 @@ const Login = () => {
     setLoading(true);
     const { error } = await signIn(email, password);
     if (error) setError(error.message);
-    else navigate("/blog");
+    else navigate(from, { replace: true });
     setLoading(false);
   };
 
