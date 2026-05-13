@@ -10,7 +10,6 @@ import {
   type DbRealityType,
   type RealityStatus,
   type Bucket,
-  bucketLabels,
   matchesBucket,
   getCategory,
   categoryConfig,
@@ -309,14 +308,14 @@ const Mappatura = () => {
                   </p>
                   <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{r.description}</p>
                   <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                    Scopri <ArrowRight size={14} />
+                    {t("home.discover")} <ArrowRight size={14} />
                   </span>
                 </Link>
               );
             })}
             {filtered.length === 0 && (
               <div className="col-span-full text-center py-16 text-muted-foreground font-body">
-                Nessuna realtà trovata con i filtri selezionati.
+                {t("map.empty")}
               </div>
             )}
           </div>
