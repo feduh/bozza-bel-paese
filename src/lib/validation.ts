@@ -88,11 +88,20 @@ export const inviteSchema = (t: TFunction) =>
       email: z.string().trim().toLowerCase().email(t("validation.email")),
       password: z.string().min(8, t("validation.passwordMin")),
       role: z.enum(["author", "moderator"]),
+      authorType: z.enum(["reality", "external", "none"]).optional(),
       realityId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
+      affiliation: z.preprocess(
+        emptyToUndefined,
+        z.string().trim().min(2).max(120).optional(),
+      ),
     })
     .refine(
-      (d) => d.role !== "author" || !!d.realityId,
+      (d) => d.role !== "author" || d.authorType !== "reality" || !!d.realityId,
       { path: ["realityId"], message: t("validation.required") },
+    )
+    .refine(
+      (d) => d.role !== "author" || d.authorType !== "external" || !!d.affiliation,
+      { path: ["affiliation"], message: t("validation.required") },
     );
 
 export type InviteInput = z.infer<ReturnType<typeof inviteSchema>>;

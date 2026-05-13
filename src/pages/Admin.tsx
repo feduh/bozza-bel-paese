@@ -31,7 +31,9 @@ const Admin = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [role, setRole] = useState<"author" | "moderator">("author");
+  const [authorType, setAuthorType] = useState<"reality" | "external" | "none">("reality");
   const [realityId, setRealityId] = useState("");
+  const [affiliation, setAffiliation] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -71,7 +73,9 @@ const Admin = () => {
       email,
       password,
       role,
-      realityId: role === "author" ? realityId : undefined,
+      authorType: role === "author" ? authorType : undefined,
+      realityId: role === "author" && authorType === "reality" ? realityId : undefined,
+      affiliation: role === "author" && authorType === "external" ? affiliation : undefined,
     });
     if (!parsed.success) {
       setErrs(fieldErrors(parsed.error));
@@ -87,6 +91,7 @@ const Admin = () => {
         display_name: parsed.data.displayName,
         role: parsed.data.role,
         reality_id: parsed.data.realityId ?? null,
+        affiliation: parsed.data.affiliation ?? null,
       },
     });
 
@@ -95,12 +100,14 @@ const Admin = () => {
     } else if (data?.error) {
       setError(data.error);
     } else {
-      setMessage(`✅ ${data.message}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`);
+      setMessage(`✅ ${data.message ?? "Account creato"}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`);
       setEmail("");
       setPassword("");
       setDisplayName("");
       setRole("author");
+      setAuthorType("reality");
       setRealityId("");
+      setAffiliation("");
       fetchProfiles();
     }
     setSubmitting(false);
@@ -189,11 +196,14 @@ const Admin = () => {
                   onChange={(e) => {
                     const v = e.target.value as "author" | "moderator";
                     setRole(v);
-                    if (v !== "author") setRealityId("");
+                    if (v !== "author") {
+                      setRealityId("");
+                      setAffiliation("");
+                    }
                   }}
                   className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
-                  <option value="author">Autore (membro di una realtà)</option>
+                  <option value="author">Autore (scrive sul Magazine)</option>
                   <option value="moderator">Collaboratore (collettivo)</option>
                 </select>
                 <p className="text-xs text-muted-foreground font-body mt-1">
@@ -204,22 +214,81 @@ const Admin = () => {
               </div>
             </div>
             {role === "author" && (
-              <div>
-                <label className="block text-sm font-body font-medium mb-2">Realtà di appartenenza *</label>
-                <select
-                  value={realityId}
-                  onChange={(e) => setRealityId(e.target.value)}
-                  aria-invalid={!!errs.realityId}
-                  className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.realityId ? "border-destructive" : "border-input"}`}
-                >
-                  <option value="">— Seleziona una realtà —</option>
-                  {realities.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name} ({r.city})
-                    </option>
-                  ))}
-                </select>
-                <FieldError id="err-realityId" message={errs.realityId} />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-body font-medium mb-2">Tipo di autore</label>
+                  <div className="grid sm:grid-cols-3 gap-2">
+                    {([
+                      { v: "reality", label: "Membro di una realtà" },
+                      { v: "external", label: "Ricercatore / Istituzione" },
+                      { v: "none", label: "Indipendente" },
+                    ] as const).map((opt) => (
+                      <label
+                        key={opt.v}
+                        className={`cursor-pointer text-xs font-body px-3 py-2 rounded-md border text-center transition-colors ${
+                          authorType === opt.v
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-input hover:border-primary/40"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="authorType"
+                          value={opt.v}
+                          checked={authorType === opt.v}
+                          onChange={() => {
+                            setAuthorType(opt.v);
+                            if (opt.v !== "reality") setRealityId("");
+                            if (opt.v !== "external") setAffiliation("");
+                          }}
+                          className="sr-only"
+                        />
+                        {opt.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {authorType === "reality" && (
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Realtà di appartenenza *</label>
+                    <select
+                      value={realityId}
+                      onChange={(e) => setRealityId(e.target.value)}
+                      aria-invalid={!!errs.realityId}
+                      className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.realityId ? "border-destructive" : "border-input"}`}
+                    >
+                      <option value="">— Seleziona una realtà —</option>
+                      {realities.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.name} ({r.city})
+                        </option>
+                      ))}
+                    </select>
+                    <FieldError id="err-realityId" message={errs.realityId} />
+                  </div>
+                )}
+
+                {authorType === "external" && (
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Affiliazione *</label>
+                    <input
+                      value={affiliation}
+                      onChange={(e) => setAffiliation(e.target.value)}
+                      placeholder="es. Università di Bologna, MAXXI, ricercatrice indipendente…"
+                      maxLength={120}
+                      aria-invalid={!!errs.affiliation}
+                      className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.affiliation ? "border-destructive" : "border-input"}`}
+                    />
+                    <FieldError id="err-affiliation" message={errs.affiliation} />
+                  </div>
+                )}
+
+                {authorType === "none" && (
+                  <p className="text-xs text-muted-foreground font-body italic">
+                    L'autore potrà aggiungere o modificare la propria affiliazione dall'area personale.
+                  </p>
+                )}
               </div>
             )}
             <button
