@@ -136,6 +136,13 @@ const Navbar = () => {
           })}
           {user ? (
             <>
+              <Link
+                to="/area-personale"
+                onClick={() => setOpen(false)}
+                className="block font-body text-sm font-medium text-secondary uppercase"
+              >
+                ◎ Area personale
+              </Link>
               {isAdmin && (
                 <Link
                   to="/admin"
