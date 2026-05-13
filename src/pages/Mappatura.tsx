@@ -149,6 +149,11 @@ const Mappatura = () => {
 
   return (
     <div className="py-20">
+      <SEO
+        title="Mappatura — realtà artistiche italiane"
+        description="Esplora la scena indipendente italiana: spazi con sede, nomadi e archivio storico. Filtra per regione, media artistico e stato."
+        canonicalPath="/mappatura"
+      />
       <div className="editorial-container">
         <div className="max-w-3xl mb-10">
           <h1 className="editorial-heading mb-6">
