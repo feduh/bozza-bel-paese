@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { MapPin, ArrowLeft, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
+import SEO from "@/components/SEO";
 import {
   type DbRealityType,
   type RealityStatus,
@@ -51,6 +52,31 @@ const RealityDetail = () => {
 
   return (
     <div className="py-12">
+      <SEO
+        title={`${reality.name} — ${reality.city}`}
+        description={reality.description}
+        type="profile"
+        canonicalPath={`/realta/${reality.id}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: reality.name,
+          description: reality.description,
+          url: reality.website ?? undefined,
+          foundingDate: reality.year_founded ? String(reality.year_founded) : undefined,
+          dissolutionDate: reality.year_closed ? String(reality.year_closed) : undefined,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: reality.city,
+            addressRegion: reality.region,
+            addressCountry: "IT",
+          },
+          geo:
+            reality.lat && reality.lng
+              ? { "@type": "GeoCoordinates", latitude: reality.lat, longitude: reality.lng }
+              : undefined,
+        }}
+      />
       <div className="editorial-container">
         <Link to="/mappatura" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8">
           <ArrowLeft size={16} /> Torna alla mappatura
