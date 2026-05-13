@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { UserPlus, Users, Shield, Eye, EyeOff, MapPinPlus } from "lucide-react";
 import RealityForm from "@/components/RealityForm";
@@ -21,7 +19,6 @@ type Profile = {
 };
 
 const Admin = () => {
-  const { user } = useAuth();
   const { t } = useTranslation();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
