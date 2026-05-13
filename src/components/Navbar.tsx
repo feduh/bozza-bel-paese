@@ -68,6 +68,12 @@ const Navbar = () => {
           </div>
           {user ? (
             <div className="flex items-center gap-3">
+              <Link
+                to="/area-personale"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary/15 text-secondary text-xs font-body font-medium hover:bg-secondary/25 transition-colors"
+              >
+                <UserIcon size={12} /> Area personale
+              </Link>
               {isAdmin && (
                 <Link
                   to="/admin"
