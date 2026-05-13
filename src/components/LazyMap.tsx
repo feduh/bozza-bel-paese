@@ -12,7 +12,7 @@ type MarkerData = {
   lng: number;
   name: string;
   city?: string;
-  popupContent?: React.ReactNode;
+  popupContent?: string;
   /** CSS color (e.g. hsl(var(--primary))) */
   color?: string;
   /** If true, renders as outline-only (white interior) */
@@ -49,18 +49,6 @@ const buildIcon = (color: string, outline: boolean) => {
   });
 };
 
-const renderToHtml = (node: React.ReactNode): string => {
-  // Lightweight: if string, escape; else assume the popup builder gave us safe markup.
-  // Our popups in this app pass a React element; we serialize by rendering with a temporary container.
-  if (node == null) return "";
-  if (typeof node === "string" || typeof node === "number") {
-    const tmp = document.createElement("div");
-    tmp.textContent = String(node);
-    return tmp.innerHTML;
-  }
-  // Fallback: use server-style render via createElement is heavy; instead callers pass HTML strings via DOM
-  return "";
-};
 
 const ClusterLayer = ({ markers, cluster }: { markers: MarkerData[]; cluster: boolean }) => {
   const map = useMap();
