@@ -48,10 +48,8 @@ const inviteSchema = z.object({
     .max(100, "Il nome può avere al massimo 100 caratteri"),
   role: z.enum(["author", "moderator"]).default("author"),
   reality_id: z.string().uuid().nullable().optional(),
-}).refine(
-  (d) => d.role !== "author" || !!d.reality_id,
-  { message: "Realtà di appartenenza obbligatoria per gli autori", path: ["reality_id"] }
-);
+  affiliation: z.string().trim().min(2).max(120).nullable().optional(),
+});
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
