@@ -119,21 +119,13 @@ const Mappatura = () => {
           city: r.city,
           color: cfg.markerColor,
           outline: cfg.outline,
-          popupContent: (
-            <div className="font-body">
-              <strong className="font-display">{r.name}</strong>
-              <br />
-              <span className="text-xs">
-                {r.city}, {r.region}
-              </span>
-              <br />
-              <span className="text-[10px] uppercase tracking-wide opacity-70">{cfg.label}</span>
-              <br />
-              <a href={`/realta/${r.id}`} className="text-xs text-primary underline">
-                Vai alla scheda →
-              </a>
-            </div>
-          ),
+          popupContent: `
+            <div style="font-family:var(--font-body)">
+              <strong style="font-family:var(--font-display);font-size:14px">${r.name.replace(/</g, "&lt;")}</strong><br/>
+              <span style="font-size:12px">${r.city}, ${r.region}</span><br/>
+              <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.7">${cfg.label}</span><br/>
+              <a href="/realta/${r.id}" style="font-size:12px;color:hsl(var(--primary));text-decoration:underline">Vai alla scheda →</a>
+            </div>`,
         };
       }),
     [filtered]

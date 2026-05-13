@@ -109,13 +109,14 @@ const RealityDetail = () => {
                   <LazyMap
                     center={[reality.lat, reality.lng]}
                     zoom={14}
+                    cluster={false}
                     markers={[
                       {
                         id: reality.id,
                         lat: reality.lat,
                         lng: reality.lng,
                         name: reality.name,
-                        popupContent: <>{reality.name}<br />{reality.city}</>,
+                        popupContent: `<strong>${reality.name}</strong><br/><span style="font-size:12px;opacity:.7">${reality.city}</span>`,
                         color: config.markerColor,
                         outline: config.outline,
                       },
