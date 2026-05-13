@@ -122,6 +122,31 @@
       "map": "We verify, geolocate and categorise each experience according to shared criteria.",
       "tell": "We publish profiles, articles and debates to give context and visibility.",
       "update": "Annual review of the status of mapped realities to keep the data alive."
+    },
+    "whyTitle": "Why",
+    "whyText": "Because independent realities often fly under the radar of institutions, official databases and funding routes. Documenting them, telling their stories and connecting them means restoring the legitimacy they deserve and enriching the country cultural heritage.",
+    "ctaTitle": "Want to contribute?",
+    "ctaText": "If you represent an independent artistic reality, are a researcher or an institutional partner, write to us to join the map or the magazine.",
+    "ctaButton": "Write to us",
+    "howIntro": "How",
+    "howSuffix": "we do it",
+    "how": {
+      "showcase": {
+        "title": "Dynamic showcase",
+        "desc": "Up-to-date profiles, filters by region, medium and type, community-sourced submissions."
+      },
+      "archive": {
+        "title": "Historical archive",
+        "desc": "Memory of concluded realities, recovered through testimonies and documents."
+      },
+      "magazine": {
+        "title": "Editorial magazine",
+        "desc": "Articles, interviews and the Point / Counter Point format with editors-in-chief as scientific guarantee."
+      },
+      "update": {
+        "title": "Lets update",
+        "desc": "Annual review of the status of mapped realities to keep the data alive."
+      }
     }
   },
   "map": {

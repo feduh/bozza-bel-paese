@@ -122,6 +122,31 @@
       "map": "Verifichiamo, geolocalizziamo e categorizziamo ogni esperienza secondo criteri condivisi.",
       "tell": "Pubblichiamo schede, articoli e dibattiti per dare contesto e visibilità.",
       "update": "Verifica annuale dello stato delle realtà mappate per mantenere il dato vivo."
+    },
+    "whyTitle": "Perché",
+    "whyText": "Perché le realtà indipendenti spesso restano fuori dai radar istituzionali, dalle banche dati ufficiali e dai percorsi di finanziamento. Documentarle, raccontarle e metterle in rete significa restituire loro la legittimazione che meritano e arricchire il patrimonio culturale del paese.",
+    "ctaTitle": "Vuoi contribuire?",
+    "ctaText": "Se rappresenti una realtà artistica indipendente, sei un ricercatore o un partner istituzionale, scrivici per entrare nella mappa o nel magazine.",
+    "ctaButton": "Scrivici",
+    "howIntro": "Come",
+    "howSuffix": "lo facciamo",
+    "how": {
+      "showcase": {
+        "title": "Vetrina dinamica",
+        "desc": "Schede aggiornate, filtri per regione, media e tipologia, segnalazioni dal basso."
+      },
+      "archive": {
+        "title": "Archivio storico",
+        "desc": "Memoria delle realtà concluse, recuperata attraverso testimonianze e documenti."
+      },
+      "magazine": {
+        "title": "Magazine editoriale",
+        "desc": "Articoli, interviste e il format Point / Counter Point con editor in chief come garanzia scientifica."
+      },
+      "update": {
+        "title": "Aggiorniamoci",
+        "desc": "Verifica annuale dello stato delle realtà mappate per mantenere il dato vivo."
+      }
     }
   },
   "map": {
