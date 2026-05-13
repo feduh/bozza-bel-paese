@@ -150,11 +150,13 @@ const MagazinePost = () => {
         </div>
 
         {post.cover_image_url && (
-          <img
+          <SmartImage
             src={post.cover_image_url}
             alt={post.title}
-            loading="lazy"
-            className="w-full rounded-lg mb-10 aspect-video object-cover"
+            priority
+            aspect="16/9"
+            wrapperClassName="w-full rounded-lg mb-10"
+            className="w-full h-full object-cover"
           />
         )}
 
