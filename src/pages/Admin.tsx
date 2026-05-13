@@ -122,57 +122,66 @@ const Admin = () => {
           <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
             <UserPlus size={20} /> Invita collaboratore
           </h2>
-          <form onSubmit={handleInvite} className="space-y-4">
+          <form onSubmit={handleInvite} noValidate className="space-y-4">
             {error && (
-              <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-body">{error}</div>
+              <div role="alert" className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-body">{error}</div>
             )}
             {message && (
-              <div className="p-4 rounded-md bg-secondary/10 text-foreground text-sm font-body border border-secondary/20">{message}</div>
+              <div role="status" className="p-4 rounded-md bg-secondary/10 text-foreground text-sm font-body border border-secondary/20">{message}</div>
             )}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-body font-medium mb-2">Nome visualizzato *</label>
+                <label className="block text-sm font-body font-medium mb-2" htmlFor="inv-name">Nome visualizzato *</label>
                 <input
-                  required
+                  id="inv-name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Mario Rossi"
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  aria-invalid={!!errs.displayName}
+                  aria-describedby={errs.displayName ? "err-displayName" : undefined}
+                  className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.displayName ? "border-destructive" : "border-input"}`}
                 />
+                <FieldError id="err-displayName" message={errs.displayName} />
               </div>
               <div>
-                <label className="block text-sm font-body font-medium mb-2">Email *</label>
+                <label className="block text-sm font-body font-medium mb-2" htmlFor="inv-email">Email *</label>
                 <input
-                  required
+                  id="inv-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="collaboratore@esempio.it"
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  aria-invalid={!!errs.email}
+                  aria-describedby={errs.email ? "err-email" : undefined}
+                  className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.email ? "border-destructive" : "border-input"}`}
                 />
+                <FieldError id="err-email" message={errs.email} />
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-body font-medium mb-2">Password *</label>
+                <label className="block text-sm font-body font-medium mb-2" htmlFor="inv-pwd">Password *</label>
                 <div className="relative">
                   <input
-                    required
+                    id="inv-pwd"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minimo 6 caratteri"
-                    minLength={6}
-                    className="w-full px-4 py-3 pr-12 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="Minimo 8 caratteri"
+                    aria-invalid={!!errs.password}
+                    aria-describedby={errs.password ? "err-password" : undefined}
+                    className={`w-full px-4 py-3 pr-12 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.password ? "border-destructive" : "border-input"}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Nascondi password" : "Mostra password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+                <FieldError id="err-password" message={errs.password} />
               </div>
               <div>
                 <label className="block text-sm font-body font-medium mb-2">Ruolo</label>
