@@ -26,18 +26,26 @@ const LanguageSwitcher = () => {
       <button
         type="button"
         aria-label={t("common.language")}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md border border-border text-xs font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors uppercase tracking-wide"
       >
-        <Globe size={14} />
+        <Globe size={14} aria-hidden />
         {current.code}
-        <ChevronDown size={12} />
+        <ChevronDown size={12} aria-hidden />
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-40 rounded-lg border border-border bg-popover shadow-lg overflow-hidden z-50">
+        <ul
+          role="listbox"
+          aria-label={t("common.language")}
+          className="absolute right-0 mt-2 w-40 rounded-lg border border-border bg-popover shadow-lg overflow-hidden z-50"
+        >
           {supportedLanguages.map((l) => (
+            <li key={l.code}>
             <button
-              key={l.code}
+              role="option"
+              aria-selected={current.code === l.code}
               onClick={() => {
                 i18n.changeLanguage(l.code);
                 setOpen(false);
@@ -49,8 +57,9 @@ const LanguageSwitcher = () => {
               <span aria-hidden>{l.flag}</span>
               {l.label}
             </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

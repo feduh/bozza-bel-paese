@@ -91,6 +91,21 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
   }
+
+  /* Accessibility: consistent visible focus ring across the app.
+     Mouse users won't see it (focus-visible), keyboard users always will. */
+  :focus { outline: none; }
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* Avoid double rings on shadcn components that already render a ring */
+  [data-radix-collection-item]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="option"]:focus-visible {
+    outline-offset: -2px;
+  }
 }
 
 @layer components {
