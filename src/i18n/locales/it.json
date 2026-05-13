@@ -1,0 +1,98 @@
+{
+  "common": {
+    "loading": "Caricamento...",
+    "back": "Indietro",
+    "close": "Chiudi",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "search": "Cerca",
+    "all": "Tutte",
+    "language": "Lingua",
+    "theme": {
+      "light": "Tema chiaro",
+      "dark": "Tema scuro",
+      "toggle": "Cambia tema"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "Chi Siamo",
+    "what": "Cosa Facciamo",
+    "map": "Mappatura",
+    "magazine": "Magazine",
+    "admin": "Admin",
+    "login": "Accedi",
+    "logout": "Esci"
+  },
+  "footer": {
+    "tagline": "Mappatura delle realtà artistiche italiane: nomadi, con sede e scomparse.",
+    "navigation": "Navigazione",
+    "contacts": "Contatti",
+    "rights": "Tutti i diritti riservati."
+  },
+  "home": {
+    "title": "Tracciamo le realtà",
+    "titleAccent": "artistiche italiane",
+    "lead": "Un archivio vivo di collettivi, spazi e movimenti — nomadi, radicati o scomparsi — che hanno plasmato il paesaggio culturale italiano.",
+    "ctaMap": "Esplora la mappa",
+    "ctaAbout": "Scopri il progetto"
+  },
+  "about": {
+    "title": "Chi",
+    "titleAccent": "Siamo"
+  },
+  "what": {
+    "title": "Cosa",
+    "titleAccent": "Facciamo",
+    "intro": "Il nostro impegno si articola attraverso tre pilastri — mappatura, promozione e ricerca — pensati per legittimare la scena indipendente e metterla in dialogo con il sistema istituzionale."
+  },
+  "map": {
+    "title": "Mappatura",
+    "titleSuffix": "delle realtà",
+    "lead": "Esplora la scena indipendente italiana. Filtra per sezione, regione o media artistico.",
+    "section": "Sezione",
+    "view": {
+      "map": "Mappa",
+      "list": "Elenco"
+    },
+    "search": "Cerca per nome o città...",
+    "filterRegion": "Tutte le regioni",
+    "filterMedia": "Tutti i media artistici",
+    "clearFilters": "Rimuovi filtri",
+    "results": "{{count}} realtà trovate",
+    "empty": "Nessuna realtà trovata con i filtri selezionati.",
+    "buckets": {
+      "spazi": "Spazi",
+      "spazi-senza-spazi": "Spazi senza spazi",
+      "spazi-che-furono": "Spazi che furono"
+    }
+  },
+  "magazine": {
+    "title": "Il",
+    "titleAccent": "Magazine",
+    "lead": "Articoli, interviste, inchieste e dibattiti sulla scena artistica indipendente italiana.",
+    "back": "Torna al magazine",
+    "notFound": "Articolo non trovato.",
+    "readReply": "Leggi la replica",
+    "readThesis": "Leggi la tesi iniziale"
+  },
+  "reality": {
+    "back": "Torna alla mappatura",
+    "notFound": "Realtà non trovata",
+    "history": "Storia",
+    "location": "Posizione",
+    "info": "Informazioni",
+    "founded": "Fondazione",
+    "closed": "Chiusura",
+    "status": "Stato",
+    "city": "Città",
+    "region": "Regione",
+    "website": "Sito web",
+    "visit": "Visita",
+    "disciplines": "Discipline",
+    "active": "Attiva",
+    "archived": "Archiviata"
+  }
+}

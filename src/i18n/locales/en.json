@@ -1,0 +1,98 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "all": "All",
+    "language": "Language",
+    "theme": {
+      "light": "Light theme",
+      "dark": "Dark theme",
+      "toggle": "Toggle theme"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "what": "What We Do",
+    "map": "Map",
+    "magazine": "Magazine",
+    "admin": "Admin",
+    "login": "Sign in",
+    "logout": "Sign out"
+  },
+  "footer": {
+    "tagline": "Mapping Italy's artistic realities: nomadic, settled and vanished.",
+    "navigation": "Navigation",
+    "contacts": "Contact",
+    "rights": "All rights reserved."
+  },
+  "home": {
+    "title": "We map Italy's",
+    "titleAccent": "artistic realities",
+    "lead": "A living archive of collectives, spaces and movements — nomadic, rooted or vanished — that shaped the Italian cultural landscape.",
+    "ctaMap": "Explore the map",
+    "ctaAbout": "Discover the project"
+  },
+  "about": {
+    "title": "About",
+    "titleAccent": "Us"
+  },
+  "what": {
+    "title": "What We",
+    "titleAccent": "Do",
+    "intro": "Our work unfolds across three pillars — mapping, promotion and research — designed to legitimise the independent scene and connect it with the institutional system."
+  },
+  "map": {
+    "title": "Mapping",
+    "titleSuffix": "of realities",
+    "lead": "Explore the Italian independent scene. Filter by section, region or artistic medium.",
+    "section": "Section",
+    "view": {
+      "map": "Map",
+      "list": "List"
+    },
+    "search": "Search by name or city...",
+    "filterRegion": "All regions",
+    "filterMedia": "All artistic media",
+    "clearFilters": "Clear filters",
+    "results": "{{count}} realities found",
+    "empty": "No realities match the selected filters.",
+    "buckets": {
+      "spazi": "Spaces",
+      "spazi-senza-spazi": "Spaces without a space",
+      "spazi-che-furono": "Spaces that were"
+    }
+  },
+  "magazine": {
+    "title": "The",
+    "titleAccent": "Magazine",
+    "lead": "Articles, interviews, investigations and debates on the Italian independent art scene.",
+    "back": "Back to magazine",
+    "notFound": "Article not found.",
+    "readReply": "Read the reply",
+    "readThesis": "Read the initial thesis"
+  },
+  "reality": {
+    "back": "Back to map",
+    "notFound": "Reality not found",
+    "history": "History",
+    "location": "Location",
+    "info": "Information",
+    "founded": "Founded",
+    "closed": "Closed",
+    "status": "Status",
+    "city": "City",
+    "region": "Region",
+    "website": "Website",
+    "visit": "Visit",
+    "disciplines": "Disciplines",
+    "active": "Active",
+    "archived": "Archived"
+  }
+}
