@@ -117,14 +117,21 @@ export type Database = {
       }
       realities: {
         Row: {
+          address: string | null
           city: string
+          confirmed_status: string
           contact_email: string | null
+          contacted_at: string | null
+          country: string
           created_at: string
           description: string
+          fb_link: string | null
           history: string
           id: string
+          ig_link: string | null
           image_url: string | null
           lat: number
+          linkedin_link: string | null
           lng: number
           name: string
           region: string
@@ -134,16 +141,24 @@ export type Database = {
           website: string | null
           year_closed: number | null
           year_founded: number
+          zip_code: string | null
         }
         Insert: {
+          address?: string | null
           city: string
+          confirmed_status?: string
           contact_email?: string | null
+          contacted_at?: string | null
+          country?: string
           created_at?: string
           description?: string
+          fb_link?: string | null
           history?: string
           id?: string
+          ig_link?: string | null
           image_url?: string | null
           lat: number
+          linkedin_link?: string | null
           lng: number
           name: string
           region: string
@@ -153,16 +168,24 @@ export type Database = {
           website?: string | null
           year_closed?: number | null
           year_founded: number
+          zip_code?: string | null
         }
         Update: {
+          address?: string | null
           city?: string
+          confirmed_status?: string
           contact_email?: string | null
+          contacted_at?: string | null
+          country?: string
           created_at?: string
           description?: string
+          fb_link?: string | null
           history?: string
           id?: string
+          ig_link?: string | null
           image_url?: string | null
           lat?: number
+          linkedin_link?: string | null
           lng?: number
           name?: string
           region?: string
@@ -172,6 +195,7 @@ export type Database = {
           website?: string | null
           year_closed?: number | null
           year_founded?: number
+          zip_code?: string | null
         }
         Relationships: []
       }
