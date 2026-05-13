@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, User, ArrowLeft, Swords } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 
