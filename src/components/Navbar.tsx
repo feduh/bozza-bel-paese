@@ -32,25 +32,36 @@ const Navbar = () => {
   }, [user]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
+    <nav
+      className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border"
+      aria-label={t("nav.home")}
+    >
       <div className="editorial-container flex items-center justify-between h-16">
-        <Link to="/" className="font-display text-xl font-bold text-primary tracking-tight">
+        <Link
+          to="/"
+          className="font-display text-xl font-bold text-primary tracking-tight"
+          aria-label="Il Bel Paese — home"
+        >
           Il Bel Paese
         </Link>
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${
-                location.pathname === link.to ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                aria-current={active ? "page" : undefined}
+                className={`font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <div className="flex items-center gap-2 pl-2 border-l border-border">
             <LanguageSwitcher />
             <ThemeToggle />
@@ -86,7 +97,13 @@ const Navbar = () => {
         <div className="md:hidden flex items-center gap-2">
           <LanguageSwitcher />
           <ThemeToggle />
-          <button onClick={() => setOpen(!open)} className="text-foreground" aria-label="menu">
+          <button
+            onClick={() => setOpen(!open)}
+            className="text-foreground"
+            aria-label={open ? t("common.closeMenu") : t("common.openMenu")}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+          >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -94,19 +111,23 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-border bg-background px-6 py-4 space-y-3">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              onClick={() => setOpen(false)}
-              className={`block font-body text-sm font-medium uppercase ${
-                location.pathname === link.to ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div id="mobile-nav" className="md:hidden border-t border-border bg-background px-6 py-4 space-y-3">
+          {navLinks.map((link) => {
+            const active = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={`block font-body text-sm font-medium uppercase ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           {user ? (
             <>
               {isAdmin && (

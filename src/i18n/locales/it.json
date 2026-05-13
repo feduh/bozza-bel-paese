@@ -10,6 +10,9 @@
     "search": "Cerca",
     "all": "Tutte",
     "language": "Lingua",
+    "skipToContent": "Vai al contenuto principale",
+    "openMenu": "Apri menu di navigazione",
+    "closeMenu": "Chiudi menu di navigazione",
     "theme": {
       "light": "Tema chiaro",
       "dark": "Tema scuro",
