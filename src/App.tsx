@@ -63,6 +63,30 @@ const App = () => (
                       </RequireRole>
                     }
                   />
+                  <Route
+                    path="/area-personale"
+                    element={
+                      <RequireAuth>
+                        <AreaPersonale />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/area-personale/articolo/nuovo"
+                    element={
+                      <RequireAuth>
+                        <ArticoloEditor />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/area-personale/articolo/:id/modifica"
+                    element={
+                      <RequireAuth>
+                        <ArticoloEditor />
+                      </RequireAuth>
+                    }
+                  />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
