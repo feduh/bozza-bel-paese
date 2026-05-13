@@ -132,36 +132,36 @@ const RealityDetail = () => {
 
           <aside className="space-y-6">
             <div className="p-6 rounded-lg bg-card border border-border">
-              <h3 className="font-display text-lg font-semibold mb-4">Informazioni</h3>
+              <h3 className="font-display text-lg font-semibold mb-4">{t("reality.info")}</h3>
               <dl className="space-y-3 text-sm font-body">
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Fondazione</dt>
+                  <dt className="text-muted-foreground">{t("reality.founded")}</dt>
                   <dd className="font-medium">{reality.year_founded}</dd>
                 </div>
                 {reality.year_closed && (
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Chiusura</dt>
+                    <dt className="text-muted-foreground">{t("reality.closed")}</dt>
                     <dd className="font-medium">{reality.year_closed}</dd>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Stato</dt>
-                  <dd className="font-medium">{status === "archiviato" ? "Archiviata" : "Attiva"}</dd>
+                  <dt className="text-muted-foreground">{t("reality.status")}</dt>
+                  <dd className="font-medium">{status === "archiviato" ? t("reality.archived") : t("reality.active")}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Città</dt>
+                  <dt className="text-muted-foreground">{t("reality.city")}</dt>
                   <dd className="font-medium">{reality.city}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Regione</dt>
+                  <dt className="text-muted-foreground">{t("reality.region")}</dt>
                   <dd className="font-medium">{reality.region}</dd>
                 </div>
                 {reality.website && (
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Sito web</dt>
+                    <dt className="text-muted-foreground">{t("reality.website")}</dt>
                     <dd>
                       <a href={reality.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                        <Globe size={12} /> Visita
+                        <Globe size={12} /> {t("reality.visit")}
                       </a>
                     </dd>
                   </div>
@@ -170,7 +170,7 @@ const RealityDetail = () => {
             </div>
 
             <div className="p-6 rounded-lg bg-card border border-border">
-              <h3 className="font-display text-lg font-semibold mb-4">Discipline</h3>
+              <h3 className="font-display text-lg font-semibold mb-4">{t("reality.disciplines")}</h3>
               <div className="flex flex-wrap gap-2">
                 {tags.map((d) => (
                   <span key={d} className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
