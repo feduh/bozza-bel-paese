@@ -4,6 +4,7 @@ import { MapPin, ArrowLeft, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
+import { RealityDetailSkeleton } from "@/components/skeletons";
 import {
   type DbRealityType,
   type RealityStatus,
@@ -33,7 +34,7 @@ const RealityDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="py-20 text-center"><p className="text-muted-foreground font-body">Caricamento...</p></div>;
+    return <RealityDetailSkeleton />;
   }
 
   if (!reality) {

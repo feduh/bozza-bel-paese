@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, User, ArrowLeft, Swords } from "lucide-react";
 import SEO from "@/components/SEO";
+import { PostDetailSkeleton } from "@/components/skeletons";
 
 type Post = {
   id: string;
@@ -69,11 +70,7 @@ const MagazinePost = () => {
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="py-20 text-center text-muted-foreground font-body">
-        Caricamento...
-      </div>
-    );
+    return <PostDetailSkeleton />;
   }
 
   if (!post) {
