@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, List, Map, ArrowRight, X, ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
