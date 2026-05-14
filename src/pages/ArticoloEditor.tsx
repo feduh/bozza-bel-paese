@@ -114,6 +114,70 @@ const ArticoloEditor = () => {
       .then(({ data }) => setParent((data as ParentMeta | null) ?? null));
   }, [replyTo]);
 
+  // Autosave drafts (debounced 30s) — only for posts not yet published
+  useEffect(() => {
+    if (!user || loading || submitting) return;
+    if (currentStatus === "published") return;
+    if (!form.title.trim() || !form.content.trim()) return;
+
+    const snapshot = JSON.stringify(form);
+    if (snapshot === lastSavedRef.current) return;
+
+    const timer = setTimeout(async () => {
+      setAutoSaveState("saving");
+      const authorName = user.email || "Anonimo";
+
+      if (editingId) {
+        const { error } = await supabase
+          .from("blog_posts")
+          .update({
+            title: form.title || "Bozza senza titolo",
+            category: form.category || "Bozza",
+            excerpt: form.excerpt || form.content.slice(0, 200),
+            content: form.content,
+            cover_image_url: form.coverImageUrl || null,
+          })
+          .eq("id", editingId);
+        if (!error) {
+          lastSavedRef.current = snapshot;
+          setAutoSaveState("saved");
+          setTimeout(() => setAutoSaveState("idle"), 2000);
+        } else {
+          setAutoSaveState("idle");
+        }
+      } else {
+        // First autosave creates a draft row so subsequent saves update it
+        const slug = `${slugify(form.title || "bozza")}-${Math.random().toString(36).slice(2, 8)}`;
+        const { data, error } = await supabase
+          .from("blog_posts")
+          .insert({
+            title: form.title || "Bozza senza titolo",
+            category: form.category || "Bozza",
+            excerpt: form.excerpt || form.content.slice(0, 200),
+            content: form.content,
+            cover_image_url: form.coverImageUrl || null,
+            author_name: authorName,
+            user_id: user.id,
+            slug,
+            status: "draft",
+            reply_to_id: replyTo,
+          })
+          .select("id")
+          .maybeSingle();
+        if (!error && data) {
+          setEditingId(data.id);
+          lastSavedRef.current = snapshot;
+          setAutoSaveState("saved");
+          setTimeout(() => setAutoSaveState("idle"), 2000);
+        } else {
+          setAutoSaveState("idle");
+        }
+      }
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, [form, user, loading, submitting, currentStatus, editingId, replyTo]);
+
   if (!user) {
     navigate("/login");
     return null;
