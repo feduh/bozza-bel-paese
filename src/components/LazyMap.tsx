@@ -153,7 +153,14 @@ const UserLocationLayer = ({ pos }: { pos: { lat: number; lng: number } | null |
     } else {
       markerRef.current = L.marker([pos.lat, pos.lng], { icon, interactive: false }).addTo(map);
     }
-    map.flyTo([pos.lat, pos.lng], 9, { duration: 1.2 });
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      map.setView([pos.lat, pos.lng], 9);
+    } else {
+      map.flyTo([pos.lat, pos.lng], 9, { duration: 1.2 });
+    }
     return () => {
       if (markerRef.current) {
         map.removeLayer(markerRef.current);
