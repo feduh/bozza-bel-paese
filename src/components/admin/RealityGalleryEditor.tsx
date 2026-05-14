@@ -37,18 +37,23 @@ const publicUrl = (path: string) =>
 
 function SortableRow({
   img,
-  onChange,
+  onPersist,
   onDelete,
   saving,
 }: {
   img: RealityImage;
-  onChange: (patch: Partial<RealityImage>) => void;
+  onPersist: (id: string, patch: Partial<RealityImage>) => void;
   onDelete: () => void;
   saving: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: img.id,
   });
+  const [caption, setCaption] = useState(img.caption ?? "");
+  const [credit, setCredit] = useState(img.credit ?? "");
+
+  useEffect(() => setCaption(img.caption ?? ""), [img.caption]);
+  useEffect(() => setCredit(img.credit ?? ""), [img.credit]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -73,23 +78,29 @@ function SortableRow({
       </button>
       <img
         src={publicUrl(img.storage_path)}
-        alt={img.caption ?? "Immagine realtà"}
+        alt={caption || "Immagine realtà"}
         className="w-24 h-24 rounded object-cover border border-border shrink-0"
         loading="lazy"
       />
       <div className="flex-1 grid gap-2">
         <input
           type="text"
-          value={img.caption ?? ""}
-          onChange={(e) => onChange({ caption: e.target.value })}
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          onBlur={() => {
+            if ((img.caption ?? "") !== caption) onPersist(img.id, { caption: caption || null });
+          }}
           placeholder="Didascalia (opzionale)"
           maxLength={200}
           className="w-full px-3 py-2 text-sm rounded border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <input
           type="text"
-          value={img.credit ?? ""}
-          onChange={(e) => onChange({ credit: e.target.value })}
+          value={credit}
+          onChange={(e) => setCredit(e.target.value)}
+          onBlur={() => {
+            if ((img.credit ?? "") !== credit) onPersist(img.id, { credit: credit || null });
+          }}
           placeholder="Crediti fotografo (opzionale)"
           maxLength={120}
           className="w-full px-3 py-2 text-sm rounded border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
@@ -181,19 +192,17 @@ export default function RealityGalleryEditor({ realityId }: { realityId: string 
     }
   };
 
-  const updateImage = async (id: string, patch: Partial<RealityImage>) => {
-    setImages((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+  const persistField = async (id: string, patch: Partial<RealityImage>) => {
     setSavingId(id);
     const { error } = await supabase.from("reality_images").update(patch).eq("id", id);
     setSavingId(null);
     if (error) {
       toast({ title: "Errore salvataggio", description: error.message, variant: "destructive" });
       load();
+    } else {
+      setImages((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
     }
   };
-
-  // Debounce field updates locally — write on blur instead, simpler:
-  const persistField = (id: string, patch: Partial<RealityImage>) => updateImage(id, patch);
 
   const deleteImage = async (img: RealityImage) => {
     if (!confirm("Eliminare questa immagine?")) return;
@@ -218,7 +227,6 @@ export default function RealityGalleryEditor({ realityId }: { realityId: string 
       sort_order: idx,
     }));
     setImages(reordered);
-    // Persist new order
     const updates = reordered.map((img) =>
       supabase.from("reality_images").update({ sort_order: img.sort_order }).eq("id", img.id)
     );
@@ -232,7 +240,7 @@ export default function RealityGalleryEditor({ realityId }: { realityId: string 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <h3 className="font-display text-lg font-semibold flex items-center gap-2">
           <ImagePlus size={18} /> Galleria immagini ({images.length})
         </h3>
@@ -268,9 +276,7 @@ export default function RealityGalleryEditor({ realityId }: { realityId: string 
                   key={img.id}
                   img={img}
                   saving={savingId === img.id}
-                  onChange={(patch) =>
-                    setImages((prev) => prev.map((i) => (i.id === img.id ? { ...i, ...patch } : i)))
-                  }
+                  onPersist={persistField}
                   onDelete={() => deleteImage(img)}
                 />
               ))}
@@ -280,38 +286,8 @@ export default function RealityGalleryEditor({ realityId }: { realityId: string 
       )}
 
       <p className="text-xs text-muted-foreground font-body">
-        Trascina per riordinare. Le modifiche a didascalia/crediti vengono salvate quando esci dal campo.
+        Trascina per riordinare. Didascalia e crediti vengono salvati quando esci dal campo.
       </p>
-      {/* persist on blur via uncontrolled bridge: see effect-less pattern */}
-      <BlurPersist images={images} persist={persistField} />
     </div>
   );
-}
-
-// Helper: persist caption/credit on blur to reduce DB writes during typing.
-function BlurPersist({
-  images,
-  persist,
-}: {
-  images: RealityImage[];
-  persist: (id: string, patch: Partial<RealityImage>) => void;
-}) {
-  useEffect(() => {
-    const handler = (e: FocusEvent) => {
-      const el = e.target as HTMLInputElement;
-      if (!el || el.tagName !== "INPUT" || !el.placeholder) return;
-      const row = el.closest("[data-img-id]") as HTMLElement | null;
-      // Fallback: just no-op; saves happen via on-blur listener wired below.
-      if (!row) return;
-      const id = row.dataset.imgId!;
-      const original = images.find((i) => i.id === id);
-      if (!original) return;
-      const isCaption = el.placeholder.startsWith("Didascalia");
-      const key = isCaption ? "caption" : "credit";
-      if ((original[key] ?? "") !== el.value) persist(id, { [key]: el.value || null });
-    };
-    document.addEventListener("blur", handler, true);
-    return () => document.removeEventListener("blur", handler, true);
-  }, [images, persist]);
-  return null;
 }
