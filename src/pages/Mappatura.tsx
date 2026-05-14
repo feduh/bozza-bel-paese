@@ -86,30 +86,87 @@ const Mappatura = () => {
 
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
+  const yearRange = useMemo(() => {
+    const years = realities.map((r) => r.year_founded).filter(Boolean);
+    return { min: Math.min(...years, 1900), max: Math.max(...years, new Date().getFullYear()) };
+  }, [realities]);
+
+  // Haversine distance in km
+  const distanceKm = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  };
 
   const filtered = useMemo(() => {
-    return realities.filter((r) => {
+    const q = search.trim().toLowerCase();
+    const yMin = yearMin ? parseInt(yearMin, 10) : null;
+    const yMax = yearMax ? parseInt(yearMax, 10) : null;
+    const list = realities.filter((r) => {
       if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
-      if (
-        search &&
-        !r.name.toLowerCase().includes(search.toLowerCase()) &&
-        !r.city.toLowerCase().includes(search.toLowerCase())
-      )
-        return false;
+      if (yMin !== null && r.year_founded < yMin) return false;
+      if (yMax !== null && r.year_founded > yMax) return false;
+      if (q) {
+        const haystack = [r.name, r.city, r.region, r.description, ...r.tags]
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
       return true;
     });
-  }, [realities, bucketFilter, regionFilter, disciplineFilter, search]);
+    if (userPos) {
+      return [...list].sort(
+        (a, b) =>
+          distanceKm(userPos, { lat: a.lat, lng: a.lng }) -
+          distanceKm(userPos, { lat: b.lat, lng: b.lng })
+      );
+    }
+    return list;
+  }, [realities, bucketFilter, regionFilter, disciplineFilter, search, yearMin, yearMax, userPos]);
 
   const hasFilters =
-    bucketFilter !== "all" || regionFilter !== "all" || disciplineFilter !== "all" || search !== "";
+    bucketFilter !== "all" ||
+    regionFilter !== "all" ||
+    disciplineFilter !== "all" ||
+    search !== "" ||
+    yearMin !== "" ||
+    yearMax !== "" ||
+    userPos !== null;
 
   const clearFilters = () => {
     setBucketFilter("all");
     setRegionFilter("all");
     setDisciplineFilter("all");
     setSearch("");
+    setYearMin("");
+    setYearMax("");
+    setUserPos(null);
+    setGeoStatus("idle");
+  };
+
+  const requestGeo = () => {
+    if (!navigator.geolocation) {
+      setGeoStatus("error");
+      return;
+    }
+    setGeoStatus("loading");
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        setUserPos({ lat: p.coords.latitude, lng: p.coords.longitude });
+        setGeoStatus("idle");
+      },
+      (err) => {
+        setGeoStatus(err.code === err.PERMISSION_DENIED ? "denied" : "error");
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
   };
 
   const mapMarkers = useMemo(
