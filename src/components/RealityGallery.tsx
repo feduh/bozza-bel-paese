@@ -99,15 +99,17 @@ export default function RealityGallery({ realityId }: { realityId: string }) {
           onClick={() => setOpenIdx(null)}
           role="dialog"
           aria-modal="true"
-          aria-label="Visualizzatore immagini"
+          aria-labelledby={current.caption ? captionId : undefined}
+          aria-label={current.caption ? undefined : "Visualizzatore immagini"}
         >
           <button
+            ref={closeBtnRef}
             type="button"
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
             onClick={() => setOpenIdx(null)}
-            aria-label="Chiudi"
+            aria-label="Chiudi visualizzatore"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
           {images.length > 1 && (
             <>
