@@ -20,9 +20,11 @@ const LazyMap = lazy(() => import("@/components/LazyMap"));
 const RealityDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
+  const { user } = useAuth();
   const [reality, setReality] = useState<any>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canEditGallery, setCanEditGallery] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
