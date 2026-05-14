@@ -66,19 +66,26 @@ export default function RealityGallery({ realityId }: { realityId: string }) {
         {images.map((img, idx) => (
           <button
             key={img.id}
+            ref={(el) => {
+              if (el) triggerRefs.current.set(img.id, el);
+              else triggerRefs.current.delete(img.id);
+            }}
             type="button"
-            onClick={() => setOpenIdx(idx)}
-            className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
-            aria-label={`Apri immagine ${idx + 1}`}
+            onClick={() => {
+              lastTriggerId.current = img.id;
+              setOpenIdx(idx);
+            }}
+            className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            aria-label={img.caption ? `Apri: ${img.caption}` : `Apri immagine ${idx + 1} di ${images.length}`}
           >
             <img
               src={publicUrl(img.storage_path)}
-              alt={img.caption ?? `Immagine ${idx + 1}`}
+              alt=""
               loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             {img.caption && (
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-xs text-white font-body line-clamp-2 text-left">
+              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-xs text-white font-body line-clamp-2 text-left">
                 {img.caption}
               </span>
             )}
