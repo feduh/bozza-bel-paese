@@ -258,6 +258,50 @@ export type Database = {
         }
         Relationships: []
       }
+      reality_images: {
+        Row: {
+          caption: string | null
+          created_at: string
+          created_by: string | null
+          credit: string | null
+          id: string
+          reality_id: string
+          sort_order: number
+          storage_path: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          created_by?: string | null
+          credit?: string | null
+          id?: string
+          reality_id: string
+          sort_order?: number
+          storage_path: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          created_by?: string | null
+          credit?: string | null
+          id?: string
+          reality_id?: string
+          sort_order?: number
+          storage_path?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reality_images_reality_id_fkey"
+            columns: ["reality_id"]
+            isOneToOne: false
+            referencedRelation: "realities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reality_tags: {
         Row: {
           id: string
