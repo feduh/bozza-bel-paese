@@ -274,7 +274,7 @@ const Mappatura = () => {
                 center={[41.8719, 12.5674]}
                 zoom={6}
                 markers={mapMarkers}
-                scrollWheelZoom={true}
+                scrollWheelZoom={false}
                 height="600px"
               />
             </Suspense>
