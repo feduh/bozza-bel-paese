@@ -12,8 +12,11 @@ import {
   FileText,
   ShieldCheck,
   ExternalLink,
+  MapPin,
+  Hourglass,
 } from "lucide-react";
 import SEO from "@/components/SEO";
+import RealityForm from "@/components/RealityForm";
 
 type Profile = {
   id: string;
