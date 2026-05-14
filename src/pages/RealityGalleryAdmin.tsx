@@ -17,22 +17,26 @@ type RealityRef = {
 
 export default function RealityGalleryAdmin() {
   const { id } = useParams();
-  const { user, roles, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [reality, setReality] = useState<RealityRef | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
-    supabase
-      .from("realities")
-      .select("id, name, city, region, created_by, confirmed_status")
-      .eq("id", id)
-      .single()
-      .then(({ data }) => {
-        setReality(data);
-        setLoading(false);
-      });
-  }, [id]);
+    if (!id || !user) return;
+    Promise.all([
+      supabase
+        .from("realities")
+        .select("id, name, city, region, created_by, confirmed_status")
+        .eq("id", id)
+        .single(),
+      supabase.from("user_roles").select("role").eq("user_id", user.id),
+    ]).then(([realityRes, rolesRes]) => {
+      setReality(realityRes.data);
+      setRoles((rolesRes.data ?? []).map((r) => r.role as string));
+      setLoading(false);
+    });
+  }, [id, user]);
 
   if (authLoading || loading) {
     return <div className="py-20 text-center editorial-container text-muted-foreground">Caricamento…</div>;
