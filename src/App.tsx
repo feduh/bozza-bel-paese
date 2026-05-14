@@ -25,6 +25,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AreaPersonale = lazy(() => import("./pages/AreaPersonale"));
 const ArticoloEditor = lazy(() => import("./pages/ArticoloEditor"));
+const RealityGalleryAdmin = lazy(() => import("./pages/RealityGalleryAdmin"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +85,14 @@ const App = () => (
                     element={
                       <RequireAuth>
                         <ArticoloEditor />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin/realta/:id/galleria"
+                    element={
+                      <RequireAuth>
+                        <RealityGalleryAdmin />
                       </RequireAuth>
                     }
                   />

@@ -1,10 +1,12 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin } from "lucide-react";
+import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
+import RealityGallery from "@/components/RealityGallery";
 import { RealityDetailSkeleton } from "@/components/skeletons";
 import {
   type DbRealityType,
@@ -18,9 +20,11 @@ const LazyMap = lazy(() => import("@/components/LazyMap"));
 const RealityDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
+  const { user } = useAuth();
   const [reality, setReality] = useState<any>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canEditGallery, setCanEditGallery] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -29,11 +33,25 @@ const RealityDetail = () => {
         setReality(data);
         const { data: tagsData } = await supabase.from("reality_tags").select("tag").eq("reality_id", id!);
         setTags(tagsData?.map((t) => t.tag) ?? []);
+
+        if (user) {
+          const { data: rolesData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id);
+          const roles = (rolesData ?? []).map((r) => r.role as string);
+          const isStaff = roles.includes("admin") || roles.includes("moderator");
+          const isOwnerPending =
+            roles.includes("collaborator") &&
+            data.created_by === user.id &&
+            data.confirmed_status === "pendente";
+          setCanEditGallery(isStaff || isOwnerPending);
+        }
       }
       setLoading(false);
     };
     fetch();
-  }, [id]);
+  }, [id, user]);
 
   if (loading) {
     return <RealityDetailSkeleton />;
@@ -93,6 +111,14 @@ const RealityDetail = () => {
             <span className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin size={13} /> {reality.city}, {reality.region}
             </span>
+            {canEditGallery && (
+              <Link
+                to={`/admin/realta/${reality.id}/galleria`}
+                className="ml-auto inline-flex items-center gap-1.5 text-xs font-body font-medium px-3 py-1.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+              >
+                <ImagePlus size={12} /> Modifica galleria
+              </Link>
+            )}
           </div>
           <h1 className="editorial-heading mb-4">{reality.name}</h1>
           <p className="editorial-body text-muted-foreground max-w-3xl">{reality.description}</p>
@@ -128,6 +154,8 @@ const RealityDetail = () => {
                 </Suspense>
               </div>
             </section>
+
+            <RealityGallery realityId={reality.id} />
           </div>
 
           <aside className="space-y-6">
