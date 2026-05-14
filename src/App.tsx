@@ -88,6 +88,14 @@ const App = () => (
                       </RequireAuth>
                     }
                   />
+                  <Route
+                    path="/admin/realta/:id/galleria"
+                    element={
+                      <RequireAuth>
+                        <RealityGalleryAdmin />
+                      </RequireAuth>
+                    }
+                  />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
