@@ -69,11 +69,14 @@ const AreaPersonale = () => {
   const [posts, setPosts] = useState<MyPost[]>([]);
   const [myRoles, setMyRoles] = useState<string[]>([]);
   const [moderationQueue, setModerationQueue] = useState<ModerationPost[]>([]);
+  const [myPendingRealities, setMyPendingRealities] = useState<MyPendingReality[]>([]);
+  const [showNewReality, setShowNewReality] = useState(false);
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
 
-  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator");
+  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("collaborator");
+  const canProposeRealities = myRoles.includes("admin") || myRoles.includes("collaborator");
 
   const loadAll = async () => {
     if (!user) return;
