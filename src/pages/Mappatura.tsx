@@ -46,6 +46,10 @@ const Mappatura = () => {
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
+  const [yearMin, setYearMin] = useState<string>("");
+  const [yearMax, setYearMax] = useState<string>("");
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
 
   useEffect(() => {
     const fetchRealities = async () => {
