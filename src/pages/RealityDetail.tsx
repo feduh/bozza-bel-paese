@@ -170,6 +170,38 @@ const RealityDetail = () => {
             </div>
 
             <div className="p-6 rounded-lg bg-card border border-border">
+              <h3 className="font-display text-lg font-semibold mb-4">Contatti</h3>
+              {(() => {
+                const items: { icon: any; label: string; href: string; text: string }[] = [];
+                if (reality.contact_email) items.push({ icon: Mail, label: "Email", href: `mailto:${reality.contact_email}`, text: reality.contact_email });
+                if (reality.ig_link) items.push({ icon: Instagram, label: "Instagram", href: reality.ig_link, text: reality.ig_link.replace(/^https?:\/\/(www\.)?/, "") });
+                if (reality.fb_link) items.push({ icon: Facebook, label: "Facebook", href: reality.fb_link, text: reality.fb_link.replace(/^https?:\/\/(www\.)?/, "") });
+                if (reality.linkedin_link) items.push({ icon: Linkedin, label: "LinkedIn", href: reality.linkedin_link, text: reality.linkedin_link.replace(/^https?:\/\/(www\.)?/, "") });
+                if (reality.website) items.push({ icon: Globe, label: "Sito web", href: reality.website, text: reality.website.replace(/^https?:\/\/(www\.)?/, "") });
+                if (items.length === 0) {
+                  return <p className="text-sm text-muted-foreground font-body">Nessun contatto disponibile.</p>;
+                }
+                return (
+                  <ul className="space-y-3 text-sm font-body">
+                    {items.map(({ icon: Icon, label, href, text }) => (
+                      <li key={label} className="flex items-start gap-3">
+                        <Icon size={16} className="mt-0.5 text-primary shrink-0" />
+                        <a
+                          href={href}
+                          target={href.startsWith("mailto:") ? undefined : "_blank"}
+                          rel={href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                          className="text-foreground hover:text-primary hover:underline break-all"
+                        >
+                          {text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
+            </div>
+
+            <div className="p-6 rounded-lg bg-card border border-border">
               <h3 className="font-display text-lg font-semibold mb-4">{t("reality.disciplines")}</h3>
               <div className="flex flex-wrap gap-2">
                 {tags.map((d) => (
