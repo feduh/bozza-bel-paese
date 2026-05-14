@@ -157,7 +157,7 @@ const MagazinePost = () => {
 
         <h1 className="editorial-heading mb-6">{post.title}</h1>
 
-        <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border">
+        <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border flex-wrap">
           <span className="flex items-center gap-1.5">
             <User size={14} /> {post.author_name}
           </span>
@@ -167,6 +167,9 @@ const MagazinePost = () => {
               i18n.language === "en" ? "en-GB" : "it-IT",
               { day: "numeric", month: "long", year: "numeric" }
             )}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Clock size={14} /> {readingTime} min di lettura
           </span>
         </div>
 
@@ -185,8 +188,8 @@ const MagazinePost = () => {
           {post.excerpt}
         </p>
 
-        <div className="font-body text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">
-          {post.content}
+        <div className="prose prose-lg max-w-none dark:prose-invert font-body prose-headings:font-display prose-a:text-primary">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
         </div>
 
         {/* Reply section */}
