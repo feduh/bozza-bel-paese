@@ -1,11 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check } from "lucide-react";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
+import MarkdownEditor from "@/components/editor/MarkdownEditor";
+import CoverImageUpload from "@/components/editor/CoverImageUpload";
 import { articleSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 const slugify = (s: string) =>
@@ -37,6 +39,9 @@ const ArticoloEditor = () => {
   const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "published">("draft");
   const [replyTo, setReplyTo] = useState<string | null>(replyToParam);
   const [parent, setParent] = useState<ParentMeta | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(id ?? null);
+  const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const lastSavedRef = useRef<string>("");
 
   const [form, setForm] = useState({
     title: "",
@@ -109,6 +114,70 @@ const ArticoloEditor = () => {
       .then(({ data }) => setParent((data as ParentMeta | null) ?? null));
   }, [replyTo]);
 
+  // Autosave drafts (debounced 30s) — only for posts not yet published
+  useEffect(() => {
+    if (!user || loading || submitting) return;
+    if (currentStatus === "published") return;
+    if (!form.title.trim() || !form.content.trim()) return;
+
+    const snapshot = JSON.stringify(form);
+    if (snapshot === lastSavedRef.current) return;
+
+    const timer = setTimeout(async () => {
+      setAutoSaveState("saving");
+      const authorName = user.email || "Anonimo";
+
+      if (editingId) {
+        const { error } = await supabase
+          .from("blog_posts")
+          .update({
+            title: form.title || "Bozza senza titolo",
+            category: form.category || "Bozza",
+            excerpt: form.excerpt || form.content.slice(0, 200),
+            content: form.content,
+            cover_image_url: form.coverImageUrl || null,
+          })
+          .eq("id", editingId);
+        if (!error) {
+          lastSavedRef.current = snapshot;
+          setAutoSaveState("saved");
+          setTimeout(() => setAutoSaveState("idle"), 2000);
+        } else {
+          setAutoSaveState("idle");
+        }
+      } else {
+        // First autosave creates a draft row so subsequent saves update it
+        const slug = `${slugify(form.title || "bozza")}-${Math.random().toString(36).slice(2, 8)}`;
+        const { data, error } = await supabase
+          .from("blog_posts")
+          .insert({
+            title: form.title || "Bozza senza titolo",
+            category: form.category || "Bozza",
+            excerpt: form.excerpt || form.content.slice(0, 200),
+            content: form.content,
+            cover_image_url: form.coverImageUrl || null,
+            author_name: authorName,
+            user_id: user.id,
+            slug,
+            status: "draft",
+            reply_to_id: replyTo,
+          })
+          .select("id")
+          .maybeSingle();
+        if (!error && data) {
+          setEditingId(data.id);
+          lastSavedRef.current = snapshot;
+          setAutoSaveState("saved");
+          setTimeout(() => setAutoSaveState("idle"), 2000);
+        } else {
+          setAutoSaveState("idle");
+        }
+      }
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, [form, user, loading, submitting, currentStatus, editingId, replyTo]);
+
   if (!user) {
     navigate("/login");
     return null;
@@ -138,7 +207,7 @@ const ArticoloEditor = () => {
       .maybeSingle();
     const authorName = prof?.display_name || user.email || "Anonimo";
 
-    if (isEdit && id) {
+    if (editingId) {
       const updates: Record<string, unknown> = {
         title: parsed.data.title,
         category: parsed.data.category,
@@ -150,7 +219,7 @@ const ArticoloEditor = () => {
       if (currentStatus !== "published" && targetStatus === "published") {
         updates.published_at = new Date().toISOString();
       }
-      const { error } = await supabase.from("blog_posts").update(updates).eq("id", id);
+      const { error } = await supabase.from("blog_posts").update(updates).eq("id", editingId);
       setSubmitting(false);
       if (error) {
         setGlobalError(error.message);
@@ -169,8 +238,7 @@ const ArticoloEditor = () => {
         slug,
         status: targetStatus,
         reply_to_id: replyTo,
-        published_at:
-          targetStatus === "published" ? new Date().toISOString() : new Date().toISOString(),
+        published_at: new Date().toISOString(),
       };
       const { error } = await supabase.from("blog_posts").insert(payload);
       setSubmitting(false);
@@ -268,17 +336,11 @@ const ArticoloEditor = () => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-body font-medium mb-2">URL immagine di copertina</label>
-            <input
-              value={form.coverImageUrl}
-              onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })}
-              placeholder="https://… (opzionale)"
-              aria-invalid={!!errs.coverImageUrl}
-              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.coverImageUrl ? "border-destructive" : "border-input"}`}
-            />
-            <FieldError id="err-coverImageUrl" message={errs.coverImageUrl} />
-          </div>
+          <CoverImageUpload
+            value={form.coverImageUrl}
+            onChange={(url) => setForm({ ...form, coverImageUrl: url })}
+          />
+          <FieldError id="err-coverImageUrl" message={errs.coverImageUrl} />
 
           <div>
             <label className="block text-sm font-body font-medium mb-2">Estratto *</label>
@@ -291,18 +353,21 @@ const ArticoloEditor = () => {
               aria-invalid={!!errs.excerpt}
               className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none ${errs.excerpt ? "border-destructive" : "border-input"}`}
             />
-            <FieldError id="err-excerpt" message={errs.excerpt} />
+            <div className="flex items-center justify-between mt-1">
+              <FieldError id="err-excerpt" message={errs.excerpt} />
+              <span className={`text-xs font-body ${form.excerpt.length > 450 ? "text-destructive" : "text-muted-foreground"}`}>
+                {form.excerpt.length}/500
+              </span>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-body font-medium mb-2">Contenuto *</label>
-            <textarea
+            <MarkdownEditor
               value={form.content}
-              onChange={(e) => setForm({ ...form, content: e.target.value })}
-              rows={14}
+              onChange={(v) => setForm({ ...form, content: v })}
               maxLength={50000}
-              aria-invalid={!!errs.content}
-              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none ${errs.content ? "border-destructive" : "border-input"}`}
+              invalid={!!errs.content}
             />
             <FieldError id="err-content" message={errs.content} />
           </div>
@@ -324,8 +389,17 @@ const ArticoloEditor = () => {
               <Send size={14} />
               {isStaff ? "Pubblica" : "Invia per pubblicazione"}
             </button>
+            {autoSaveState !== "idle" && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
+                {autoSaveState === "saving" ? (
+                  <><Loader2 size={12} className="animate-spin" /> Salvataggio bozza…</>
+                ) : (
+                  <><Check size={12} className="text-secondary" /> Bozza salvata</>
+                )}
+              </span>
+            )}
             {!isStaff && (
-              <p className="text-xs text-muted-foreground font-body">
+              <p className="text-xs text-muted-foreground font-body w-full">
                 Il tuo articolo verrà rivisto da un membro dello staff prima della pubblicazione.
               </p>
             )}

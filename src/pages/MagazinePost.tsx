@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, User, ArrowLeft, Reply, ArrowUpLeft } from "lucide-react";
+import { Calendar, User, ArrowLeft, Reply, ArrowUpLeft, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
@@ -39,6 +41,13 @@ const MagazinePost = () => {
   const [parent, setParent] = useState<ReplyMeta | null>(null);
   const [replies, setReplies] = useState<ReplyMeta[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const readingTime = useMemo(() => {
+    if (!post?.content) return 1;
+    const text = post.content.replace(/[#>*_`\-\[\]()!]/g, "");
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }, [post?.content]);
 
   useEffect(() => {
     let cancelled = false;
@@ -155,7 +164,7 @@ const MagazinePost = () => {
 
         <h1 className="editorial-heading mb-6">{post.title}</h1>
 
-        <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border">
+        <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border flex-wrap">
           <span className="flex items-center gap-1.5">
             <User size={14} /> {post.author_name}
           </span>
@@ -165,6 +174,9 @@ const MagazinePost = () => {
               i18n.language === "en" ? "en-GB" : "it-IT",
               { day: "numeric", month: "long", year: "numeric" }
             )}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Clock size={14} /> {readingTime} min di lettura
           </span>
         </div>
 
@@ -183,8 +195,8 @@ const MagazinePost = () => {
           {post.excerpt}
         </p>
 
-        <div className="font-body text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">
-          {post.content}
+        <div className="prose prose-lg max-w-none dark:prose-invert font-body prose-headings:font-display prose-a:text-primary">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
         </div>
 
         {/* Reply section */}
