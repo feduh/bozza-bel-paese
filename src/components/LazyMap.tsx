@@ -33,6 +33,8 @@ type LazyMapProps = {
   maxZoom?: number;
   /** Bounds to constrain panning (default: Italy) */
   maxBounds?: [[number, number], [number, number]];
+  /** When set, the map flies to this position and shows a "you are here" marker */
+  userLocation?: { lat: number; lng: number } | null;
 };
 
 // Italian territory bounding box (with a little breathing room)
