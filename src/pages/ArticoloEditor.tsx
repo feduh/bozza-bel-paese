@@ -1,11 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check } from "lucide-react";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
+import MarkdownEditor from "@/components/editor/MarkdownEditor";
+import CoverImageUpload from "@/components/editor/CoverImageUpload";
 import { articleSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 const slugify = (s: string) =>
