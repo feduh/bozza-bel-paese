@@ -94,6 +94,11 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
 
     setSubmitting(true);
     const v = parsed.data;
+    const { data: { user } } = await supabase.auth.getUser();
+    const effectiveStatus = isCollaborator ? "pendente" : v.confirmedStatus;
+    const autoConfirmAt = isCollaborator
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      : null;
     const { error: insertError } = await supabase.from("realities").insert({
       name: v.name,
       type: v.type,
@@ -113,8 +118,10 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       ig_link: v.ig ?? null,
       fb_link: v.fb ?? null,
       linkedin_link: v.linkedin ?? null,
-      confirmed_status: v.confirmedStatus,
-      status: v.confirmedStatus === "storico" ? "archiviato" : "attivo",
+      confirmed_status: effectiveStatus,
+      status: effectiveStatus === "storico" ? "archiviato" : "attivo",
+      created_by: user?.id ?? null,
+      auto_confirm_at: autoConfirmAt,
     });
 
     if (insertError) {
