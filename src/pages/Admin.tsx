@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { UserPlus, Users, Shield, Eye, EyeOff, MapPinPlus } from "lucide-react";
 import RealityForm from "@/components/RealityForm";
 import FieldError from "@/components/FieldError";
+import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 type Profile = {
@@ -311,6 +312,9 @@ const Admin = () => {
           </p>
           <RealityForm />
         </div>
+
+        {/* Audit log */}
+        <AuditLogPanel />
 
         {/* Collaborators list */}
         <div>
