@@ -1,10 +1,12 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin } from "lucide-react";
+import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
+import RealityGallery from "@/components/RealityGallery";
 import { RealityDetailSkeleton } from "@/components/skeletons";
 import {
   type DbRealityType,
