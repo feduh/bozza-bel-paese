@@ -43,9 +43,15 @@ export default function RealityGallery({ realityId }: { realityId: string }) {
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    // Move focus to close button when lightbox opens
+    requestAnimationFrame(() => closeBtnRef.current?.focus());
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      // Return focus to the thumbnail that opened the lightbox
+      if (lastTriggerId.current) {
+        triggerRefs.current.get(lastTriggerId.current)?.focus();
+      }
     };
   }, [openIdx, images.length]);
 
