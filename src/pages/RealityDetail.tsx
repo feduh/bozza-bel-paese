@@ -33,11 +33,25 @@ const RealityDetail = () => {
         setReality(data);
         const { data: tagsData } = await supabase.from("reality_tags").select("tag").eq("reality_id", id!);
         setTags(tagsData?.map((t) => t.tag) ?? []);
+
+        if (user) {
+          const { data: rolesData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id);
+          const roles = (rolesData ?? []).map((r) => r.role as string);
+          const isStaff = roles.includes("admin") || roles.includes("moderator");
+          const isOwnerPending =
+            roles.includes("collaborator") &&
+            data.created_by === user.id &&
+            data.confirmed_status === "pendente";
+          setCanEditGallery(isStaff || isOwnerPending);
+        }
       }
       setLoading(false);
     };
     fetch();
-  }, [id]);
+  }, [id, user]);
 
   if (loading) {
     return <RealityDetailSkeleton />;
