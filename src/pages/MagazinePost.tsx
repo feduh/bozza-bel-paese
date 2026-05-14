@@ -42,6 +42,13 @@ const MagazinePost = () => {
   const [replies, setReplies] = useState<ReplyMeta[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const readingTime = useMemo(() => {
+    if (!post?.content) return 1;
+    const text = post.content.replace(/[#>*_`\-\[\]()!]/g, "");
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }, [post?.content]);
+
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
