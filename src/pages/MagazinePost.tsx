@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, User, ArrowLeft, Reply, ArrowUpLeft } from "lucide-react";
+import { Calendar, User, ArrowLeft, Reply, ArrowUpLeft, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
