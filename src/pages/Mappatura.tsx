@@ -353,32 +353,32 @@ const Mappatura = () => {
           )}
         </div>
         {geoStatus === "denied" && (
-          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+          <p role="alert" className="text-xs text-destructive font-body mb-4 -mt-2">
             Permesso di geolocalizzazione negato. Abilitalo nelle impostazioni del browser.
           </p>
         )}
         {geoStatus === "error" && (
-          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+          <p role="alert" className="text-xs text-destructive font-body mb-4 -mt-2">
             Impossibile ottenere la posizione. Riprova tra poco.
           </p>
         )}
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground" aria-label="Legenda categorie">
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
-            <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
             {t("map.buckets.spazi-che-furono")}
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-6 font-body">
+        <p className="text-sm text-muted-foreground mb-6 font-body" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>
 
