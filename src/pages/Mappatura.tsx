@@ -279,8 +279,8 @@ const Mappatura = () => {
           />
         </div>
 
-        {/* Region + Discipline filters */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        {/* Region + Discipline + Year + Geo filters */}
+        <div className="flex flex-wrap gap-3 mb-6 items-center">
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
@@ -301,12 +301,62 @@ const Mappatura = () => {
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
+          <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
+            <span className="text-xs text-muted-foreground mr-1">Anno:</span>
+            <input
+              type="number"
+              value={yearMin}
+              onChange={(e) => setYearMin(e.target.value)}
+              placeholder={String(yearRange.min)}
+              min={1800}
+              max={yearRange.max}
+              className="w-20 bg-transparent focus:outline-none text-sm"
+              aria-label="Anno fondazione minimo"
+            />
+            <span className="text-muted-foreground">–</span>
+            <input
+              type="number"
+              value={yearMax}
+              onChange={(e) => setYearMax(e.target.value)}
+              placeholder={String(yearRange.max)}
+              min={1800}
+              max={yearRange.max}
+              className="w-20 bg-transparent focus:outline-none text-sm"
+              aria-label="Anno fondazione massimo"
+            />
+          </div>
+          <button
+            onClick={requestGeo}
+            disabled={geoStatus === "loading"}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-body text-sm transition-colors ${
+              userPos
+                ? "border-secondary bg-secondary/15 text-secondary"
+                : "border-input bg-background hover:border-primary/40"
+            } disabled:opacity-50`}
+          >
+            {geoStatus === "loading" ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Navigation size={14} />
+            )}
+            {userPos ? "Vicino a te" : "Vicino a me"}
+          </button>
           {hasFilters && (
             <button onClick={clearFilters} className="inline-flex items-center gap-1 px-4 py-2 text-xs font-body text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
         </div>
+        {geoStatus === "denied" && (
+          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+            Permesso di geolocalizzazione negato. Abilitalo nelle impostazioni del browser.
+          </p>
+        )}
+        {geoStatus === "error" && (
+          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+            Impossibile ottenere la posizione. Riprova tra poco.
+          </p>
+        )}
 
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground">
