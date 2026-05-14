@@ -17,6 +17,10 @@ export default function RealityGallery({ realityId }: { realityId: string }) {
   const [images, setImages] = useState<RealityImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const triggerRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const lastTriggerId = useRef<string | null>(null);
+  const captionId = "ibp-lightbox-caption";
 
   useEffect(() => {
     supabase
