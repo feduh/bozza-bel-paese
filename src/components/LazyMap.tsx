@@ -134,11 +134,18 @@ const LazyMap = ({
   scrollWheelZoom = false,
   height = "100%",
   cluster = true,
+  minZoom = 5,
+  maxZoom = 18,
+  maxBounds = ITALY_BOUNDS,
 }: LazyMapProps) => {
   return (
     <MapContainer
       center={center}
       zoom={zoom}
+      minZoom={minZoom}
+      maxZoom={maxZoom}
+      maxBounds={maxBounds}
+      maxBoundsViscosity={1.0}
       scrollWheelZoom={scrollWheelZoom}
       zoomControl={false}
       style={{ height, width: "100%" }}
