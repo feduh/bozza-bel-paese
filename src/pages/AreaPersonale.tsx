@@ -46,6 +46,15 @@ type ModerationPost = MyPost & { author_name: string; user_id: string };
 
 type RealityRef = { id: string; name: string };
 
+type MyPendingReality = {
+  id: string;
+  name: string;
+  city: string;
+  region: string | null;
+  auto_confirm_at: string | null;
+  created_at: string;
+};
+
 const STATUS_LABEL: Record<MyPost["status"], { label: string; tone: string; icon: typeof Clock }> = {
   draft: { label: "Bozza", tone: "bg-muted text-muted-foreground", icon: FileText },
   pending: { label: "In moderazione", tone: "bg-amber-500/15 text-amber-600 border-amber-500/30", icon: Clock },
