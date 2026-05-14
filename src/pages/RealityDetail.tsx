@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowLeft, Globe } from "lucide-react";
+import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
