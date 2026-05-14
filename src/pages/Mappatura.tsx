@@ -387,6 +387,7 @@ const Mappatura = () => {
                 markers={mapMarkers}
                 scrollWheelZoom={false}
                 height="600px"
+                userLocation={userPos}
               />
             </Suspense>
           </div>
