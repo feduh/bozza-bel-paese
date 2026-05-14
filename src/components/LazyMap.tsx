@@ -27,7 +27,19 @@ type LazyMapProps = {
   height?: string;
   /** Disable clustering (e.g. on the single-reality detail page) */
   cluster?: boolean;
+  /** Minimum zoom level (default 5 — full Italy) */
+  minZoom?: number;
+  /** Maximum zoom level */
+  maxZoom?: number;
+  /** Bounds to constrain panning (default: Italy) */
+  maxBounds?: [[number, number], [number, number]];
 };
+
+// Italian territory bounding box (with a little breathing room)
+const ITALY_BOUNDS: [[number, number], [number, number]] = [
+  [35.2, 6.2],   // SW
+  [47.3, 19.0],  // NE
+];
 
 const buildIcon = (color: string, outline: boolean) => {
   const html = outline
@@ -122,11 +134,18 @@ const LazyMap = ({
   scrollWheelZoom = false,
   height = "100%",
   cluster = true,
+  minZoom = 5,
+  maxZoom = 18,
+  maxBounds = ITALY_BOUNDS,
 }: LazyMapProps) => {
   return (
     <MapContainer
       center={center}
       zoom={zoom}
+      minZoom={minZoom}
+      maxZoom={maxZoom}
+      maxBounds={maxBounds}
+      maxBoundsViscosity={1.0}
       scrollWheelZoom={scrollWheelZoom}
       zoomControl={false}
       style={{ height, width: "100%" }}
