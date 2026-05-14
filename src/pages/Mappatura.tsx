@@ -221,20 +221,23 @@ const Mappatura = () => {
           </p>
         </div>
 
-        {/* Section dropdown (3 main categories) */}
         <div className="mb-6 relative inline-block">
           <button
             onClick={() => setBucketMenuOpen((o) => !o)}
+            aria-haspopup="menu"
+            aria-expanded={bucketMenuOpen}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card font-body text-sm font-medium hover:border-primary/40 transition-colors"
           >
             {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
-            <ChevronDown size={14} />
+            <ChevronDown size={14} aria-hidden="true" />
           </button>
           {bucketMenuOpen && (
-            <div className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+            <div role="menu" className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
               {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
                 <button
                   key={val}
+                  role="menuitemradio"
+                  aria-checked={bucketFilter === val}
                   onClick={() => {
                     setBucketFilter(val as "all" | Bucket);
                     setBucketMenuOpen(false);
