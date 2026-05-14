@@ -129,6 +129,42 @@ const ClusterLayer = ({ markers, cluster }: { markers: MarkerData[]; cluster: bo
   return null;
 };
 
+const UserLocationLayer = ({ pos }: { pos: { lat: number; lng: number } | null | undefined }) => {
+  const map = useMap();
+  const markerRef = useRef<L.Marker | null>(null);
+
+  useEffect(() => {
+    if (!pos) {
+      if (markerRef.current) {
+        map.removeLayer(markerRef.current);
+        markerRef.current = null;
+      }
+      return;
+    }
+    const icon = L.divIcon({
+      html: `<span class="ibp-user-loc"><span class="ibp-user-loc__pulse"></span><span class="ibp-user-loc__dot"></span></span>`,
+      className: "ibp-user-loc-wrap",
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+    if (markerRef.current) {
+      markerRef.current.setLatLng([pos.lat, pos.lng]);
+      markerRef.current.setIcon(icon);
+    } else {
+      markerRef.current = L.marker([pos.lat, pos.lng], { icon, interactive: false }).addTo(map);
+    }
+    map.flyTo([pos.lat, pos.lng], 9, { duration: 1.2 });
+    return () => {
+      if (markerRef.current) {
+        map.removeLayer(markerRef.current);
+        markerRef.current = null;
+      }
+    };
+  }, [map, pos?.lat, pos?.lng]);
+
+  return null;
+};
+
 const LazyMap = ({
   center,
   zoom,
@@ -139,6 +175,7 @@ const LazyMap = ({
   minZoom = 5,
   maxZoom = 18,
   maxBounds = ITALY_BOUNDS,
+  userLocation = null,
 }: LazyMapProps) => {
   return (
     <MapContainer
@@ -166,6 +203,7 @@ const LazyMap = ({
       />
       <ZoomControl position="bottomright" />
       <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
+      <UserLocationLayer pos={userLocation} />
     </MapContainer>
   );
 };
