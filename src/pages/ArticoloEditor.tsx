@@ -207,7 +207,7 @@ const ArticoloEditor = () => {
       .maybeSingle();
     const authorName = prof?.display_name || user.email || "Anonimo";
 
-    if (isEdit && id) {
+    if (editingId) {
       const updates: Record<string, unknown> = {
         title: parsed.data.title,
         category: parsed.data.category,
@@ -219,7 +219,7 @@ const ArticoloEditor = () => {
       if (currentStatus !== "published" && targetStatus === "published") {
         updates.published_at = new Date().toISOString();
       }
-      const { error } = await supabase.from("blog_posts").update(updates).eq("id", id);
+      const { error } = await supabase.from("blog_posts").update(updates).eq("id", editingId);
       setSubmitting(false);
       if (error) {
         setGlobalError(error.message);
@@ -238,8 +238,7 @@ const ArticoloEditor = () => {
         slug,
         status: targetStatus,
         reply_to_id: replyTo,
-        published_at:
-          targetStatus === "published" ? new Date().toISOString() : new Date().toISOString(),
+        published_at: new Date().toISOString(),
       };
       const { error } = await supabase.from("blog_posts").insert(payload);
       setSubmitting(false);
