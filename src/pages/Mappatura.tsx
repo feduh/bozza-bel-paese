@@ -417,6 +417,11 @@ const Mappatura = () => {
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
                   <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
+                    {userPos && (
+                      <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-medium">
+                        {Math.round(distanceKm(userPos, { lat: r.lat, lng: r.lng }))} km
+                      </span>
+                    )}
                   </p>
                   <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{r.description}</p>
                   <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
