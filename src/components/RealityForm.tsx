@@ -12,8 +12,11 @@ const inputCls =
   "w-full px-4 py-2.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 const inputErrCls = "border-destructive focus:ring-destructive";
 
-const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
+type FormMode = "admin" | "collaborator";
+
+const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mode?: FormMode }) => {
   const { t } = useTranslation();
+  const isCollaborator = mode === "collaborator";
 
   const [name, setName] = useState("");
   const [type, setType] = useState<RealityType>("con-sede");
@@ -91,6 +94,11 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
 
     setSubmitting(true);
     const v = parsed.data;
+    const { data: { user } } = await supabase.auth.getUser();
+    const effectiveStatus = isCollaborator ? "pendente" : v.confirmedStatus;
+    const autoConfirmAt = isCollaborator
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      : null;
     const { error: insertError } = await supabase.from("realities").insert({
       name: v.name,
       type: v.type,
@@ -110,8 +118,10 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
       ig_link: v.ig ?? null,
       fb_link: v.fb ?? null,
       linkedin_link: v.linkedin ?? null,
-      confirmed_status: v.confirmedStatus,
-      status: v.confirmedStatus === "storico" ? "archiviato" : "attivo",
+      confirmed_status: effectiveStatus,
+      status: effectiveStatus === "storico" ? "archiviato" : "attivo",
+      created_by: user?.id ?? null,
+      auto_confirm_at: autoConfirmAt,
     });
 
     if (insertError) {
@@ -255,17 +265,25 @@ const RealityForm = ({ onCreated }: { onCreated?: () => void }) => {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">Stato di conferma</label>
-        <select value={confirmedStatus} onChange={(e) => setConfirmedStatus(e.target.value as ConfirmedStatus)} className={cls("confirmedStatus")} {...aria("confirmedStatus")}>
-          <option value="pendente">Pendente</option>
-          <option value="confermato">Confermato</option>
-          <option value="storico">Storico</option>
-        </select>
-      </div>
+      {!isCollaborator && (
+        <div>
+          <label className="block text-sm font-medium mb-2">Stato di conferma</label>
+          <select value={confirmedStatus} onChange={(e) => setConfirmedStatus(e.target.value as ConfirmedStatus)} className={cls("confirmedStatus")} {...aria("confirmedStatus")}>
+            <option value="pendente">Pendente</option>
+            <option value="confermato">Confermato</option>
+            <option value="storico">Storico</option>
+          </select>
+        </div>
+      )}
+
+      {isCollaborator && (
+        <div className="p-4 rounded-md bg-amber-500/10 border border-amber-500/30 text-sm font-body">
+          ⏳ La realtà che proponi resterà <strong>in verifica per 24 ore</strong>: in questa finestra puoi correggerla o eliminarla. Trascorso il tempo verrà <strong>pubblicata automaticamente</strong> sulla mappa. Ricontrolla bene tutti i contatti prima di salvare.
+        </div>
+      )}
 
       <button type="submit" disabled={submitting} className="px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:opacity-90 disabled:opacity-50">
-        {submitting ? "Salvataggio..." : "Salva realtà"}
+        {submitting ? "Salvataggio..." : isCollaborator ? "Proponi realtà" : "Salva realtà"}
       </button>
     </form>
   );

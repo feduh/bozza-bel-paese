@@ -12,8 +12,11 @@ import {
   FileText,
   ShieldCheck,
   ExternalLink,
+  MapPin,
+  Hourglass,
 } from "lucide-react";
 import SEO from "@/components/SEO";
+import RealityForm from "@/components/RealityForm";
 
 type Profile = {
   id: string;
@@ -43,6 +46,15 @@ type ModerationPost = MyPost & { author_name: string; user_id: string };
 
 type RealityRef = { id: string; name: string };
 
+type MyPendingReality = {
+  id: string;
+  name: string;
+  city: string;
+  region: string | null;
+  auto_confirm_at: string | null;
+  created_at: string;
+};
+
 const STATUS_LABEL: Record<MyPost["status"], { label: string; tone: string; icon: typeof Clock }> = {
   draft: { label: "Bozza", tone: "bg-muted text-muted-foreground", icon: FileText },
   pending: { label: "In moderazione", tone: "bg-amber-500/15 text-amber-600 border-amber-500/30", icon: Clock },
@@ -57,11 +69,14 @@ const AreaPersonale = () => {
   const [posts, setPosts] = useState<MyPost[]>([]);
   const [myRoles, setMyRoles] = useState<string[]>([]);
   const [moderationQueue, setModerationQueue] = useState<ModerationPost[]>([]);
+  const [myPendingRealities, setMyPendingRealities] = useState<MyPendingReality[]>([]);
+  const [showNewReality, setShowNewReality] = useState(false);
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
 
-  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator");
+  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("collaborator");
+  const canProposeRealities = myRoles.includes("admin") || myRoles.includes("collaborator");
 
   const loadAll = async () => {
     if (!user) return;
@@ -97,13 +112,23 @@ const AreaPersonale = () => {
       .order("published_at", { ascending: false });
     setPosts((mine as MyPost[]) ?? []);
 
-    if (rs.includes("admin") || rs.includes("moderator")) {
+    if (rs.includes("admin") || rs.includes("moderator") || rs.includes("collaborator")) {
       const { data: queue } = await supabase
         .from("blog_posts")
         .select("id, slug, title, excerpt, status, category, published_at, reply_to_id, author_name, user_id")
         .eq("status", "pending")
         .order("published_at", { ascending: true });
       setModerationQueue((queue as ModerationPost[]) ?? []);
+    }
+
+    if (rs.includes("admin") || rs.includes("collaborator")) {
+      const { data: pending } = await supabase
+        .from("realities")
+        .select("id, name, city, region, auto_confirm_at, created_at")
+        .eq("created_by", user.id)
+        .eq("confirmed_status", "pendente")
+        .order("created_at", { ascending: false });
+      setMyPendingRealities((pending as MyPendingReality[]) ?? []);
     }
 
     setLoading(false);
@@ -266,7 +291,63 @@ const AreaPersonale = () => {
               </form>
             </section>
 
-            {/* Coda di moderazione (solo staff) */}
+            {/* Proponi nuova realtà (collaboratori + admin) */}
+            {canProposeRealities && (
+              <section className="p-8 rounded-lg bg-card border border-border">
+                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                  <h2 className="font-display text-xl font-semibold flex items-center gap-2">
+                    <MapPin size={20} /> Proponi una nuova realtà
+                  </h2>
+                  <button
+                    onClick={() => setShowNewReality((s) => !s)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
+                  >
+                    <Plus size={14} /> {showNewReality ? "Chiudi form" : "Nuova realtà"}
+                  </button>
+                </div>
+                {showNewReality && (
+                  <RealityForm
+                    mode={myRoles.includes("admin") ? "admin" : "collaborator"}
+                    onCreated={() => { setShowNewReality(false); loadAll(); }}
+                  />
+                )}
+
+                {myPendingRealities.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="font-display text-sm font-semibold mb-3 flex items-center gap-2">
+                      <Hourglass size={14} className="text-amber-600" /> Le tue proposte in verifica
+                    </h3>
+                    <div className="space-y-2">
+                      {myPendingRealities.map((r) => {
+                        const ms = r.auto_confirm_at ? new Date(r.auto_confirm_at).getTime() - Date.now() : 0;
+                        const hours = Math.max(0, Math.floor(ms / 3600000));
+                        const mins = Math.max(0, Math.floor((ms % 3600000) / 60000));
+                        const ready = ms <= 0;
+                        return (
+                          <div key={r.id} className="p-3 rounded-md border border-amber-500/30 bg-amber-500/5 flex items-center justify-between gap-3 flex-wrap">
+                            <div className="min-w-0">
+                              <p className="font-body font-medium text-sm">{r.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {r.city}{r.region ? ` · ${r.region}` : ""} ·{" "}
+                                {ready ? "in pubblicazione automatica" : `pubblicazione tra ${hours}h ${mins}m`}
+                              </p>
+                            </div>
+                            <Link
+                              to={`/realta/${r.id}`}
+                              className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors"
+                            >
+                              Anteprima
+                            </Link>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+
+
             {isStaff && (
               <section className="p-8 rounded-lg bg-card border border-amber-500/30">
                 <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">

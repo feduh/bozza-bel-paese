@@ -129,12 +129,16 @@ export type Database = {
       realities: {
         Row: {
           address: string | null
+          auto_confirm_at: string | null
           city: string
+          confirmed_at: string | null
+          confirmed_by: string | null
           confirmed_status: string
           contact_email: string | null
           contacted_at: string | null
           country: string
           created_at: string
+          created_by: string | null
           description: string
           fb_link: string | null
           history: string
@@ -156,12 +160,16 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          auto_confirm_at?: string | null
           city: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           confirmed_status?: string
           contact_email?: string | null
           contacted_at?: string | null
           country?: string
           created_at?: string
+          created_by?: string | null
           description?: string
           fb_link?: string | null
           history?: string
@@ -183,12 +191,16 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          auto_confirm_at?: string | null
           city?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           confirmed_status?: string
           contact_email?: string | null
           contacted_at?: string | null
           country?: string
           created_at?: string
+          created_by?: string | null
           description?: string
           fb_link?: string | null
           history?: string
@@ -259,6 +271,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_confirm_pending_realities: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -268,7 +281,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "author"
+      app_role: "admin" | "moderator" | "user" | "author" | "collaborator"
       reality_type: "nomade" | "con-sede" | "scomparsa"
     }
     CompositeTypes: {
@@ -397,7 +410,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "author"],
+      app_role: ["admin", "moderator", "user", "author", "collaborator"],
       reality_type: ["nomade", "con-sede", "scomparsa"],
     },
   },
