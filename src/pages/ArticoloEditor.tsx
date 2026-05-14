@@ -336,17 +336,11 @@ const ArticoloEditor = () => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-body font-medium mb-2">URL immagine di copertina</label>
-            <input
-              value={form.coverImageUrl}
-              onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })}
-              placeholder="https://… (opzionale)"
-              aria-invalid={!!errs.coverImageUrl}
-              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.coverImageUrl ? "border-destructive" : "border-input"}`}
-            />
-            <FieldError id="err-coverImageUrl" message={errs.coverImageUrl} />
-          </div>
+          <CoverImageUpload
+            value={form.coverImageUrl}
+            onChange={(url) => setForm({ ...form, coverImageUrl: url })}
+          />
+          <FieldError id="err-coverImageUrl" message={errs.coverImageUrl} />
 
           <div>
             <label className="block text-sm font-body font-medium mb-2">Estratto *</label>
@@ -359,18 +353,21 @@ const ArticoloEditor = () => {
               aria-invalid={!!errs.excerpt}
               className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none ${errs.excerpt ? "border-destructive" : "border-input"}`}
             />
-            <FieldError id="err-excerpt" message={errs.excerpt} />
+            <div className="flex items-center justify-between mt-1">
+              <FieldError id="err-excerpt" message={errs.excerpt} />
+              <span className={`text-xs font-body ${form.excerpt.length > 450 ? "text-destructive" : "text-muted-foreground"}`}>
+                {form.excerpt.length}/500
+              </span>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-body font-medium mb-2">Contenuto *</label>
-            <textarea
+            <MarkdownEditor
               value={form.content}
-              onChange={(e) => setForm({ ...form, content: e.target.value })}
-              rows={14}
+              onChange={(v) => setForm({ ...form, content: v })}
               maxLength={50000}
-              aria-invalid={!!errs.content}
-              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none ${errs.content ? "border-destructive" : "border-input"}`}
+              invalid={!!errs.content}
             />
             <FieldError id="err-content" message={errs.content} />
           </div>
@@ -392,8 +389,17 @@ const ArticoloEditor = () => {
               <Send size={14} />
               {isStaff ? "Pubblica" : "Invia per pubblicazione"}
             </button>
+            {autoSaveState !== "idle" && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
+                {autoSaveState === "saving" ? (
+                  <><Loader2 size={12} className="animate-spin" /> Salvataggio bozza…</>
+                ) : (
+                  <><Check size={12} className="text-secondary" /> Bozza salvata</>
+                )}
+              </span>
+            )}
             {!isStaff && (
-              <p className="text-xs text-muted-foreground font-body">
+              <p className="text-xs text-muted-foreground font-body w-full">
                 Il tuo articolo verrà rivisto da un membro dello staff prima della pubblicazione.
               </p>
             )}
