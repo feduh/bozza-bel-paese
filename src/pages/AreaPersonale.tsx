@@ -112,13 +112,23 @@ const AreaPersonale = () => {
       .order("published_at", { ascending: false });
     setPosts((mine as MyPost[]) ?? []);
 
-    if (rs.includes("admin") || rs.includes("moderator")) {
+    if (rs.includes("admin") || rs.includes("moderator") || rs.includes("collaborator")) {
       const { data: queue } = await supabase
         .from("blog_posts")
         .select("id, slug, title, excerpt, status, category, published_at, reply_to_id, author_name, user_id")
         .eq("status", "pending")
         .order("published_at", { ascending: true });
       setModerationQueue((queue as ModerationPost[]) ?? []);
+    }
+
+    if (rs.includes("admin") || rs.includes("collaborator")) {
+      const { data: pending } = await supabase
+        .from("realities")
+        .select("id, name, city, region, auto_confirm_at, created_at")
+        .eq("created_by", user.id)
+        .eq("confirmed_status", "pendente")
+        .order("created_at", { ascending: false });
+      setMyPendingRealities((pending as MyPendingReality[]) ?? []);
     }
 
     setLoading(false);
