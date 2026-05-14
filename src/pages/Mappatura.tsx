@@ -252,31 +252,36 @@ const Mappatura = () => {
 
         {/* View toggle + Search */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex rounded-lg border border-border overflow-hidden">
+          <div className="flex rounded-lg border border-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
+              aria-pressed={view === "map"}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Map size={16} /> {t("map.view.map")}
+              <Map size={16} aria-hidden="true" /> {t("map.view.map")}
             </button>
             <button
               onClick={() => setView("list")}
+              aria-pressed={view === "list"}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
-              <List size={16} /> {t("map.view.list")}
+              <List size={16} aria-hidden="true" /> {t("map.view.list")}
             </button>
           </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("map.search")}
-            className="flex-1 px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+          <label className="flex-1">
+            <span className="sr-only">{t("map.search")}</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("map.search")}
+              className="w-full px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </label>
         </div>
 
         {/* Region + Discipline + Year + Geo filters */}
