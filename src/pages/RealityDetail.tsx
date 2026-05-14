@@ -111,6 +111,14 @@ const RealityDetail = () => {
             <span className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin size={13} /> {reality.city}, {reality.region}
             </span>
+            {canEditGallery && (
+              <Link
+                to={`/admin/realta/${reality.id}/galleria`}
+                className="ml-auto inline-flex items-center gap-1.5 text-xs font-body font-medium px-3 py-1.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+              >
+                <ImagePlus size={12} /> Modifica galleria
+              </Link>
+            )}
           </div>
           <h1 className="editorial-heading mb-4">{reality.name}</h1>
           <p className="editorial-body text-muted-foreground max-w-3xl">{reality.description}</p>
