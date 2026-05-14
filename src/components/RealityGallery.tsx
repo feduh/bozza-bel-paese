@@ -115,25 +115,25 @@ export default function RealityGallery({ realityId }: { realityId: string }) {
             <>
               <button
                 type="button"
-                className="absolute left-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white"
+                className="absolute left-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenIdx((i) => (i === null ? null : (i - 1 + images.length) % images.length));
                 }}
-                aria-label="Precedente"
+                aria-label="Immagine precedente"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={24} aria-hidden="true" />
               </button>
               <button
                 type="button"
-                className="absolute right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white"
+                className="absolute right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenIdx((i) => (i === null ? null : (i + 1) % images.length));
                 }}
-                aria-label="Successiva"
+                aria-label="Immagine successiva"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={24} aria-hidden="true" />
               </button>
             </>
           )}
@@ -143,18 +143,18 @@ export default function RealityGallery({ realityId }: { realityId: string }) {
           >
             <img
               src={publicUrl(current.storage_path)}
-              alt={current.caption ?? "Immagine"}
+              alt={current.caption ?? `Immagine ${openIdx + 1} di ${images.length}`}
               className="max-w-full max-h-[75vh] object-contain rounded"
             />
             {(current.caption || current.credit) && (
-              <figcaption className="mt-3 text-center text-white/90 font-body text-sm max-w-2xl">
+              <figcaption id={captionId} className="mt-3 text-center text-white/90 font-body text-sm max-w-2xl">
                 {current.caption && <p>{current.caption}</p>}
                 {current.credit && (
                   <p className="text-white/60 text-xs mt-1 italic">© {current.credit}</p>
                 )}
               </figcaption>
             )}
-            <p className="mt-2 text-white/50 text-xs font-body">
+            <p className="mt-2 text-white/50 text-xs font-body" aria-live="polite">
               {openIdx + 1} / {images.length}
             </p>
           </figure>
