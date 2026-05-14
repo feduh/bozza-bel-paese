@@ -221,20 +221,23 @@ const Mappatura = () => {
           </p>
         </div>
 
-        {/* Section dropdown (3 main categories) */}
         <div className="mb-6 relative inline-block">
           <button
             onClick={() => setBucketMenuOpen((o) => !o)}
+            aria-haspopup="menu"
+            aria-expanded={bucketMenuOpen}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card font-body text-sm font-medium hover:border-primary/40 transition-colors"
           >
             {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
-            <ChevronDown size={14} />
+            <ChevronDown size={14} aria-hidden="true" />
           </button>
           {bucketMenuOpen && (
-            <div className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+            <div role="menu" className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
               {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
                 <button
                   key={val}
+                  role="menuitemradio"
+                  aria-checked={bucketFilter === val}
                   onClick={() => {
                     setBucketFilter(val as "all" | Bucket);
                     setBucketMenuOpen(false);
@@ -252,31 +255,36 @@ const Mappatura = () => {
 
         {/* View toggle + Search */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex rounded-lg border border-border overflow-hidden">
+          <div className="flex rounded-lg border border-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
+              aria-pressed={view === "map"}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Map size={16} /> {t("map.view.map")}
+              <Map size={16} aria-hidden="true" /> {t("map.view.map")}
             </button>
             <button
               onClick={() => setView("list")}
+              aria-pressed={view === "list"}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
-              <List size={16} /> {t("map.view.list")}
+              <List size={16} aria-hidden="true" /> {t("map.view.list")}
             </button>
           </div>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("map.search")}
-            className="flex-1 px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+          <label className="flex-1">
+            <span className="sr-only">{t("map.search")}</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("map.search")}
+              className="w-full px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </label>
         </div>
 
         {/* Region + Discipline + Year + Geo filters */}
@@ -348,32 +356,32 @@ const Mappatura = () => {
           )}
         </div>
         {geoStatus === "denied" && (
-          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+          <p role="alert" className="text-xs text-destructive font-body mb-4 -mt-2">
             Permesso di geolocalizzazione negato. Abilitalo nelle impostazioni del browser.
           </p>
         )}
         {geoStatus === "error" && (
-          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+          <p role="alert" className="text-xs text-destructive font-body mb-4 -mt-2">
             Impossibile ottenere la posizione. Riprova tra poco.
           </p>
         )}
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground" aria-label="Legenda categorie">
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
-            <span className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
             {t("map.buckets.spazi-che-furono")}
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-6 font-body">
+        <p className="text-sm text-muted-foreground mb-6 font-body" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>
 
