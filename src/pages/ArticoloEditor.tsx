@@ -39,6 +39,9 @@ const ArticoloEditor = () => {
   const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "published">("draft");
   const [replyTo, setReplyTo] = useState<string | null>(replyToParam);
   const [parent, setParent] = useState<ParentMeta | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(id ?? null);
+  const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const lastSavedRef = useRef<string>("");
 
   const [form, setForm] = useState({
     title: "",
