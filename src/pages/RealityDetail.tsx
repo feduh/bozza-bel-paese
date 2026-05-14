@@ -154,6 +154,8 @@ const RealityDetail = () => {
                 </Suspense>
               </div>
             </section>
+
+            <RealityGallery realityId={reality.id} />
           </div>
 
           <aside className="space-y-6">
