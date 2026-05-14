@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, List, Map, ArrowRight, X, ChevronDown } from "lucide-react";
+import { MapPin, List, Map, ArrowRight, X, ChevronDown, Navigation, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,6 +46,10 @@ const Mappatura = () => {
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
+  const [yearMin, setYearMin] = useState<string>("");
+  const [yearMax, setYearMax] = useState<string>("");
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
 
   useEffect(() => {
     const fetchRealities = async () => {
@@ -82,30 +86,87 @@ const Mappatura = () => {
 
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
+  const yearRange = useMemo(() => {
+    const years = realities.map((r) => r.year_founded).filter(Boolean);
+    return { min: Math.min(...years, 1900), max: Math.max(...years, new Date().getFullYear()) };
+  }, [realities]);
+
+  // Haversine distance in km
+  const distanceKm = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  };
 
   const filtered = useMemo(() => {
-    return realities.filter((r) => {
+    const q = search.trim().toLowerCase();
+    const yMin = yearMin ? parseInt(yearMin, 10) : null;
+    const yMax = yearMax ? parseInt(yearMax, 10) : null;
+    const list = realities.filter((r) => {
       if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
-      if (
-        search &&
-        !r.name.toLowerCase().includes(search.toLowerCase()) &&
-        !r.city.toLowerCase().includes(search.toLowerCase())
-      )
-        return false;
+      if (yMin !== null && r.year_founded < yMin) return false;
+      if (yMax !== null && r.year_founded > yMax) return false;
+      if (q) {
+        const haystack = [r.name, r.city, r.region, r.description, ...r.tags]
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
       return true;
     });
-  }, [realities, bucketFilter, regionFilter, disciplineFilter, search]);
+    if (userPos) {
+      return [...list].sort(
+        (a, b) =>
+          distanceKm(userPos, { lat: a.lat, lng: a.lng }) -
+          distanceKm(userPos, { lat: b.lat, lng: b.lng })
+      );
+    }
+    return list;
+  }, [realities, bucketFilter, regionFilter, disciplineFilter, search, yearMin, yearMax, userPos]);
 
   const hasFilters =
-    bucketFilter !== "all" || regionFilter !== "all" || disciplineFilter !== "all" || search !== "";
+    bucketFilter !== "all" ||
+    regionFilter !== "all" ||
+    disciplineFilter !== "all" ||
+    search !== "" ||
+    yearMin !== "" ||
+    yearMax !== "" ||
+    userPos !== null;
 
   const clearFilters = () => {
     setBucketFilter("all");
     setRegionFilter("all");
     setDisciplineFilter("all");
     setSearch("");
+    setYearMin("");
+    setYearMax("");
+    setUserPos(null);
+    setGeoStatus("idle");
+  };
+
+  const requestGeo = () => {
+    if (!navigator.geolocation) {
+      setGeoStatus("error");
+      return;
+    }
+    setGeoStatus("loading");
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        setUserPos({ lat: p.coords.latitude, lng: p.coords.longitude });
+        setGeoStatus("idle");
+      },
+      (err) => {
+        setGeoStatus(err.code === err.PERMISSION_DENIED ? "denied" : "error");
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
   };
 
   const mapMarkers = useMemo(
@@ -218,8 +279,8 @@ const Mappatura = () => {
           />
         </div>
 
-        {/* Region + Discipline filters */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        {/* Region + Discipline + Year + Geo filters */}
+        <div className="flex flex-wrap gap-3 mb-6 items-center">
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
@@ -240,12 +301,62 @@ const Mappatura = () => {
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
+          <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
+            <span className="text-xs text-muted-foreground mr-1">Anno:</span>
+            <input
+              type="number"
+              value={yearMin}
+              onChange={(e) => setYearMin(e.target.value)}
+              placeholder={String(yearRange.min)}
+              min={1800}
+              max={yearRange.max}
+              className="w-20 bg-transparent focus:outline-none text-sm"
+              aria-label="Anno fondazione minimo"
+            />
+            <span className="text-muted-foreground">–</span>
+            <input
+              type="number"
+              value={yearMax}
+              onChange={(e) => setYearMax(e.target.value)}
+              placeholder={String(yearRange.max)}
+              min={1800}
+              max={yearRange.max}
+              className="w-20 bg-transparent focus:outline-none text-sm"
+              aria-label="Anno fondazione massimo"
+            />
+          </div>
+          <button
+            onClick={requestGeo}
+            disabled={geoStatus === "loading"}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-body text-sm transition-colors ${
+              userPos
+                ? "border-secondary bg-secondary/15 text-secondary"
+                : "border-input bg-background hover:border-primary/40"
+            } disabled:opacity-50`}
+          >
+            {geoStatus === "loading" ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Navigation size={14} />
+            )}
+            {userPos ? "Vicino a te" : "Vicino a me"}
+          </button>
           {hasFilters && (
             <button onClick={clearFilters} className="inline-flex items-center gap-1 px-4 py-2 text-xs font-body text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
         </div>
+        {geoStatus === "denied" && (
+          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+            Permesso di geolocalizzazione negato. Abilitalo nelle impostazioni del browser.
+          </p>
+        )}
+        {geoStatus === "error" && (
+          <p className="text-xs text-destructive font-body mb-4 -mt-2">
+            Impossibile ottenere la posizione. Riprova tra poco.
+          </p>
+        )}
 
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground">
@@ -276,6 +387,7 @@ const Mappatura = () => {
                 markers={mapMarkers}
                 scrollWheelZoom={false}
                 height="600px"
+                userLocation={userPos}
               />
             </Suspense>
           </div>
@@ -305,6 +417,11 @@ const Mappatura = () => {
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
                   <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
+                    {userPos && (
+                      <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-medium">
+                        {Math.round(distanceKm(userPos, { lat: r.lat, lng: r.lng }))} km
+                      </span>
+                    )}
                   </p>
                   <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{r.description}</p>
                   <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
