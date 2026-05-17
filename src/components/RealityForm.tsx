@@ -38,6 +38,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
   const [fb, setFb] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [confirmedStatus, setConfirmedStatus] = useState<ConfirmedStatus>("pendente");
+  const [category, setCategory] = useState<string>("");
 
   const [geocoding, setGeocoding] = useState(false);
   const [geocoded, setGeocoded] = useState(false);
