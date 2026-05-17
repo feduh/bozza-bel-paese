@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { UserPlus, Users, Shield, Eye, EyeOff, MapPinPlus } from "lucide-react";
+import { UserPlus, Eye, EyeOff, MapPinPlus } from "lucide-react";
 import RealityForm from "@/components/RealityForm";
 import FieldError from "@/components/FieldError";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
@@ -10,24 +10,10 @@ import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
 import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
 import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
-type Profile = {
-  id: string;
-  user_id: string;
-  display_name: string;
-  bio: string;
-  avatar_url: string | null;
-  website: string | null;
-  social_instagram: string | null;
-  social_twitter: string | null;
-  created_at: string;
-};
-
 type RealityRef = { id: string; name: string; city: string };
 
 const Admin = () => {
   const { t } = useTranslation();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(true);
   const [realities, setRealities] = useState<RealityRef[]>([]);
 
   // Invite form
@@ -44,15 +30,6 @@ const Admin = () => {
   const [error, setError] = useState("");
   const [errs, setErrs] = useState<FieldErrors>({});
 
-  const fetchProfiles = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setProfiles((data as Profile[]) ?? []);
-    setLoadingProfiles(false);
-  };
-
   const fetchRealities = async () => {
     const { data } = await supabase
       .from("realities")
@@ -62,7 +39,6 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    fetchProfiles();
     fetchRealities();
   }, []);
 
