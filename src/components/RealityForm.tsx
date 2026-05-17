@@ -162,6 +162,16 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
         </div>
       </div>
 
+      <div>
+        <label className="block text-sm font-medium mb-2">Categoria artistica</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
+          <option value="">— nessuna —</option>
+          {REALITY_CATEGORIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
       <div className="grid md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Paese</label>
