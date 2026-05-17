@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
+import { parseCategories } from "@/lib/articleCategories";
 
 type Post = {
   id: string;
