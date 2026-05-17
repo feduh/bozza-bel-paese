@@ -387,15 +387,6 @@ const AreaPersonale = () => {
                   {savingProfile ? "Salvataggio…" : "Salva profilo"}
                 </button>
               </form>
-                {profileMsg && <p className="text-sm font-body text-muted-foreground">{profileMsg}</p>}
-                <button
-                  type="submit"
-                  disabled={savingProfile}
-                  className="px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {savingProfile ? "Salvataggio…" : "Salva profilo"}
-                </button>
-              </form>
             </section>
 
             {/* Proponi nuova realtà (collaboratori + admin) */}
