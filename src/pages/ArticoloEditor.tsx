@@ -3,7 +3,8 @@ import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
 import MarkdownEditor from "@/components/editor/MarkdownEditor";
@@ -42,6 +43,7 @@ const ArticoloEditor = () => {
   const [parent, setParent] = useState<ParentMeta | null>(null);
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [catOpen, setCatOpen] = useState(false);
   const lastSavedRef = useRef<string>("");
 
   const [form, setForm] = useState({
@@ -311,51 +313,80 @@ const ArticoloEditor = () => {
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-body font-medium mb-2">Titolo *</label>
-              <input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                maxLength={200}
-                aria-invalid={!!errs.title}
-                className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.title ? "border-destructive" : "border-input"}`}
-              />
-              <FieldError id="err-title" message={errs.title} />
-            </div>
-            <div>
-              <label className="block text-sm font-body font-medium mb-2">Categorie *</label>
-              <div className="flex flex-wrap gap-2 p-3 rounded-md border border-input bg-background min-h-[3rem]">
-                {ARTICLE_CATEGORIES.map((cat) => {
-                  const selected = parseCategories(form.category).includes(cat);
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => {
-                        const current = parseCategories(form.category);
-                        const next = selected
-                          ? current.filter((c) => c !== cat)
-                          : [...current, cat];
-                        setForm({ ...form, category: serializeCategories(next) });
-                      }}
-                      className={`text-xs font-body px-3 py-1.5 rounded-full border transition-colors ${
-                        selected
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-background text-foreground border-input hover:border-primary/40"
-                      }`}
-                      aria-pressed={selected}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-xs text-muted-foreground font-body mt-1">
-                Seleziona una o più categorie (puoi cliccare di nuovo per deselezionare).
-              </p>
-              <FieldError id="err-category" message={errs.category} />
-            </div>
+          <div>
+            <label className="block text-sm font-body font-medium mb-2">Titolo *</label>
+            <input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              maxLength={200}
+              aria-invalid={!!errs.title}
+              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.title ? "border-destructive" : "border-input"}`}
+            />
+            <FieldError id="err-title" message={errs.title} />
+          </div>
+
+          <div>
+            <label className="block text-sm font-body font-medium mb-2">Categorie *</label>
+            <Popover open={catOpen} onOpenChange={setCatOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  aria-invalid={!!errs.category}
+                  className={`w-full min-h-[3rem] px-4 py-2.5 rounded-md border bg-background font-body text-sm text-left focus:outline-none focus:ring-2 focus:ring-ring flex items-center justify-between gap-2 ${errs.category ? "border-destructive" : "border-input"} hover:border-primary/40 transition-colors`}
+                >
+                  <div className="flex flex-wrap gap-1.5 flex-1">
+                    {parseCategories(form.category).length === 0 ? (
+                      <span className="text-muted-foreground">Seleziona una o più categorie…</span>
+                    ) : (
+                      parseCategories(form.category).map((c) => (
+                        <span key={c} className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                          {c}
+                        </span>
+                      ))
+                    )}
+                  </div>
+                  <ChevronDown size={16} className="text-muted-foreground shrink-0" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-3" align="start">
+                <div className="flex flex-wrap gap-2">
+                  {ARTICLE_CATEGORIES.map((cat) => {
+                    const selected = parseCategories(form.category).includes(cat);
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => {
+                          const current = parseCategories(form.category);
+                          const next = selected
+                            ? current.filter((c) => c !== cat)
+                            : [...current, cat];
+                          setForm({ ...form, category: serializeCategories(next) });
+                        }}
+                        className={`text-xs font-body px-3 py-1.5 rounded-full border transition-colors ${
+                          selected
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-foreground border-input hover:border-primary/40"
+                        }`}
+                        aria-pressed={selected}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-end mt-3 pt-3 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => setCatOpen(false)}
+                    className="text-xs font-body px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                  >
+                    Chiudi
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <FieldError id="err-category" message={errs.category} />
           </div>
 
           <CoverImageUpload
