@@ -134,7 +134,7 @@ const MagazinePost = () => {
           description: post.excerpt,
           image: post.cover_image_url ?? undefined,
           datePublished: post.published_at,
-          author: { "@type": "Person", name: post.author_name },
+          author: { "@type": "Person", name: resolveAuthorName(nameMap, post.user_id, post.author_name) },
           publisher: { "@type": "Organization", name: "Il Bel Paese" },
           articleSection: post.category,
           inLanguage: "it-IT",
@@ -160,7 +160,7 @@ const MagazinePost = () => {
               {parent.title}
             </p>
             <p className="font-body text-xs text-muted-foreground mt-1">
-              di {parent.author_name}
+              di {resolveAuthorName(nameMap, parent.user_id, parent.author_name)}
             </p>
           </Link>
         )}
@@ -182,7 +182,7 @@ const MagazinePost = () => {
 
         <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border flex-wrap">
           <span className="flex items-center gap-1.5">
-            <User size={14} /> {post.author_name}
+            <User size={14} /> {resolveAuthorName(nameMap, post.user_id, post.author_name)}
           </span>
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
@@ -261,7 +261,7 @@ const MagazinePost = () => {
                   </p>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground font-body">
                     <span className="flex items-center gap-1">
-                      <User size={12} /> {r.author_name}
+                      <User size={12} /> {resolveAuthorName(nameMap, r.user_id, r.author_name)}
                     </span>
                     <span>·</span>
                     <span>
