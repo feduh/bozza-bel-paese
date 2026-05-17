@@ -7,6 +7,7 @@ import { Calendar, User, Plus, ArrowRight, Reply } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
+import { parseCategories } from "@/lib/articleCategories";
 
 type MagazinePost = {
   id: string;

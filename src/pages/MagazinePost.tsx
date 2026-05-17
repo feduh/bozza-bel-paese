@@ -152,9 +152,11 @@ const MagazinePost = () => {
         )}
 
         <div className="flex flex-wrap items-center gap-2 mb-6">
-          <span className="text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-            {post.category}
-          </span>
+          {parseCategories(post.category).map((c) => (
+            <span key={c} className="text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+              {c}
+            </span>
+          ))}
           {post.reply_to_id && (
             <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
               <Reply size={10} /> Risposta
