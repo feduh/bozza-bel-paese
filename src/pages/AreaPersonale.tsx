@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import RealityForm from "@/components/RealityForm";
+import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
 
 type Profile = {
   id: string;
@@ -27,8 +28,15 @@ type Profile = {
   website: string | null;
   social_instagram: string | null;
   social_twitter: string | null;
+  social_linkedin: string | null;
   reality_id: string | null;
   affiliation: string | null;
+  public_email: string | null;
+  consent_public: boolean;
+  member_type: string | null;
+  role_collective: string | null;
+  role_real_life: string | null;
+  figure_category: string | null;
 };
 
 type MyPost = {
