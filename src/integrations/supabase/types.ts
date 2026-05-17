@@ -114,11 +114,18 @@ export type Database = {
           affiliation: string | null
           avatar_url: string | null
           bio: string
+          consent_public: boolean
           created_at: string
           display_name: string
+          figure_category: string | null
           id: string
+          member_type: string | null
+          public_email: string | null
           reality_id: string | null
+          role_collective: string | null
+          role_real_life: string | null
           social_instagram: string | null
+          social_linkedin: string | null
           social_twitter: string | null
           updated_at: string
           user_id: string
@@ -128,11 +135,18 @@ export type Database = {
           affiliation?: string | null
           avatar_url?: string | null
           bio?: string
+          consent_public?: boolean
           created_at?: string
           display_name?: string
+          figure_category?: string | null
           id?: string
+          member_type?: string | null
+          public_email?: string | null
           reality_id?: string | null
+          role_collective?: string | null
+          role_real_life?: string | null
           social_instagram?: string | null
+          social_linkedin?: string | null
           social_twitter?: string | null
           updated_at?: string
           user_id: string
@@ -142,11 +156,18 @@ export type Database = {
           affiliation?: string | null
           avatar_url?: string | null
           bio?: string
+          consent_public?: boolean
           created_at?: string
           display_name?: string
+          figure_category?: string | null
           id?: string
+          member_type?: string | null
+          public_email?: string | null
           reality_id?: string | null
+          role_collective?: string | null
+          role_real_life?: string | null
           social_instagram?: string | null
+          social_linkedin?: string | null
           social_twitter?: string | null
           updated_at?: string
           user_id?: string
@@ -166,6 +187,7 @@ export type Database = {
         Row: {
           address: string | null
           auto_confirm_at: string | null
+          category: string | null
           city: string
           confirmed_at: string | null
           confirmed_by: string | null
@@ -197,6 +219,7 @@ export type Database = {
         Insert: {
           address?: string | null
           auto_confirm_at?: string | null
+          category?: string | null
           city: string
           confirmed_at?: string | null
           confirmed_by?: string | null
@@ -228,6 +251,7 @@ export type Database = {
         Update: {
           address?: string | null
           auto_confirm_at?: string | null
+          category?: string | null
           city?: string
           confirmed_at?: string | null
           confirmed_by?: string | null

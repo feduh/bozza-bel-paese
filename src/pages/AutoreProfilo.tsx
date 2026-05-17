@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
-import { ArrowLeft, Globe, Instagram, Twitter, MapPin, Calendar, FileText } from "lucide-react";
+import { ArrowLeft, Globe, Instagram, Twitter, Linkedin, Mail, MapPin, Calendar, FileText } from "lucide-react";
 
 type Profile = {
   user_id: string;
@@ -13,7 +13,13 @@ type Profile = {
   website: string | null;
   social_instagram: string | null;
   social_twitter: string | null;
+  social_linkedin: string | null;
+  public_email: string | null;
   reality_id: string | null;
+  member_type: string | null;
+  role_collective: string | null;
+  role_real_life: string | null;
+  figure_category: string | null;
 };
 
 type RealityRef = { id: string; name: string; city: string; region: string };
@@ -41,8 +47,9 @@ const AutoreProfilo = () => {
     (async () => {
       const { data: p } = await supabase
         .from("profiles")
-        .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_twitter, reality_id")
+        .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_twitter, social_linkedin, public_email, reality_id, member_type, role_collective, role_real_life, figure_category, consent_public")
         .eq("user_id", userId)
+        .eq("consent_public", true)
         .maybeSingle();
       if (cancelled) return;
       if (!p) { setNotFound(true); setLoading(false); return; }
@@ -120,6 +127,14 @@ const AutoreProfilo = () => {
           )}
           <div className="flex-1 min-w-0">
             <h1 className="font-display text-4xl font-bold mb-2">{profile.display_name}</h1>
+            {profile.figure_category && (
+              <p className="font-body text-primary text-sm mb-1">{profile.figure_category}</p>
+            )}
+            {(profile.role_collective || profile.role_real_life) && (
+              <p className="font-body text-muted-foreground text-sm mb-2">
+                {[profile.role_collective, profile.role_real_life].filter(Boolean).join(" · ")}
+              </p>
+            )}
             {(reality || profile.affiliation) && (
               <p className="font-body text-muted-foreground mb-4">
                 {reality ? (
@@ -135,6 +150,14 @@ const AutoreProfilo = () => {
               <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line">{profile.bio}</p>
             )}
             <div className="mt-5 flex flex-wrap gap-3">
+              {profile.public_email && (
+                <a
+                  href={`mailto:${profile.public_email}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+                >
+                  <Mail size={14} /> Email
+                </a>
+              )}
               {profile.website && (
                 <a
                   href={profile.website}
@@ -143,6 +166,16 @@ const AutoreProfilo = () => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
                 >
                   <Globe size={14} /> Sito
+                </a>
+              )}
+              {profile.social_linkedin && (
+                <a
+                  href={profile.social_linkedin.startsWith("http") ? profile.social_linkedin : `https://linkedin.com/in/${profile.social_linkedin.replace(/^@/, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+                >
+                  <Linkedin size={14} /> LinkedIn
                 </a>
               )}
               {profile.social_instagram && (

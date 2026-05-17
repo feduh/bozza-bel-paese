@@ -4,6 +4,7 @@ import { MapPin, Loader2, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { realitySchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 import FieldError from "@/components/FieldError";
+import { REALITY_CATEGORIES } from "@/lib/categories";
 
 type RealityType = "con-sede" | "nomade" | "scomparsa";
 type ConfirmedStatus = "pendente" | "confermato" | "storico";
@@ -37,6 +38,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
   const [fb, setFb] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [confirmedStatus, setConfirmedStatus] = useState<ConfirmedStatus>("pendente");
+  const [category, setCategory] = useState<string>("");
 
   const [geocoding, setGeocoding] = useState(false);
   const [geocoded, setGeocoded] = useState(false);
@@ -122,6 +124,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       status: effectiveStatus === "storico" ? "archiviato" : "attivo",
       created_by: user?.id ?? null,
       auto_confirm_at: autoConfirmAt,
+      category: category || null,
     });
 
     if (insertError) {
@@ -131,7 +134,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
       setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
       setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false);
+      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategory("");
       onCreated?.();
     }
     setSubmitting(false);
@@ -157,6 +160,16 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
           </select>
           <FieldError id="err-type" message={errs.type} />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2">Categoria artistica</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
+          <option value="">— nessuna —</option>
+          {REALITY_CATEGORIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">

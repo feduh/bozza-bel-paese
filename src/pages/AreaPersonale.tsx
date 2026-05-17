@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import RealityForm from "@/components/RealityForm";
+import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
 
 type Profile = {
   id: string;
@@ -27,8 +28,15 @@ type Profile = {
   website: string | null;
   social_instagram: string | null;
   social_twitter: string | null;
+  social_linkedin: string | null;
   reality_id: string | null;
   affiliation: string | null;
+  public_email: string | null;
+  consent_public: boolean;
+  member_type: string | null;
+  role_collective: string | null;
+  role_real_life: string | null;
+  figure_category: string | null;
 };
 
 type MyPost = {
@@ -139,6 +147,24 @@ const AreaPersonale = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
+  const handleAvatarUpload = async (file: File) => {
+    if (!user || !profile) return;
+    setSavingProfile(true);
+    setProfileMsg("");
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (upErr) {
+      setProfileMsg(`Errore upload: ${upErr.message}`);
+      setSavingProfile(false);
+      return;
+    }
+    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+    setProfile({ ...profile, avatar_url: pub.publicUrl });
+    setSavingProfile(false);
+    setProfileMsg("✅ Foto caricata. Ricorda di salvare il profilo.");
+  };
+
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile || !user) return;
@@ -153,7 +179,14 @@ const AreaPersonale = () => {
         website: profile.website || null,
         social_instagram: profile.social_instagram || null,
         social_twitter: profile.social_twitter || null,
+        social_linkedin: profile.social_linkedin || null,
         affiliation: profile.reality_id ? null : (profile.affiliation || null),
+        public_email: profile.public_email || null,
+        consent_public: !!profile.consent_public,
+        member_type: profile.member_type || null,
+        role_collective: profile.role_collective || null,
+        role_real_life: profile.role_real_life || null,
+        figure_category: profile.figure_category || null,
       })
       .eq("user_id", user.id);
     setSavingProfile(false);
@@ -233,6 +266,32 @@ const AreaPersonale = () => {
                 </div>
               </div>
               <form onSubmit={handleProfileSave} className="space-y-4">
+                {/* Avatar upload */}
+                <div className="flex items-center gap-4">
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover bg-muted border border-border" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-2xl border border-border">
+                      {(profile.display_name || "?").charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <label className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-input bg-background text-sm font-body cursor-pointer hover:border-primary/40 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) handleAvatarUpload(f);
+                        }}
+                      />
+                      Carica foto
+                    </label>
+                    <p className="text-xs text-muted-foreground font-body mt-1">JPG/PNG, max ~2MB consigliato</p>
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <Field
                     label="Nome visualizzato"
@@ -240,13 +299,21 @@ const AreaPersonale = () => {
                     onChange={(v) => setProfile({ ...profile, display_name: v })}
                     required
                   />
-                  <Field
-                    label="URL avatar"
-                    value={profile.avatar_url ?? ""}
-                    onChange={(v) => setProfile({ ...profile, avatar_url: v })}
-                    placeholder="https://…"
-                  />
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Ruolo nel collettivo</label>
+                    <select
+                      value={profile.member_type ?? ""}
+                      onChange={(e) => setProfile({ ...profile, member_type: e.target.value })}
+                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">— non specificato —</option>
+                      {MEMBER_TYPES.map((m) => (
+                        <option key={m.value} value={m.value}>{m.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
+
                 <div>
                   <label className="block text-sm font-body font-medium mb-2">Bio</label>
                   <textarea
@@ -257,29 +324,60 @@ const AreaPersonale = () => {
                     className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                   />
                 </div>
-                {!profile.reality_id && (
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label="Ruolo dentro il collettivo" value={profile.role_collective ?? ""} onChange={(v) => setProfile({ ...profile, role_collective: v })} placeholder="es. coordinamento editoriale" />
+                  <Field label="Ruolo nella vita reale" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-body font-medium mb-2">
-                      Affiliazione
-                      <span className="text-xs font-normal text-muted-foreground ml-2">
-                        (es. università, istituzione, indipendente)
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      value={profile.affiliation ?? ""}
-                      onChange={(e) => setProfile({ ...profile, affiliation: e.target.value })}
-                      placeholder="es. Università di Bologna, MAXXI, ricercatore indipendente…"
-                      maxLength={120}
+                    <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
+                    <select
+                      value={profile.figure_category ?? ""}
+                      onChange={(e) => setProfile({ ...profile, figure_category: e.target.value })}
                       className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
+                    >
+                      <option value="">— non specificata —</option>
+                      {FIGURE_CATEGORIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
                   </div>
-                )}
-                <div className="grid md:grid-cols-3 gap-4">
+                  {!profile.reality_id && (
+                    <Field
+                      label="Affiliazione"
+                      value={profile.affiliation ?? ""}
+                      onChange={(v) => setProfile({ ...profile, affiliation: v })}
+                      placeholder="es. Università di Bologna, MAXXI…"
+                    />
+                  )}
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label="Email pubblica" value={profile.public_email ?? ""} onChange={(v) => setProfile({ ...profile, public_email: v })} placeholder="visibile sul profilo pubblico" />
                   <Field label="Sito web" value={profile.website ?? ""} onChange={(v) => setProfile({ ...profile, website: v })} placeholder="https://…" />
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4">
                   <Field label="Instagram" value={profile.social_instagram ?? ""} onChange={(v) => setProfile({ ...profile, social_instagram: v })} />
+                  <Field label="LinkedIn" value={profile.social_linkedin ?? ""} onChange={(v) => setProfile({ ...profile, social_linkedin: v })} placeholder="https://linkedin.com/in/…" />
                   <Field label="Twitter / X" value={profile.social_twitter ?? ""} onChange={(v) => setProfile({ ...profile, social_twitter: v })} />
                 </div>
+
+                <label className="flex items-start gap-3 p-4 rounded-md border border-border bg-muted/30 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!profile.consent_public}
+                    onChange={(e) => setProfile({ ...profile, consent_public: e.target.checked })}
+                    className="mt-1"
+                  />
+                  <span className="text-sm font-body">
+                    <strong>Acconsento alla pubblicazione del mio profilo</strong> nella pagina pubblica della rete /
+                    chi siamo. I dati condivisi (nome, foto, bio, ruoli, email pubblica, social) saranno visibili a
+                    chiunque visiti il sito, per favorire connessioni e collaborazioni.
+                  </span>
+                </label>
                 {profileMsg && <p className="text-sm font-body text-muted-foreground">{profileMsg}</p>}
                 <button
                   type="submit"
