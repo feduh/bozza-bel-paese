@@ -333,18 +333,6 @@ const Mappatura = () => {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
-          {allDisciplines.length > 0 && (
-            <select
-              value={disciplineFilter}
-              onChange={(e) => setDisciplineFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="all">{t("map.filterMedia")}</option>
-              {allDisciplines.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          )}
           {view === "list" && (
             <select
               value={sortMode}
