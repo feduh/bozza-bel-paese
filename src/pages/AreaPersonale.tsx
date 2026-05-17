@@ -299,21 +299,14 @@ const AreaPersonale = () => {
                     onChange={(v) => setProfile({ ...profile, display_name: v })}
                     required
                   />
-                  {isStaff ? (
-                    <div>
-                      <label className="block text-sm font-body font-medium mb-2">Ruolo nel collettivo</label>
-                      <select
-                        value={profile.member_type ?? ""}
-                        onChange={(e) => setProfile({ ...profile, member_type: e.target.value })}
-                        className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                      >
-                        <option value="">— non specificato —</option>
-                        {MEMBER_TYPES.map((m) => (
-                          <option key={m.value} value={m.value}>{m.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                  ) : null}
+                  {isStaff && (
+                    <Field
+                      label="Ruolo dentro il collettivo"
+                      value={profile.role_collective ?? ""}
+                      onChange={(v) => setProfile({ ...profile, role_collective: v })}
+                      placeholder="es. coordinamento editoriale"
+                    />
+                  )}
                 </div>
 
                 <div>
@@ -326,12 +319,6 @@ const AreaPersonale = () => {
                     className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                   />
                 </div>
-
-                {isStaff && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Field label="Ruolo dentro il collettivo" value={profile.role_collective ?? ""} onChange={(v) => setProfile({ ...profile, role_collective: v })} placeholder="es. coordinamento editoriale" />
-                  </div>
-                )}
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <Field label="Ruolo nella vita reale" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
