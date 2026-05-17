@@ -10,6 +10,7 @@ import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
 import { parseCategories } from "@/lib/articleCategories";
+import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
 
 type Post = {
   id: string;
@@ -18,6 +19,7 @@ type Post = {
   excerpt: string;
   content: string;
   author_name: string;
+  user_id: string;
   category: string;
   cover_image_url: string | null;
   reply_to_id: string | null;
@@ -31,6 +33,7 @@ type ReplyMeta = {
   title: string;
   excerpt: string;
   author_name: string;
+  user_id: string;
   published_at: string;
 };
 
@@ -41,6 +44,7 @@ const MagazinePost = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [parent, setParent] = useState<ReplyMeta | null>(null);
   const [replies, setReplies] = useState<ReplyMeta[]>([]);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   const readingTime = useMemo(() => {
@@ -63,14 +67,18 @@ const MagazinePost = () => {
       const p = data as Post | null;
       setPost(p);
 
+      let parentRow: ReplyMeta | null = null;
+      let replyRows: ReplyMeta[] = [];
+
       if (p?.reply_to_id) {
         const { data: parentData } = await supabase
           .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, published_at")
+          .select("id, slug, title, excerpt, author_name, user_id, published_at")
           .eq("id", p.reply_to_id)
           .eq("status", "published")
           .maybeSingle();
-        if (!cancelled) setParent((parentData as ReplyMeta | null) ?? null);
+        parentRow = (parentData as ReplyMeta | null) ?? null;
+        if (!cancelled) setParent(parentRow);
       } else {
         setParent(null);
       }
@@ -78,12 +86,17 @@ const MagazinePost = () => {
       if (p) {
         const { data: replyData } = await supabase
           .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, published_at")
+          .select("id, slug, title, excerpt, author_name, user_id, published_at")
           .eq("reply_to_id", p.id)
           .eq("status", "published")
           .order("published_at", { ascending: true });
-        if (!cancelled) setReplies((replyData as ReplyMeta[]) ?? []);
+        replyRows = (replyData as ReplyMeta[]) ?? [];
+        if (!cancelled) setReplies(replyRows);
       }
+
+      const allIds = [p?.user_id, parentRow?.user_id, ...replyRows.map((r) => r.user_id)];
+      const names = await fetchAuthorNames(allIds);
+      if (!cancelled) setNameMap(names);
 
       setLoading(false);
     };
@@ -121,7 +134,7 @@ const MagazinePost = () => {
           description: post.excerpt,
           image: post.cover_image_url ?? undefined,
           datePublished: post.published_at,
-          author: { "@type": "Person", name: post.author_name },
+          author: { "@type": "Person", name: resolveAuthorName(nameMap, post.user_id, post.author_name) },
           publisher: { "@type": "Organization", name: "Il Bel Paese" },
           articleSection: post.category,
           inLanguage: "it-IT",
@@ -147,7 +160,7 @@ const MagazinePost = () => {
               {parent.title}
             </p>
             <p className="font-body text-xs text-muted-foreground mt-1">
-              di {parent.author_name}
+              di {resolveAuthorName(nameMap, parent.user_id, parent.author_name)}
             </p>
           </Link>
         )}
@@ -169,7 +182,7 @@ const MagazinePost = () => {
 
         <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border flex-wrap">
           <span className="flex items-center gap-1.5">
-            <User size={14} /> {post.author_name}
+            <User size={14} /> {resolveAuthorName(nameMap, post.user_id, post.author_name)}
           </span>
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
@@ -248,7 +261,7 @@ const MagazinePost = () => {
                   </p>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground font-body">
                     <span className="flex items-center gap-1">
-                      <User size={12} /> {r.author_name}
+                      <User size={12} /> {resolveAuthorName(nameMap, r.user_id, r.author_name)}
                     </span>
                     <span>·</span>
                     <span>

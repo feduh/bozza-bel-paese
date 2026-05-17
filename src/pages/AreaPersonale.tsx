@@ -18,6 +18,7 @@ import {
 import SEO from "@/components/SEO";
 import RealityForm from "@/components/RealityForm";
 import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
+import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
 
 type Profile = {
   id: string;
@@ -78,6 +79,7 @@ const AreaPersonale = () => {
   const [myRoles, setMyRoles] = useState<string[]>([]);
   const [moderationQueue, setModerationQueue] = useState<ModerationPost[]>([]);
   const [myPendingRealities, setMyPendingRealities] = useState<MyPendingReality[]>([]);
+  const [modNameMap, setModNameMap] = useState<Record<string, string>>({});
   const [showNewReality, setShowNewReality] = useState(false);
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -126,7 +128,10 @@ const AreaPersonale = () => {
         .select("id, slug, title, excerpt, status, category, published_at, reply_to_id, author_name, user_id")
         .eq("status", "pending")
         .order("published_at", { ascending: true });
-      setModerationQueue((queue as ModerationPost[]) ?? []);
+      const list = (queue as ModerationPost[]) ?? [];
+      setModerationQueue(list);
+      const names = await fetchAuthorNames(list.map((p) => p.user_id));
+      setModNameMap(names);
     }
 
     if (rs.includes("admin") || rs.includes("coordinatore")) {
@@ -460,7 +465,7 @@ const AreaPersonale = () => {
                           <div className="flex-1 min-w-0">
                             <p className="font-display font-semibold mb-1">{p.title}</p>
                             <p className="text-xs text-muted-foreground font-body mb-1">
-                              di {p.author_name} · {p.category}
+                              di {resolveAuthorName(modNameMap, p.user_id, p.author_name)} · {p.category}
                               {p.reply_to_id && " · risposta"}
                             </p>
                             <p className="text-sm font-body text-muted-foreground line-clamp-2">
