@@ -85,7 +85,7 @@ describe("Admin", () => {
     await waitFor(() => {
       expect(screen.getByText("Pannello Admin")).toBeInTheDocument();
     });
-    expect(screen.getByText("Invita collaboratore")).toBeInTheDocument();
+    expect(screen.getByText("Invita coordinatore")).toBeInTheDocument();
     expect(screen.getByText("Collaboratori")).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("Admin", () => {
     renderAdmin();
 
     await waitFor(() => {
-      expect(screen.getByText(/Nessun collaboratore/)).toBeInTheDocument();
+      expect(screen.getByText(/Nessun coordinatore/)).toBeInTheDocument();
     });
   });
 

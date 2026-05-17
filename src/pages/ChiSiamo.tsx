@@ -31,7 +31,7 @@ const ChiSiamo = () => {
         .from("profiles")
         .select("user_id, display_name, bio, avatar_url, role_collective, role_real_life, social_linkedin, public_email, website")
         .eq("consent_public", true)
-        .eq("member_type", "collaboratore")
+        .eq("member_type", "coordinatore")
         .order("display_name", { ascending: true });
       if (cancelled) return;
       setCollaborators((data as Collaborator[]) ?? []);
@@ -78,7 +78,7 @@ const ChiSiamo = () => {
           {loading ? (
             <p className="font-body text-muted-foreground text-sm">Caricamento…</p>
           ) : collaborators.length === 0 ? (
-            <p className="font-body text-muted-foreground text-sm italic">Nessun collaboratore pubblico al momento.</p>
+            <p className="font-body text-muted-foreground text-sm italic">Nessun coordinatore pubblico al momento.</p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {collaborators.map((c) => (

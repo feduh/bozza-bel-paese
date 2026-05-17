@@ -383,7 +383,7 @@ const AreaPersonale = () => {
               </form>
             </section>
 
-            {/* Proponi nuova realtà (collaboratori + admin) */}
+            {/* Proponi nuova realtà (coordinatori + admin) */}
             {canProposeRealities && (
               <section className="p-8 rounded-lg bg-card border border-border">
                 <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">

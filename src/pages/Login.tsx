@@ -41,7 +41,7 @@ const Login = () => {
             <span className="italic text-primary">Accedi</span>
           </h1>
           <p className="font-body text-muted-foreground">
-            Area riservata ai collaboratori. Le credenziali vengono fornite dall'amministratore del sito.
+            Area riservata ai coordinatori. Le credenziali vengono fornite dall'amministratore del sito.
           </p>
         </div>
 
