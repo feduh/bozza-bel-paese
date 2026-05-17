@@ -67,14 +67,18 @@ const MagazinePost = () => {
       const p = data as Post | null;
       setPost(p);
 
+      let parentRow: ReplyMeta | null = null;
+      let replyRows: ReplyMeta[] = [];
+
       if (p?.reply_to_id) {
         const { data: parentData } = await supabase
           .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, published_at")
+          .select("id, slug, title, excerpt, author_name, user_id, published_at")
           .eq("id", p.reply_to_id)
           .eq("status", "published")
           .maybeSingle();
-        if (!cancelled) setParent((parentData as ReplyMeta | null) ?? null);
+        parentRow = (parentData as ReplyMeta | null) ?? null;
+        if (!cancelled) setParent(parentRow);
       } else {
         setParent(null);
       }
@@ -82,12 +86,17 @@ const MagazinePost = () => {
       if (p) {
         const { data: replyData } = await supabase
           .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, published_at")
+          .select("id, slug, title, excerpt, author_name, user_id, published_at")
           .eq("reply_to_id", p.id)
           .eq("status", "published")
           .order("published_at", { ascending: true });
-        if (!cancelled) setReplies((replyData as ReplyMeta[]) ?? []);
+        replyRows = (replyData as ReplyMeta[]) ?? [];
+        if (!cancelled) setReplies(replyRows);
       }
+
+      const allIds = [p?.user_id, parentRow?.user_id, ...replyRows.map((r) => r.user_id)];
+      const names = await fetchAuthorNames(allIds);
+      if (!cancelled) setNameMap(names);
 
       setLoading(false);
     };
