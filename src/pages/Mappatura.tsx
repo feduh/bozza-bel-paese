@@ -323,15 +323,41 @@ const Mappatura = () => {
             ))}
           </select>
           <select
-            value={disciplineFilter}
-            onChange={(e) => setDisciplineFilter(e.target.value)}
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            aria-label="Filtra per categoria artistica"
           >
-            <option value="all">{t("map.filterMedia")}</option>
-            {allDisciplines.map((d) => (
-              <option key={d} value={d}>{d}</option>
+            <option value="all">Tutte le categorie</option>
+            {REALITY_CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
             ))}
           </select>
+          {allDisciplines.length > 0 && (
+            <select
+              value={disciplineFilter}
+              onChange={(e) => setDisciplineFilter(e.target.value)}
+              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">{t("map.filterMedia")}</option>
+              {allDisciplines.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          )}
+          {view === "list" && (
+            <select
+              value={sortMode}
+              onChange={(e) => setSortMode(e.target.value as SortMode)}
+              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Ordina risultati"
+            >
+              <option value="default">Ordine predefinito</option>
+              <option value="az">A-Z</option>
+              <option value="za">Z-A</option>
+              <option value="latest">Ultimi aggiunti</option>
+            </select>
+          )}
           <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
             <span className="text-xs text-muted-foreground mr-1">Anno:</span>
             <input
