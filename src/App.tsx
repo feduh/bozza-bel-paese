@@ -26,6 +26,9 @@ const Admin = lazy(() => import("./pages/Admin"));
 const AreaPersonale = lazy(() => import("./pages/AreaPersonale"));
 const ArticoloEditor = lazy(() => import("./pages/ArticoloEditor"));
 const RealityGalleryAdmin = lazy(() => import("./pages/RealityGalleryAdmin"));
+const LaRete = lazy(() => import("./pages/LaRete"));
+const AutoreProfilo = lazy(() => import("./pages/AutoreProfilo"));
+const SegnalaRealta = lazy(() => import("./pages/SegnalaRealta"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,6 +58,9 @@ const App = () => (
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/magazine" element={<Blog />} />
                   <Route path="/magazine/:slug" element={<MagazinePost />} />
+                  <Route path="/la-rete" element={<LaRete />} />
+                  <Route path="/autori/:userId" element={<AutoreProfilo />} />
+                  <Route path="/segnala-realta" element={<SegnalaRealta />} />
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/admin"
