@@ -239,6 +239,44 @@ const RealityDetail = () => {
             </div>
 
             <div className="p-6 rounded-lg bg-card border border-border">
+              <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
+                <Users size={16} className="text-primary" /> Membri di riferimento
+              </h3>
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-body">Nessun membro collegato pubblicamente.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {members.map((m) => (
+                    <li key={m.user_id}>
+                      <Link
+                        to={`/autori/${m.user_id}`}
+                        className="flex items-center gap-3 group"
+                      >
+                        {m.avatar_url ? (
+                          <img src={m.avatar_url} alt={m.display_name} className="w-10 h-10 rounded-full object-cover border border-border" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-display font-semibold text-sm">
+                            {m.display_name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="font-body font-medium text-sm group-hover:text-primary transition-colors truncate">
+                            {m.display_name}
+                          </div>
+                          {(m.role_collective || m.member_type) && (
+                            <div className="text-xs text-muted-foreground font-body truncate">
+                              {m.role_collective || (m.member_type === "coordinatore" ? "Coordinatore" : "Autore")}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="p-6 rounded-lg bg-card border border-border">
               <h3 className="font-display text-lg font-semibold mb-4">{t("reality.disciplines")}</h3>
               <div className="flex flex-wrap gap-2">
                 {tags.map((d) => (
