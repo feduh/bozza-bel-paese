@@ -10,6 +10,8 @@ const Footer = () => {
     { to: "/la-rete", label: "La rete" },
     { to: "/magazine", label: t("nav.magazine") },
     { to: "/segnala-realta", label: "Segnala una realtà" },
+    { to: "/contatti", label: "Contatti" },
+    { to: "/privacy", label: "Privacy" },
   ];
 
   return (
