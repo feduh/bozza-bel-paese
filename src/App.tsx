@@ -68,6 +68,8 @@ const App = () => (
                   <Route path="/contatti" element={<Contatti />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/password-dimenticata" element={<PasswordDimenticata />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route
                     path="/admin"
                     element={
