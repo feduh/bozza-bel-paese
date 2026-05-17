@@ -1,102 +1,82 @@
-# Magazine partecipativo: author, risposte, moderazione
+## Batch 2 — Account & Sicurezza
 
-## Obiettivo
-- I membri delle realtà ottengono un account `author` e un'area personale dedicata al solo Magazine.
-- Gli articoli `author` passano per una coda di moderazione prima di essere pubblicati.
-- Sotto ogni articolo, un membro loggato può scrivere un articolo di **risposta** che resta linkato all'originale (sostituisce il vecchio formato Point/Counter Point).
-- Il pubblico non loggato continua a vedere solo articoli pubblicati.
+Due aree distinte, entrambe necessarie per chiudere il loop di gestione account.
 
-## 1. Database (un'unica migrazione)
+---
 
-**Enum ruoli**
-- Aggiungo `'author'` a `app_role`.
+### 1. Gestione utenti esistenti (pannello Admin)
 
-**Tabella `blog_posts`**
-- Aggiungo `status text not null default 'draft'` con valori validi `draft | pending | published`.
-- Aggiungo `reply_to_id uuid references blog_posts(id) on delete set null`.
-- Aggiungo `published_at timestamptz null` (separato da `created_at`).
-- **Rimuovo** `is_point_counterpoint`, `stance`, `counterpart_id` (nessun PCP pubblicato).
-- Aggiorno il trigger `validate_blog_pcp` rimuovendolo.
-- Backfill: i 3 articoli esistenti vanno in `status='published'` con `published_at = created_at`.
+Oggi `/admin` permette solo di **creare** collaboratori. Aggiungo un pannello completo per gestire quelli esistenti.
 
-**Tabella `profiles`**
-- Aggiungo `reality_id uuid references realities(id) on delete set null` per legare l'autore alla sua realtà di provenienza (sola visualizzazione, nessun permesso sulla mappa).
+**Nuovo componente `UsersManagementPanel.tsx`** dentro `src/components/admin/`:
 
-**RLS aggiornate su `blog_posts`**
-- SELECT pubblico: solo `status='published'`.
-- SELECT autenticati: i propri post anche se `draft/pending`; admin e collaborator vedono tutto.
-- INSERT autenticati: chiunque loggato; `author` può inserire SOLO con `status in ('draft','pending')`; admin/collaborator possono inserire direttamente `published`.
-- UPDATE: l'autore può modificare i propri post solo se non ancora `published`; admin e collaborator possono modificare/pubblicare qualsiasi post.
-- DELETE: autore i propri non pubblicati; admin/collaborator tutti.
+- **Lista utenti** unisce `profiles` + `user_roles` + email da `auth.users` (recuperata via edge function con service role)
+- **Per ogni utente**:
+  - Avatar / nome / email / data creazione
+  - Badge ruoli correnti (admin / moderator / collaborator / author)
+  - Tipo (membro/autore), realtà o affiliazione
+- **Azioni**:
+  - **Cambia ruolo**: aggiungi/rimuovi `admin`, `moderator`, `collaborator`, `author` (toggle multipli — un utente può avere più ruoli)
+  - **Reset password**: l'admin imposta una nuova password temporanea per quell'utente
+  - **Sospendi / Riattiva account**: usa `auth.users.banned_until` (sospensione = banned_until = '2099-…', riattivazione = null)
+  - **Elimina account**: cancella `auth.user` + cascata su profiles/roles (con conferma dialog)
+- **Filtri**: per ruolo, per realtà, ricerca testuale su nome/email
+- **Self-protection**: un admin non può togliersi il ruolo admin né eliminarsi (evita lockout)
 
-**RLS `user_roles`**
-- Aggiungo policy SELECT per admin (serve per la coda di moderazione e gestione utenti).
+**Nuova edge function `manage-user`** (`supabase/functions/manage-user/index.ts`):
+- Operazioni: `list_users`, `update_roles`, `reset_password`, `set_banned`, `delete_user`
+- Usa `SUPABASE_SERVICE_ROLE_KEY` per accedere a `auth.admin.*`
+- Verifica nel codice che il caller sia admin (via JWT + `has_role`)
+- Logga ogni azione in `admin_audit_log` (già esistente)
 
-## 2. Frontend
+---
 
-**Nuova pagina `/area-personale`**
-- Route protetta (qualsiasi utente loggato).
-- Header: nome, avatar, badge ruolo, edit profilo (display_name, bio, avatar_url, social, website).
-- Tab/sezione **"I miei articoli"**: lista dei propri post con stato (`draft`, `in moderazione`, `pubblicato`), pulsanti edit/elimina dove permesso.
-- Pulsante **"Nuovo articolo"** → editor.
-- Se ruolo è `collaborator` o `admin`, link aggiuntivo a `/admin`.
-- Se ruolo è `admin` o `collaborator`, sezione **"Coda moderazione"** con post `status='pending'` di tutti, e azioni "Pubblica" / "Rimanda in bozza" / "Elimina".
+### 2. Reset password autonomo
 
-**Editor articolo (`/area-personale/articolo/nuovo` e `/articolo/:id/modifica`)**
-- Form con titolo, slug (auto), excerpt, cover image (URL per ora), categoria, contenuto (textarea markdown semplice come oggi).
-- Validazione zod (titoli/excerpt con limiti lunghezza, slug unico).
-- Bottoni: "Salva bozza" (`draft`) e "Invia per pubblicazione" (`pending` per author, `published` diretto per admin/collaborator).
-- Se l'articolo è una risposta, mostra in alto un riquadro "Stai rispondendo a: [titolo originale]" (read-only).
+Per utenti che hanno perso la password — flow completo email-based.
 
-**Pagina articolo (`/magazine/:slug`)**
-- Sotto al contenuto: pulsante **"Scrivi una risposta"** visibile solo a utenti loggati → apre l'editor con `reply_to_id` precompilato.
-- Sezione **"Risposte"** in fondo: lista dei post pubblicati con `reply_to_id` = id corrente, ordinati cronologicamente, con autore + data + excerpt + link.
-- Se l'articolo corrente è una risposta, mostra in alto "↰ In risposta a: [titolo originale]".
+**Pagine nuove:**
+- `/password-dimenticata` (`PasswordDimenticata.tsx`): form email → `supabase.auth.resetPasswordForEmail()` con `redirectTo: /reset-password`
+- `/reset-password` (`ResetPassword.tsx`): form nuova password + conferma; valida sessione di recovery e chiama `supabase.auth.updateUser({ password })`
 
-**Pagina elenco Magazine (`/magazine`)**
-- Mostra solo articoli `status='published'` (già di fatto, rinforzato da RLS).
-- Rimuovo qualsiasi UI legata al PCP.
+**Regole password** (validate sia client che server tramite HIBP già attivo):
+- Minimo 10 caratteri
+- Almeno 1 maiuscola, 1 minuscola, 1 numero, 1 simbolo
+- Non compromessa (HIBP, già attivo nella migration precedente)
+- Indicatore di forza visivo durante la digitazione
 
-**Pannello admin (`/admin`)**
-- Nel form invito aggiungo dropdown ruolo: `collaborator` | `author`.
-- Se `author`, dropdown realtà di appartenenza (popolata da `realities`).
-- L'edge function `invite-collaborator` viene rinominata logicamente: accetta `role` e `reality_id` opzionale, crea utente, assegna ruolo, e (per author) imposta `profiles.reality_id`.
+**Modifiche a `Login.tsx`:**
+- Link "Password dimenticata?" sotto il form
 
-## 3. File toccati
+---
 
-**Nuovi**
-- `src/pages/AreaPersonale.tsx`
-- `src/pages/ArticoloEditor.tsx`
-- `src/components/magazine/RepliesSection.tsx`
-- `src/components/magazine/ReplyButton.tsx`
-- `src/components/admin/ModerationQueue.tsx`
-- `src/lib/schemas/articleSchema.ts` (zod)
+### Cosa NON includo in questo batch
 
-**Modificati**
-- `src/App.tsx` (nuove route protette)
-- `src/pages/MagazinePost.tsx` (riquadro "in risposta a", sezione risposte, pulsante rispondi)
-- `src/pages/Blog.tsx` (rimozione UI PCP)
-- `src/pages/Admin.tsx` (dropdown ruolo + realtà nell'invito, link a moderazione)
-- `supabase/functions/invite-collaborator/index.ts` (parametri role + reality_id)
-- `src/components/Navbar.tsx` (link "Area personale" se loggato)
+- Sincronizzazione `author_name` negli articoli al cambio nome profilo (sposto al batch successivo perché impatta sul layout articolo)
+- Notifiche email transazionali (verranno con il batch Newsletter)
+- "Magic link" come alternativa alla password (richiede setup SMTP)
 
-**Eliminati**
-- Riferimenti `is_point_counterpoint`, `stance`, `counterpart_id` ovunque.
+---
 
-## 4. Sicurezza
-- RLS è la difesa primaria: un `author` non può mai pubblicare direttamente, anche bypassando il client.
-- Validazione zod sia client che (implicita via RLS + check constraint) server.
-- HIBP password check già attivabile, lo lascio così com'è (non lo tocco in questa migrazione).
-- Nessun input HTML raw: il contenuto resta testo/markdown semplice come oggi.
+### File toccati
 
-## 5. Ordine di esecuzione
-1. Migrazione DB (schema + RLS + backfill + drop trigger PCP).
-2. Aggiornamento types Supabase (automatico).
-3. Edge function `invite-collaborator` con nuovi parametri.
-4. Pagine area personale + editor.
-5. Risposte e moderazione su MagazinePost + Admin.
-6. Pulizia UI PCP da Blog e i18n.
+**Nuovi:**
+- `src/components/admin/UsersManagementPanel.tsx`
+- `src/pages/PasswordDimenticata.tsx`
+- `src/pages/ResetPassword.tsx`
+- `supabase/functions/manage-user/index.ts`
+- Migration: validation triggers su operazioni audit, eventuale view `auth_users_view` se serve
 
-## Note
-- Email transazionali per invito e per "il tuo articolo è stato pubblicato/rifiutato": le **rimando** a un'iterazione successiva (richiedono Resend e dominio email configurato).
-- Niente notifiche in-app per ora: l'autore vede lo stato nei "I miei articoli".
+**Modificati:**
+- `src/pages/Admin.tsx` (aggiunge il nuovo pannello)
+- `src/pages/Login.tsx` (link recupero)
+- `src/App.tsx` (nuove route)
+- `src/lib/validation.ts` (regole password)
+
+---
+
+### Domanda per te prima di partire
+
+1. **Eliminazione account**: la voglio "hard delete" (utente + profilo + articoli vanno via) o "soft" (anonimizza profilo, mantiene articoli con autore "Utente rimosso")? Per un magazine consiglierei **soft** così la cronologia editoriale resta integra.
+
+2. **Reset password da admin**: l'admin sceglie lui la nuova password e la comunica all'utente (come ora per la creazione), o l'admin scatena solo un'email di recovery all'utente?

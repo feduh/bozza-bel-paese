@@ -1,32 +1,19 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { UserPlus, Users, Shield, Eye, EyeOff, MapPinPlus } from "lucide-react";
+import { UserPlus, Eye, EyeOff, MapPinPlus } from "lucide-react";
 import RealityForm from "@/components/RealityForm";
 import FieldError from "@/components/FieldError";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
+import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
 import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
-
-type Profile = {
-  id: string;
-  user_id: string;
-  display_name: string;
-  bio: string;
-  avatar_url: string | null;
-  website: string | null;
-  social_instagram: string | null;
-  social_twitter: string | null;
-  created_at: string;
-};
 
 type RealityRef = { id: string; name: string; city: string };
 
 const Admin = () => {
   const { t } = useTranslation();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(true);
   const [realities, setRealities] = useState<RealityRef[]>([]);
 
   // Invite form
@@ -43,15 +30,6 @@ const Admin = () => {
   const [error, setError] = useState("");
   const [errs, setErrs] = useState<FieldErrors>({});
 
-  const fetchProfiles = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setProfiles((data as Profile[]) ?? []);
-    setLoadingProfiles(false);
-  };
-
   const fetchRealities = async () => {
     const { data } = await supabase
       .from("realities")
@@ -61,7 +39,6 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    fetchProfiles();
     fetchRealities();
   }, []);
 
@@ -111,7 +88,6 @@ const Admin = () => {
       setAuthorType("reality");
       setRealityId("");
       setAffiliation("");
-      fetchProfiles();
     }
     setSubmitting(false);
   };
@@ -315,6 +291,9 @@ const Admin = () => {
           <RealityForm />
         </div>
 
+        {/* Users management */}
+        <UsersManagementPanel />
+
         {/* Contact messages */}
         <ContactMessagesPanel />
 
@@ -323,38 +302,6 @@ const Admin = () => {
 
         {/* Audit log */}
         <AuditLogPanel />
-
-        {/* Collaborators list */}
-        <div>
-          <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
-            <Users size={20} /> Collaboratori
-          </h2>
-          {loadingProfiles ? (
-            <div className="text-center py-8 text-muted-foreground font-body">Caricamento...</div>
-          ) : profiles.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground font-body">
-              Nessun collaboratore ancora. Usa il form sopra per invitarne uno.
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {profiles.map((profile) => (
-                <div key={profile.id} className="flex items-center gap-4 p-5 rounded-lg bg-card border border-border">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-sm">
-                    {profile.display_name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display font-semibold text-sm">{profile.display_name}</p>
-                    <p className="font-body text-xs text-muted-foreground truncate">{profile.bio || "Nessuna bio"}</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs font-body text-muted-foreground">
-                    <Shield size={12} />
-                    <span>{new Date(profile.created_at).toLocaleDateString("it-IT")}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

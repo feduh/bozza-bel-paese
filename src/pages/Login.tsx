@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Lock, Mail } from "lucide-react";
 
 type LocationState = { from?: { pathname?: string } } | null;
@@ -90,6 +90,12 @@ const Login = () => {
           >
             {loading ? "Caricamento..." : "Accedi"}
           </button>
+
+          <p className="text-center text-sm font-body">
+            <Link to="/password-dimenticata" className="text-muted-foreground hover:text-foreground underline">
+              Password dimenticata?
+            </Link>
+          </p>
         </form>
       </div>
     </div>
