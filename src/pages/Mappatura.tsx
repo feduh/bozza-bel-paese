@@ -49,6 +49,8 @@ const Mappatura = () => {
   const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(initialBucket ?? "all");
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [sortMode, setSortMode] = useState<SortMode>("default");
   const [search, setSearch] = useState("");
   const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
   const [yearMin, setYearMin] = useState<string>("");
