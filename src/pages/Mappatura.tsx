@@ -14,6 +14,7 @@ import {
   getCategory,
   categoryConfig,
 } from "@/lib/realityCategory";
+import { REALITY_CATEGORIES } from "@/lib/categories";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
@@ -30,8 +31,12 @@ type Reality = {
   lat: number;
   lng: number;
   website: string | null;
+  category: string | null;
+  created_at: string;
   tags: string[];
 };
+
+type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
   const { t } = useTranslation();
