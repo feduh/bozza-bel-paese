@@ -183,8 +183,8 @@ const AreaPersonale = () => {
         affiliation: profile.reality_id ? null : (profile.affiliation || null),
         public_email: profile.public_email || null,
         consent_public: !!profile.consent_public,
-        member_type: profile.member_type || null,
-        role_collective: profile.role_collective || null,
+        member_type: isStaff ? (profile.member_type || null) : "autore",
+        role_collective: isStaff ? (profile.role_collective || null) : null,
         role_real_life: profile.role_real_life || null,
         figure_category: profile.figure_category || null,
       })
