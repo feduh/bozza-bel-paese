@@ -3,7 +3,8 @@ import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
 import MarkdownEditor from "@/components/editor/MarkdownEditor";
