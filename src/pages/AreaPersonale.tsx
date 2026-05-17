@@ -183,8 +183,8 @@ const AreaPersonale = () => {
         affiliation: profile.reality_id ? null : (profile.affiliation || null),
         public_email: profile.public_email || null,
         consent_public: !!profile.consent_public,
-        member_type: profile.member_type || null,
-        role_collective: profile.role_collective || null,
+        member_type: isStaff ? (profile.member_type || null) : "autore",
+        role_collective: isStaff ? (profile.role_collective || null) : null,
         role_real_life: profile.role_real_life || null,
         figure_category: profile.figure_category || null,
       })
@@ -299,19 +299,21 @@ const AreaPersonale = () => {
                     onChange={(v) => setProfile({ ...profile, display_name: v })}
                     required
                   />
-                  <div>
-                    <label className="block text-sm font-body font-medium mb-2">Ruolo nel collettivo</label>
-                    <select
-                      value={profile.member_type ?? ""}
-                      onChange={(e) => setProfile({ ...profile, member_type: e.target.value })}
-                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="">— non specificato —</option>
-                      {MEMBER_TYPES.map((m) => (
-                        <option key={m.value} value={m.value}>{m.label}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {isStaff ? (
+                    <div>
+                      <label className="block text-sm font-body font-medium mb-2">Ruolo nel collettivo</label>
+                      <select
+                        value={profile.member_type ?? ""}
+                        onChange={(e) => setProfile({ ...profile, member_type: e.target.value })}
+                        className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <option value="">— non specificato —</option>
+                        {MEMBER_TYPES.map((m) => (
+                          <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div>
@@ -326,7 +328,9 @@ const AreaPersonale = () => {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Field label="Ruolo dentro il collettivo" value={profile.role_collective ?? ""} onChange={(v) => setProfile({ ...profile, role_collective: v })} placeholder="es. coordinamento editoriale" />
+                  {isStaff ? (
+                    <Field label="Ruolo dentro il collettivo" value={profile.role_collective ?? ""} onChange={(v) => setProfile({ ...profile, role_collective: v })} placeholder="es. coordinamento editoriale" />
+                  ) : null}
                   <Field label="Ruolo nella vita reale" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
                 </div>
 
