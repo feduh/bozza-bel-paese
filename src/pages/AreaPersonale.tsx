@@ -328,7 +328,9 @@ const AreaPersonale = () => {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Field label="Ruolo dentro il collettivo" value={profile.role_collective ?? ""} onChange={(v) => setProfile({ ...profile, role_collective: v })} placeholder="es. coordinamento editoriale" />
+                  {isStaff ? (
+                    <Field label="Ruolo dentro il collettivo" value={profile.role_collective ?? ""} onChange={(v) => setProfile({ ...profile, role_collective: v })} placeholder="es. coordinamento editoriale" />
+                  ) : null}
                   <Field label="Ruolo nella vita reale" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
                 </div>
 
