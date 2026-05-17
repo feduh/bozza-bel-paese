@@ -302,6 +302,57 @@ export type Database = {
           },
         ]
       }
+      reality_reports: {
+        Row: {
+          admin_notes: string | null
+          city: string | null
+          contact_email: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          region: string | null
+          reporter_email: string | null
+          reporter_name: string | null
+          reporter_user_id: string | null
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          city?: string | null
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          region?: string | null
+          reporter_email?: string | null
+          reporter_name?: string | null
+          reporter_user_id?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          city?: string | null
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          region?: string | null
+          reporter_email?: string | null
+          reporter_name?: string | null
+          reporter_user_id?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       reality_tags: {
         Row: {
           id: string
