@@ -316,6 +316,9 @@ const Admin = () => {
           <RealityForm />
         </div>
 
+        {/* Users management */}
+        <UsersManagementPanel />
+
         {/* Contact messages */}
         <ContactMessagesPanel />
 
@@ -324,38 +327,6 @@ const Admin = () => {
 
         {/* Audit log */}
         <AuditLogPanel />
-
-        {/* Collaborators list */}
-        <div>
-          <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
-            <Users size={20} /> Collaboratori
-          </h2>
-          {loadingProfiles ? (
-            <div className="text-center py-8 text-muted-foreground font-body">Caricamento...</div>
-          ) : profiles.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground font-body">
-              Nessun collaboratore ancora. Usa il form sopra per invitarne uno.
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {profiles.map((profile) => (
-                <div key={profile.id} className="flex items-center gap-4 p-5 rounded-lg bg-card border border-border">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-sm">
-                    {profile.display_name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display font-semibold text-sm">{profile.display_name}</p>
-                    <p className="font-body text-xs text-muted-foreground truncate">{profile.bio || "Nessuna bio"}</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs font-body text-muted-foreground">
-                    <Shield size={12} />
-                    <span>{new Date(profile.created_at).toLocaleDateString("it-IT")}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
