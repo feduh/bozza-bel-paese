@@ -47,8 +47,9 @@ const AutoreProfilo = () => {
     (async () => {
       const { data: p } = await supabase
         .from("profiles")
-        .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_twitter, reality_id")
+        .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_twitter, social_linkedin, public_email, reality_id, member_type, role_collective, role_real_life, figure_category, consent_public")
         .eq("user_id", userId)
+        .eq("consent_public", true)
         .maybeSingle();
       if (cancelled) return;
       if (!p) { setNotFound(true); setLoading(false); return; }
