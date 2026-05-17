@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, LogOut, Shield, User as UserIcon } from "lucide-react";
+import { Menu, X, LogOut, Shield, User as UserIcon, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -14,14 +22,21 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
-  const navLinks = [
-    { to: "/", label: t("nav.home") },
-    { to: "/chi-siamo", label: t("nav.about") },
-    { to: "/cosa-facciamo", label: t("nav.what") },
+  // Link diretti (azioni principali)
+  const primaryLinks = [
     { to: "/mappatura", label: t("nav.map") },
-    { to: "/la-rete", label: "La rete" },
     { to: "/magazine", label: t("nav.magazine") },
   ];
+
+  // Dropdown "Il progetto" (pagine istituzionali)
+  const projectLinks = [
+    { to: "/chi-siamo", label: t("nav.about") },
+    { to: "/cosa-facciamo", label: t("nav.what") },
+    { to: "/la-rete", label: "La rete" },
+    { to: "/contatti", label: "Contatti" },
+  ];
+
+  const projectActive = projectLinks.some((l) => location.pathname === l.to);
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
@@ -31,6 +46,8 @@ const Navbar = () => {
     };
     check();
   }, [user]);
+
+  const userInitial = user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
     <nav
@@ -48,7 +65,28 @@ const Navbar = () => {
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => {
+          {/* Dropdown "Il progetto" */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`inline-flex items-center gap-1 font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary focus:outline-none ${
+                projectActive ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              Il progetto
+              <ChevronDown size={14} aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[180px]">
+              {projectLinks.map((l) => (
+                <DropdownMenuItem key={l.to} asChild>
+                  <Link to={l.to} className="font-body text-sm cursor-pointer">
+                    {l.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {primaryLinks.map((link) => {
             const active = location.pathname === link.to;
             return (
               <Link
@@ -63,33 +101,43 @@ const Navbar = () => {
               </Link>
             );
           })}
+
           <div className="flex items-center gap-2 pl-2 border-l border-border">
             <LanguageSwitcher />
             <ThemeToggle />
           </div>
+
           {user ? (
-            <div className="flex items-center gap-3">
-              <Link
-                to="/area-personale"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary/15 text-secondary text-xs font-body font-medium hover:bg-secondary/25 transition-colors"
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label="Menu utente"
+                className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-sm font-body font-semibold hover:bg-primary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                <UserIcon size={12} /> Area personale
-              </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-body font-medium hover:bg-primary/20 transition-colors"
-                >
-                  <Shield size={12} /> {t("nav.admin")}
-                </Link>
-              )}
-              <button
-                onClick={() => signOut()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border text-sm font-body font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
-              >
-                <LogOut size={14} /> {t("nav.logout")}
-              </button>
-            </div>
+                {userInitial}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[200px]">
+                <DropdownMenuLabel className="font-body text-xs text-muted-foreground truncate">
+                  {user.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/area-personale" className="cursor-pointer">
+                    <UserIcon size={14} className="mr-2" /> Area personale
+                  </Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="cursor-pointer">
+                      <Shield size={14} className="mr-2" /> {t("nav.admin")}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer text-destructive focus:text-destructive">
+                  <LogOut size={14} className="mr-2" /> {t("nav.logout")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Link
               to="/login"
@@ -119,7 +167,7 @@ const Navbar = () => {
       {/* Mobile menu */}
       {open && (
         <div id="mobile-nav" className="md:hidden border-t border-border bg-background px-6 py-4 space-y-3">
-          {navLinks.map((link) => {
+          {primaryLinks.map((link) => {
             const active = location.pathname === link.to;
             return (
               <Link
@@ -135,8 +183,27 @@ const Navbar = () => {
               </Link>
             );
           })}
+          <div className="pt-2 border-t border-border/60">
+            <p className="font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Il progetto</p>
+            {projectLinks.map((link) => {
+              const active = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={`block font-body text-sm font-medium uppercase py-1 ${
+                    active ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
           {user ? (
-            <>
+            <div className="pt-2 border-t border-border/60 space-y-2">
               <Link
                 to="/area-personale"
                 onClick={() => setOpen(false)}
@@ -159,7 +226,7 @@ const Navbar = () => {
               >
                 {t("nav.logout")}
               </button>
-            </>
+            </div>
           ) : (
             <Link
               to="/login"
