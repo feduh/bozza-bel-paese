@@ -13,11 +13,11 @@ const inputCls =
   "w-full px-4 py-2.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 const inputErrCls = "border-destructive focus:ring-destructive";
 
-type FormMode = "admin" | "collaborator";
+type FormMode = "admin" | "coordinatore";
 
 const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mode?: FormMode }) => {
   const { t } = useTranslation();
-  const isCollaborator = mode === "collaborator";
+  const isCollaborator = mode === "coordinatore";
 
   const [name, setName] = useState("");
   const [type, setType] = useState<RealityType>("con-sede");

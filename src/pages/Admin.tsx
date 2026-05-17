@@ -99,13 +99,13 @@ const Admin = () => {
           <span className="italic text-primary">Pannello Admin</span>
         </h1>
         <p className="editorial-body text-muted-foreground mb-12">
-          Gestisci i collaboratori del blog e del sito.
+          Gestisci i coordinatori del blog e del sito.
         </p>
 
         {/* Invite form */}
         <div className="p-8 rounded-lg bg-card border border-border mb-12">
           <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
-            <UserPlus size={20} /> Invita collaboratore
+            <UserPlus size={20} /> Invita coordinatore
           </h2>
           <form onSubmit={handleInvite} noValidate className="space-y-4">
             {error && (
@@ -135,7 +135,7 @@ const Admin = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="collaboratore@esempio.it"
+                  placeholder="coordinatore@esempio.it"
                   aria-invalid={!!errs.email}
                   aria-describedby={errs.email ? "err-email" : undefined}
                   className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.email ? "border-destructive" : "border-input"}`}
@@ -183,7 +183,7 @@ const Admin = () => {
                   className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="author">Autore (scrive sul Magazine)</option>
-                  <option value="moderator">Collaboratore (collettivo)</option>
+                  <option value="moderator">Coordinatore (collettivo)</option>
                 </select>
                 <p className="text-xs text-muted-foreground font-body mt-1">
                   {role === "author"

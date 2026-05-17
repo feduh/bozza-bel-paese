@@ -42,7 +42,7 @@ const RealityDetail = () => {
           const roles = (rolesData ?? []).map((r) => r.role as string);
           const isStaff = roles.includes("admin") || roles.includes("moderator");
           const isOwnerPending =
-            roles.includes("collaborator") &&
+            roles.includes("coordinatore") &&
             data.created_by === user.id &&
             data.confirmed_status === "pendente";
           setCanEditGallery(isStaff || isOwnerPending);

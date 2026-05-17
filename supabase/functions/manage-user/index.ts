@@ -7,15 +7,15 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-type AppRole = "admin" | "moderator" | "collaborator" | "author";
-const ALL_ROLES: AppRole[] = ["admin", "moderator", "collaborator", "author"];
+type AppRole = "admin" | "moderator" | "coordinatore" | "author";
+const ALL_ROLES: AppRole[] = ["admin", "moderator", "coordinatore", "author"];
 
 const opSchema = z.discriminatedUnion("op", [
   z.object({ op: z.literal("list_users") }),
   z.object({
     op: z.literal("update_roles"),
     user_id: z.string().uuid(),
-    roles: z.array(z.enum(["admin", "moderator", "collaborator", "author"])),
+    roles: z.array(z.enum(["admin", "moderator", "coordinatore", "author"])),
   }),
   z.object({
     op: z.literal("reset_password"),

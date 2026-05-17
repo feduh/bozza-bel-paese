@@ -17,7 +17,7 @@ const Privacy = () => {
           </h1>
           <p className="editorial-body text-muted-foreground">
             Questa informativa descrive come Il Bel Paese tratta i dati personali raccolti tramite il sito,
-            il modulo contatti, la registrazione collaboratori e la mappatura delle realtà artistiche.
+            il modulo contatti, la registrazione coordinatori e la mappatura delle realtà artistiche.
           </p>
         </header>
 
@@ -34,7 +34,7 @@ const Privacy = () => {
             <h2 className="font-display text-xl font-semibold mb-3">2. Dati raccolti</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Modulo contatti</strong>: nome, email, oggetto e messaggio che invii volontariamente.</li>
-              <li><strong>Account collaboratori/autori</strong> (su invito): email, nome visualizzato, biografia, foto profilo, ruoli e dati professionali che decidi di condividere.</li>
+              <li><strong>Account coordinatori/autori</strong> (su invito): email, nome visualizzato, biografia, foto profilo, ruoli e dati professionali che decidi di condividere.</li>
               <li><strong>Segnalazione realtà</strong>: dati della realtà segnalata ed eventuali tuoi recapiti se forniti.</li>
               <li><strong>Dati tecnici minimi</strong>: log di accesso al backend strettamente necessari alla sicurezza del servizio.</li>
             </ul>

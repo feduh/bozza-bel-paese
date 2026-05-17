@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
 
     if (!isAdmin) {
       return new Response(
-        JSON.stringify({ error: "Solo gli admin possono invitare collaboratori" }),
+        JSON.stringify({ error: "Solo gli admin possono invitare coordinatori" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -167,7 +167,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         user: { id: newUser.user.id, email: newUser.user.email },
-        message: `${role === "author" ? "Autore" : "Collaboratore"} ${display_name} creato con successo`,
+        message: `${role === "author" ? "Autore" : "Coordinatore"} ${display_name} creato con successo`,
       }),
       {
         status: 200,

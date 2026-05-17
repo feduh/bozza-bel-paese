@@ -41,6 +41,6 @@ export const FIGURE_CATEGORIES = [
 export type FigureCategory = (typeof FIGURE_CATEGORIES)[number];
 
 export const MEMBER_TYPES = [
-  { value: "collaboratore", label: "Collaboratore del collettivo" },
+  { value: "coordinatore", label: "Coordinatore del collettivo" },
   { value: "autore", label: "Autore / contributor" },
 ] as const;

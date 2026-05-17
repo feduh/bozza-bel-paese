@@ -73,7 +73,7 @@ const AuditLogPanel = () => {
             <ScrollText size={20} /> Registro azioni
           </h2>
           <p className="text-sm text-muted-foreground font-body">
-            Ultime 100 azioni di admin, collaboratori e autori sul database.
+            Ultime 100 azioni di admin, coordinatori e autori sul database.
           </p>
         </div>
         <div className="flex items-center gap-2">
