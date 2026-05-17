@@ -9,6 +9,7 @@ import FieldError from "@/components/FieldError";
 import MarkdownEditor from "@/components/editor/MarkdownEditor";
 import CoverImageUpload from "@/components/editor/CoverImageUpload";
 import { articleSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
+import { ARTICLE_CATEGORIES, parseCategories, serializeCategories } from "@/lib/articleCategories";
 
 const slugify = (s: string) =>
   s
@@ -323,15 +324,36 @@ const ArticoloEditor = () => {
               <FieldError id="err-title" message={errs.title} />
             </div>
             <div>
-              <label className="block text-sm font-body font-medium mb-2">Categoria *</label>
-              <input
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="Es. Tendenze, Inchieste, Intervista"
-                maxLength={60}
-                aria-invalid={!!errs.category}
-                className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.category ? "border-destructive" : "border-input"}`}
-              />
+              <label className="block text-sm font-body font-medium mb-2">Categorie *</label>
+              <div className="flex flex-wrap gap-2 p-3 rounded-md border border-input bg-background min-h-[3rem]">
+                {ARTICLE_CATEGORIES.map((cat) => {
+                  const selected = parseCategories(form.category).includes(cat);
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => {
+                        const current = parseCategories(form.category);
+                        const next = selected
+                          ? current.filter((c) => c !== cat)
+                          : [...current, cat];
+                        setForm({ ...form, category: serializeCategories(next) });
+                      }}
+                      className={`text-xs font-body px-3 py-1.5 rounded-full border transition-colors ${
+                        selected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background text-foreground border-input hover:border-primary/40"
+                      }`}
+                      aria-pressed={selected}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground font-body mt-1">
+                Seleziona una o più categorie (puoi cliccare di nuovo per deselezionare).
+              </p>
               <FieldError id="err-category" message={errs.category} />
             </div>
           </div>
