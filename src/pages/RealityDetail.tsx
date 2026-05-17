@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus } from "lucide-react";
+import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +23,7 @@ const RealityDetail = () => {
   const { user } = useAuth();
   const [reality, setReality] = useState<any>(null);
   const [tags, setTags] = useState<string[]>([]);
+  const [members, setMembers] = useState<Array<{ user_id: string; display_name: string; avatar_url: string | null; role_collective: string | null; member_type: string | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [canEditGallery, setCanEditGallery] = useState(false);
 
@@ -33,6 +34,14 @@ const RealityDetail = () => {
         setReality(data);
         const { data: tagsData } = await supabase.from("reality_tags").select("tag").eq("reality_id", id!);
         setTags(tagsData?.map((t) => t.tag) ?? []);
+
+        const { data: membersData } = await supabase
+          .from("profiles")
+          .select("user_id, display_name, avatar_url, role_collective, member_type")
+          .eq("reality_id", id!)
+          .eq("consent_public", true)
+          .order("member_type", { ascending: true });
+        setMembers(membersData ?? []);
 
         if (user) {
           const { data: rolesData } = await supabase
