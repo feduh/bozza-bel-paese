@@ -3,12 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Users, Shield, KeyRound, Ban, Trash2, RefreshCw, Search } from "lucide-react";
 import { PASSWORD_RULES, passwordSchema, passwordStrength } from "@/lib/passwordPolicy";
 
-type AppRole = "admin" | "moderator" | "collaborator" | "author";
-const ALL_ROLES: AppRole[] = ["admin", "moderator", "collaborator", "author"];
+type AppRole = "admin" | "moderator" | "coordinatore" | "author";
+const ALL_ROLES: AppRole[] = ["admin", "moderator", "coordinatore", "author"];
 const ROLE_LABEL: Record<AppRole, string> = {
   admin: "Admin",
   moderator: "Moderatore",
-  collaborator: "Collaboratore",
+  coordinatore: "Coordinatore",
   author: "Autore",
 };
 
