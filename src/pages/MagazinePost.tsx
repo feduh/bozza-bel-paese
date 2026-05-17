@@ -10,6 +10,7 @@ import SEO from "@/components/SEO";
 import { PostDetailSkeleton } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
 import { parseCategories } from "@/lib/articleCategories";
+import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
 
 type Post = {
   id: string;
@@ -18,6 +19,7 @@ type Post = {
   excerpt: string;
   content: string;
   author_name: string;
+  user_id: string;
   category: string;
   cover_image_url: string | null;
   reply_to_id: string | null;
@@ -31,6 +33,7 @@ type ReplyMeta = {
   title: string;
   excerpt: string;
   author_name: string;
+  user_id: string;
   published_at: string;
 };
 
@@ -41,6 +44,7 @@ const MagazinePost = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [parent, setParent] = useState<ReplyMeta | null>(null);
   const [replies, setReplies] = useState<ReplyMeta[]>([]);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   const readingTime = useMemo(() => {
