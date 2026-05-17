@@ -43,6 +43,7 @@ const ArticoloEditor = () => {
   const [parent, setParent] = useState<ParentMeta | null>(null);
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [catOpen, setCatOpen] = useState(false);
   const lastSavedRef = useRef<string>("");
 
   const [form, setForm] = useState({
