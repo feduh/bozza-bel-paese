@@ -472,6 +472,9 @@ const Mappatura = () => {
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
+                  {r.category && (
+                    <p className="text-[11px] uppercase tracking-wider text-primary font-body font-semibold mb-2">{r.category}</p>
+                  )}
                   <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
                     {userPos && (
