@@ -7,6 +7,7 @@ import FieldError from "@/components/FieldError";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
+import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
 import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 type Profile = {
