@@ -7,6 +7,7 @@ import { Calendar, User, Plus, ArrowRight, Reply } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
+import { parseCategories } from "@/lib/articleCategories";
 
 type MagazinePost = {
   id: string;
@@ -103,10 +104,12 @@ const ArticleCard = ({ post }: { post: MagazinePost }) => (
       />
     )}
     <div className="p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-          {post.category}
-        </span>
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        {parseCategories(post.category).map((c) => (
+          <span key={c} className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+            {c}
+          </span>
+        ))}
         {post.reply_to_id && (
           <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
             <Reply size={10} /> Risposta

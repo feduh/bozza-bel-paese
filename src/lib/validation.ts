@@ -111,7 +111,7 @@ export type InviteInput = z.infer<ReturnType<typeof inviteSchema>>;
 export const articleSchema = (t: TFunction) =>
   z.object({
     title: z.string().trim().min(3, t("validation.required")).max(200),
-    category: z.string().trim().min(2, t("validation.required")).max(60),
+    category: z.string().trim().min(2, t("validation.required")).max(300),
     excerpt: z.string().trim().min(10, t("validation.required")).max(500),
     content: z.string().trim().min(20, t("validation.required")).max(50000),
     coverImageUrl: optionalUrl(t),
