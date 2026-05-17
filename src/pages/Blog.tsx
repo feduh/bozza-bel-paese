@@ -86,7 +86,7 @@ const Magazine = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
-              <ArticleCard key={post.id} post={post} />
+              <ArticleCard key={post.id} post={post} authorName={resolveAuthorName(nameMap, post.user_id, post.author_name)} />
             ))}
           </div>
         )}
@@ -95,7 +95,7 @@ const Magazine = () => {
   );
 };
 
-const ArticleCard = ({ post }: { post: MagazinePost }) => (
+const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: string }) => (
   <Link
     to={`/magazine/${post.slug}`}
     className="group block rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all overflow-hidden"
@@ -130,7 +130,7 @@ const ArticleCard = ({ post }: { post: MagazinePost }) => (
       </p>
       <div className="flex items-center gap-4 text-xs text-muted-foreground font-body">
         <span className="flex items-center gap-1">
-          <User size={12} /> {post.author_name}
+          <User size={12} /> {authorName}
         </span>
         <span className="flex items-center gap-1">
           <Calendar size={12} />
