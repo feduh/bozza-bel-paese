@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus } from "lucide-react";
+import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +23,7 @@ const RealityDetail = () => {
   const { user } = useAuth();
   const [reality, setReality] = useState<any>(null);
   const [tags, setTags] = useState<string[]>([]);
+  const [members, setMembers] = useState<Array<{ user_id: string; display_name: string; avatar_url: string | null; role_collective: string | null; member_type: string | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [canEditGallery, setCanEditGallery] = useState(false);
 
@@ -33,6 +34,14 @@ const RealityDetail = () => {
         setReality(data);
         const { data: tagsData } = await supabase.from("reality_tags").select("tag").eq("reality_id", id!);
         setTags(tagsData?.map((t) => t.tag) ?? []);
+
+        const { data: membersData } = await supabase
+          .from("profiles")
+          .select("user_id, display_name, avatar_url, role_collective, member_type")
+          .eq("reality_id", id!)
+          .eq("consent_public", true)
+          .order("member_type", { ascending: true });
+        setMembers(membersData ?? []);
 
         if (user) {
           const { data: rolesData } = await supabase
@@ -227,6 +236,44 @@ const RealityDetail = () => {
                   </ul>
                 );
               })()}
+            </div>
+
+            <div className="p-6 rounded-lg bg-card border border-border">
+              <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
+                <Users size={16} className="text-primary" /> Membri di riferimento
+              </h3>
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground font-body">Nessun membro collegato pubblicamente.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {members.map((m) => (
+                    <li key={m.user_id}>
+                      <Link
+                        to={`/autori/${m.user_id}`}
+                        className="flex items-center gap-3 group"
+                      >
+                        {m.avatar_url ? (
+                          <img src={m.avatar_url} alt={m.display_name} className="w-10 h-10 rounded-full object-cover border border-border" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-display font-semibold text-sm">
+                            {m.display_name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="font-body font-medium text-sm group-hover:text-primary transition-colors truncate">
+                            {m.display_name}
+                          </div>
+                          {(m.role_collective || m.member_type) && (
+                            <div className="text-xs text-muted-foreground font-body truncate">
+                              {m.role_collective || (m.member_type === "coordinatore" ? "Coordinatore" : "Autore")}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div className="p-6 rounded-lg bg-card border border-border">
