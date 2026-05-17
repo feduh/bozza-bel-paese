@@ -90,6 +90,12 @@ const Login = () => {
           >
             {loading ? "Caricamento..." : "Accedi"}
           </button>
+
+          <p className="text-center text-sm font-body">
+            <Link to="/password-dimenticata" className="text-muted-foreground hover:text-foreground underline">
+              Password dimenticata?
+            </Link>
+          </p>
         </form>
       </div>
     </div>
