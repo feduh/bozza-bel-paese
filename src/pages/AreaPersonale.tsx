@@ -147,6 +147,24 @@ const AreaPersonale = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
+  const handleAvatarUpload = async (file: File) => {
+    if (!user || !profile) return;
+    setSavingProfile(true);
+    setProfileMsg("");
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (upErr) {
+      setProfileMsg(`Errore upload: ${upErr.message}`);
+      setSavingProfile(false);
+      return;
+    }
+    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+    setProfile({ ...profile, avatar_url: pub.publicUrl });
+    setSavingProfile(false);
+    setProfileMsg("✅ Foto caricata. Ricorda di salvare il profilo.");
+  };
+
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile || !user) return;
@@ -161,7 +179,14 @@ const AreaPersonale = () => {
         website: profile.website || null,
         social_instagram: profile.social_instagram || null,
         social_twitter: profile.social_twitter || null,
+        social_linkedin: profile.social_linkedin || null,
         affiliation: profile.reality_id ? null : (profile.affiliation || null),
+        public_email: profile.public_email || null,
+        consent_public: !!profile.consent_public,
+        member_type: profile.member_type || null,
+        role_collective: profile.role_collective || null,
+        role_real_life: profile.role_real_life || null,
+        figure_category: profile.figure_category || null,
       })
       .eq("user_id", user.id);
     setSavingProfile(false);
