@@ -299,19 +299,21 @@ const AreaPersonale = () => {
                     onChange={(v) => setProfile({ ...profile, display_name: v })}
                     required
                   />
-                  <div>
-                    <label className="block text-sm font-body font-medium mb-2">Ruolo nel collettivo</label>
-                    <select
-                      value={profile.member_type ?? ""}
-                      onChange={(e) => setProfile({ ...profile, member_type: e.target.value })}
-                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="">— non specificato —</option>
-                      {MEMBER_TYPES.map((m) => (
-                        <option key={m.value} value={m.value}>{m.label}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {isStaff ? (
+                    <div>
+                      <label className="block text-sm font-body font-medium mb-2">Ruolo nel collettivo</label>
+                      <select
+                        value={profile.member_type ?? ""}
+                        onChange={(e) => setProfile({ ...profile, member_type: e.target.value })}
+                        className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <option value="">— non specificato —</option>
+                        {MEMBER_TYPES.map((m) => (
+                          <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div>
