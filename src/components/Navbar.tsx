@@ -141,9 +141,11 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+              aria-label={t("nav.login")}
+              title={t("nav.login")}
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              {t("nav.login")}
+              <UserIcon size={18} />
             </Link>
           )}
         </div>
