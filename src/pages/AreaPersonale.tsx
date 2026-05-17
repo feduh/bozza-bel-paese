@@ -83,8 +83,8 @@ const AreaPersonale = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
 
-  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("collaborator");
-  const canProposeRealities = myRoles.includes("admin") || myRoles.includes("collaborator");
+  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
+  const canProposeRealities = myRoles.includes("admin") || myRoles.includes("coordinatore");
 
   const loadAll = async () => {
     if (!user) return;
@@ -120,7 +120,7 @@ const AreaPersonale = () => {
       .order("published_at", { ascending: false });
     setPosts((mine as MyPost[]) ?? []);
 
-    if (rs.includes("admin") || rs.includes("moderator") || rs.includes("collaborator")) {
+    if (rs.includes("admin") || rs.includes("moderator") || rs.includes("coordinatore")) {
       const { data: queue } = await supabase
         .from("blog_posts")
         .select("id, slug, title, excerpt, status, category, published_at, reply_to_id, author_name, user_id")
@@ -129,7 +129,7 @@ const AreaPersonale = () => {
       setModerationQueue((queue as ModerationPost[]) ?? []);
     }
 
-    if (rs.includes("admin") || rs.includes("collaborator")) {
+    if (rs.includes("admin") || rs.includes("coordinatore")) {
       const { data: pending } = await supabase
         .from("realities")
         .select("id, name, city, region, auto_confirm_at, created_at")
@@ -399,7 +399,7 @@ const AreaPersonale = () => {
                 </div>
                 {showNewReality && (
                   <RealityForm
-                    mode={myRoles.includes("admin") ? "admin" : "collaborator"}
+                    mode={myRoles.includes("admin") ? "admin" : "coordinatore"}
                     onCreated={() => { setShowNewReality(false); loadAll(); }}
                   />
                 )}

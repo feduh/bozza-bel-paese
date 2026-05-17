@@ -53,7 +53,7 @@ export default function RealityGalleryAdmin() {
 
   const isStaff = roles.includes("admin") || roles.includes("moderator");
   const isOwnerPending =
-    roles.includes("collaborator") &&
+    roles.includes("coordinatore") &&
     reality.created_by === user.id &&
     reality.confirmed_status === "pendente";
 
