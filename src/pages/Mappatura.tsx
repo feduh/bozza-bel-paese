@@ -14,6 +14,7 @@ import {
   getCategory,
   categoryConfig,
 } from "@/lib/realityCategory";
+import { REALITY_CATEGORIES } from "@/lib/categories";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
@@ -30,8 +31,12 @@ type Reality = {
   lat: number;
   lng: number;
   website: string | null;
+  category: string | null;
+  created_at: string;
   tags: string[];
 };
+
+type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
   const { t } = useTranslation();
@@ -44,6 +49,8 @@ const Mappatura = () => {
   const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(initialBucket ?? "all");
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [sortMode, setSortMode] = useState<SortMode>("default");
   const [search, setSearch] = useState("");
   const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
   const [yearMin, setYearMin] = useState<string>("");
@@ -111,16 +118,28 @@ const Mappatura = () => {
       if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
+      if (categoryFilter !== "all" && r.category !== categoryFilter) return false;
       if (yMin !== null && r.year_founded < yMin) return false;
       if (yMax !== null && r.year_founded > yMax) return false;
       if (q) {
-        const haystack = [r.name, r.city, r.region, r.description, ...r.tags]
+        const haystack = [r.name, r.city, r.region, r.description, r.category ?? "", ...r.tags]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
+
+    // Explicit sort (only meaningful in list view) wins over geo-sort
+    if (view === "list" && sortMode !== "default") {
+      const sorted = [...list];
+      if (sortMode === "az") sorted.sort((a, b) => a.name.localeCompare(b.name, "it"));
+      else if (sortMode === "za") sorted.sort((a, b) => b.name.localeCompare(a.name, "it"));
+      else if (sortMode === "latest")
+        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return sorted;
+    }
+
     if (userPos) {
       return [...list].sort(
         (a, b) =>
@@ -129,21 +148,25 @@ const Mappatura = () => {
       );
     }
     return list;
-  }, [realities, bucketFilter, regionFilter, disciplineFilter, search, yearMin, yearMax, userPos]);
+  }, [realities, bucketFilter, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
 
   const hasFilters =
     bucketFilter !== "all" ||
     regionFilter !== "all" ||
     disciplineFilter !== "all" ||
+    categoryFilter !== "all" ||
     search !== "" ||
     yearMin !== "" ||
     yearMax !== "" ||
-    userPos !== null;
+    userPos !== null ||
+    sortMode !== "default";
 
   const clearFilters = () => {
     setBucketFilter("all");
     setRegionFilter("all");
     setDisciplineFilter("all");
+    setCategoryFilter("all");
+    setSortMode("default");
     setSearch("");
     setYearMin("");
     setYearMax("");
@@ -300,15 +323,41 @@ const Mappatura = () => {
             ))}
           </select>
           <select
-            value={disciplineFilter}
-            onChange={(e) => setDisciplineFilter(e.target.value)}
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            aria-label="Filtra per categoria artistica"
           >
-            <option value="all">{t("map.filterMedia")}</option>
-            {allDisciplines.map((d) => (
-              <option key={d} value={d}>{d}</option>
+            <option value="all">Tutte le categorie</option>
+            {REALITY_CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
             ))}
           </select>
+          {allDisciplines.length > 0 && (
+            <select
+              value={disciplineFilter}
+              onChange={(e) => setDisciplineFilter(e.target.value)}
+              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">{t("map.filterMedia")}</option>
+              {allDisciplines.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          )}
+          {view === "list" && (
+            <select
+              value={sortMode}
+              onChange={(e) => setSortMode(e.target.value as SortMode)}
+              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label="Ordina risultati"
+            >
+              <option value="default">Ordine predefinito</option>
+              <option value="az">A-Z</option>
+              <option value="za">Z-A</option>
+              <option value="latest">Ultimi aggiunti</option>
+            </select>
+          )}
           <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
             <span className="text-xs text-muted-foreground mr-1">Anno:</span>
             <input
@@ -423,6 +472,9 @@ const Mappatura = () => {
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
+                  {r.category && (
+                    <p className="text-[11px] uppercase tracking-wider text-primary font-body font-semibold mb-2">{r.category}</p>
+                  )}
                   <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
                     {userPos && (
