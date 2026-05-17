@@ -19,6 +19,7 @@ const Navbar = () => {
     { to: "/chi-siamo", label: t("nav.about") },
     { to: "/cosa-facciamo", label: t("nav.what") },
     { to: "/mappatura", label: t("nav.map") },
+    { to: "/la-rete", label: "La rete" },
     { to: "/magazine", label: t("nav.magazine") },
   ];
 
