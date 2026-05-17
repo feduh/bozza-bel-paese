@@ -118,16 +118,28 @@ const Mappatura = () => {
       if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
+      if (categoryFilter !== "all" && r.category !== categoryFilter) return false;
       if (yMin !== null && r.year_founded < yMin) return false;
       if (yMax !== null && r.year_founded > yMax) return false;
       if (q) {
-        const haystack = [r.name, r.city, r.region, r.description, ...r.tags]
+        const haystack = [r.name, r.city, r.region, r.description, r.category ?? "", ...r.tags]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
+
+    // Explicit sort (only meaningful in list view) wins over geo-sort
+    if (view === "list" && sortMode !== "default") {
+      const sorted = [...list];
+      if (sortMode === "az") sorted.sort((a, b) => a.name.localeCompare(b.name, "it"));
+      else if (sortMode === "za") sorted.sort((a, b) => b.name.localeCompare(a.name, "it"));
+      else if (sortMode === "latest")
+        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return sorted;
+    }
+
     if (userPos) {
       return [...list].sort(
         (a, b) =>
@@ -136,21 +148,25 @@ const Mappatura = () => {
       );
     }
     return list;
-  }, [realities, bucketFilter, regionFilter, disciplineFilter, search, yearMin, yearMax, userPos]);
+  }, [realities, bucketFilter, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
 
   const hasFilters =
     bucketFilter !== "all" ||
     regionFilter !== "all" ||
     disciplineFilter !== "all" ||
+    categoryFilter !== "all" ||
     search !== "" ||
     yearMin !== "" ||
     yearMax !== "" ||
-    userPos !== null;
+    userPos !== null ||
+    sortMode !== "default";
 
   const clearFilters = () => {
     setBucketFilter("all");
     setRegionFilter("all");
     setDisciplineFilter("all");
+    setCategoryFilter("all");
+    setSortMode("default");
     setSearch("");
     setYearMin("");
     setYearMax("");
