@@ -88,7 +88,6 @@ const Admin = () => {
       setAuthorType("reality");
       setRealityId("");
       setAffiliation("");
-      fetchProfiles();
     }
     setSubmitting(false);
   };
