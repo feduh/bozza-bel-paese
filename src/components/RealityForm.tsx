@@ -134,7 +134,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
       setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
       setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false);
+      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategory("");
       onCreated?.();
     }
     setSubmitting(false);
