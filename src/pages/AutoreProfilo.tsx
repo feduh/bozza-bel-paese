@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
-import { ArrowLeft, Globe, Instagram, Twitter, MapPin, Calendar, FileText } from "lucide-react";
+import { ArrowLeft, Globe, Instagram, Twitter, Linkedin, Mail, MapPin, Calendar, FileText } from "lucide-react";
 
 type Profile = {
   user_id: string;
@@ -13,7 +13,13 @@ type Profile = {
   website: string | null;
   social_instagram: string | null;
   social_twitter: string | null;
+  social_linkedin: string | null;
+  public_email: string | null;
   reality_id: string | null;
+  member_type: string | null;
+  role_collective: string | null;
+  role_real_life: string | null;
+  figure_category: string | null;
 };
 
 type RealityRef = { id: string; name: string; city: string; region: string };
