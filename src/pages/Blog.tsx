@@ -8,6 +8,7 @@ import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
 import { parseCategories } from "@/lib/articleCategories";
+import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
 
 type MagazinePost = {
   id: string;
@@ -15,6 +16,7 @@ type MagazinePost = {
   title: string;
   excerpt: string;
   author_name: string;
+  user_id: string;
   category: string;
   cover_image_url: string | null;
   reply_to_id: string | null;
@@ -24,6 +26,7 @@ type MagazinePost = {
 
 const Magazine = () => {
   const [posts, setPosts] = useState<MagazinePost[]>([]);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -33,11 +36,14 @@ const Magazine = () => {
     (async () => {
       const { data } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, author_name, category, cover_image_url, reply_to_id, published_at, status")
+        .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, reply_to_id, published_at, status")
         .eq("status", "published")
         .order("published_at", { ascending: false });
       if (cancelled) return;
-      setPosts((data as MagazinePost[]) ?? []);
+      const list = (data as MagazinePost[]) ?? [];
+      setPosts(list);
+      const names = await fetchAuthorNames(list.map((p) => p.user_id));
+      if (!cancelled) setNameMap(names);
       setLoading(false);
     })();
     return () => {
