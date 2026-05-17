@@ -314,6 +314,9 @@ const Admin = () => {
           <RealityForm />
         </div>
 
+        {/* Reality reports */}
+        <RealityReportsPanel />
+
         {/* Audit log */}
         <AuditLogPanel />
 
