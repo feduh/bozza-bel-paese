@@ -124,6 +124,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       status: effectiveStatus === "storico" ? "archiviato" : "attivo",
       created_by: user?.id ?? null,
       auto_confirm_at: autoConfirmAt,
+      category: category || null,
     });
 
     if (insertError) {
