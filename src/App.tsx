@@ -31,6 +31,8 @@ const AutoreProfilo = lazy(() => import("./pages/AutoreProfilo"));
 const SegnalaRealta = lazy(() => import("./pages/SegnalaRealta"));
 const Contatti = lazy(() => import("./pages/Contatti"));
 const Privacy = lazy(() => import("./pages/Privacy"));
+const PasswordDimenticata = lazy(() => import("./pages/PasswordDimenticata"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
