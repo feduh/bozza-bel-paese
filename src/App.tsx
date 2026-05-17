@@ -29,6 +29,8 @@ const RealityGalleryAdmin = lazy(() => import("./pages/RealityGalleryAdmin"));
 const LaRete = lazy(() => import("./pages/LaRete"));
 const AutoreProfilo = lazy(() => import("./pages/AutoreProfilo"));
 const SegnalaRealta = lazy(() => import("./pages/SegnalaRealta"));
+const Contatti = lazy(() => import("./pages/Contatti"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +63,8 @@ const App = () => (
                   <Route path="/la-rete" element={<LaRete />} />
                   <Route path="/autori/:userId" element={<AutoreProfilo />} />
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />
+                  <Route path="/contatti" element={<Contatti />} />
+                  <Route path="/privacy" element={<Privacy />} />
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/admin"
