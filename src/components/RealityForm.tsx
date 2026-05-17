@@ -4,6 +4,7 @@ import { MapPin, Loader2, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { realitySchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 import FieldError from "@/components/FieldError";
+import { REALITY_CATEGORIES } from "@/lib/categories";
 
 type RealityType = "con-sede" | "nomade" | "scomparsa";
 type ConfirmedStatus = "pendente" | "confermato" | "storico";
