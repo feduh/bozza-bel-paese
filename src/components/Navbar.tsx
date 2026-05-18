@@ -158,25 +158,6 @@ const Navbar = () => {
               </Link>
             );
           })}
-          <div className="pt-2 border-t border-border/60">
-            <p className="font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Il progetto</p>
-            {projectLinks.map((link) => {
-              const active = location.pathname === link.to;
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setOpen(false)}
-                  aria-current={active ? "page" : undefined}
-                  className={`block font-body text-sm font-medium uppercase py-1 ${
-                    active ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
           {user ? (
             <div className="pt-2 border-t border-border/60 space-y-2">
               <Link
