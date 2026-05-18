@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, LogOut, Shield, User as UserIcon, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
@@ -22,21 +22,14 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
-  // Link diretti (azioni principali)
+  // Link primari nella navbar (cuore pulsante del progetto)
   const primaryLinks = [
     { to: "/mappatura", label: t("nav.map") },
+    { to: "/la-rete", label: "La nostra rete" },
     { to: "/magazine", label: t("nav.magazine") },
-  ];
-
-  // Dropdown "Il progetto" (pagine istituzionali)
-  const projectLinks = [
-    { to: "/chi-siamo", label: t("nav.about") },
     { to: "/cosa-facciamo", label: t("nav.what") },
-    { to: "/la-rete", label: "La rete" },
     { to: "/contatti", label: "Contatti" },
   ];
-
-  const projectActive = projectLinks.some((l) => location.pathname === l.to);
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
@@ -65,26 +58,6 @@ const Navbar = () => {
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
-          {/* Dropdown "Il progetto" */}
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`inline-flex items-center gap-1 font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary focus:outline-none ${
-                projectActive ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              Il progetto
-              <ChevronDown size={14} aria-hidden="true" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[180px]">
-              {projectLinks.map((l) => (
-                <DropdownMenuItem key={l.to} asChild>
-                  <Link to={l.to} className="font-body text-sm cursor-pointer">
-                    {l.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
 
           {primaryLinks.map((link) => {
             const active = location.pathname === link.to;
@@ -185,25 +158,6 @@ const Navbar = () => {
               </Link>
             );
           })}
-          <div className="pt-2 border-t border-border/60">
-            <p className="font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Il progetto</p>
-            {projectLinks.map((link) => {
-              const active = location.pathname === link.to;
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setOpen(false)}
-                  aria-current={active ? "page" : undefined}
-                  className={`block font-body text-sm font-medium uppercase py-1 ${
-                    active ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
           {user ? (
             <div className="pt-2 border-t border-border/60 space-y-2">
               <Link
