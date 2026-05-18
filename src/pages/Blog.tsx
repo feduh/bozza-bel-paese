@@ -28,6 +28,8 @@ const Magazine = () => {
   const [posts, setPosts] = useState<MagazinePost[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [activeCats, setActiveCats] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
   const { user } = useAuth();
   const { t } = useTranslation();
 
@@ -51,6 +53,33 @@ const Magazine = () => {
     };
   }, []);
 
+  const availableCats = useMemo(() => {
+    const set = new Set<string>();
+    posts.forEach((p) => parseCategories(p.category).forEach((c) => set.add(c)));
+    return ARTICLE_CATEGORIES.filter((c) => set.has(c));
+  }, [posts]);
+
+  const filteredPosts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return posts.filter((p) => {
+      if (activeCats.length > 0) {
+        const cats = parseCategories(p.category);
+        if (!activeCats.some((c) => cats.includes(c))) return false;
+      }
+      if (q) {
+        const author = resolveAuthorName(nameMap, p.user_id, p.author_name).toLowerCase();
+        const hay = `${p.title} ${p.excerpt} ${author}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [posts, activeCats, query, nameMap]);
+
+  const toggleCat = (c: string) =>
+    setActiveCats((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+
+  const hasFilters = activeCats.length > 0 || query.length > 0;
+
   return (
     <div className="py-20">
       <SEO
@@ -59,7 +88,7 @@ const Magazine = () => {
         canonicalPath="/magazine"
       />
       <div className="editorial-container">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="max-w-3xl">
             <h1 className="editorial-heading mb-4">
               {t("magazine.title")}{" "}
@@ -77,15 +106,70 @@ const Magazine = () => {
           )}
         </div>
 
+        {/* Filtri */}
+        {!loading && posts.length > 0 && (
+          <div className="mb-10 space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[220px] max-w-sm">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Cerca per titolo, autore…"
+                  className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                />
+              </div>
+              {hasFilters && (
+                <button
+                  type="button"
+                  onClick={() => { setActiveCats([]); setQuery(""); }}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X size={14} /> Azzera filtri
+                </button>
+              )}
+              <span className="ml-auto text-xs font-body text-muted-foreground">
+                {filteredPosts.length} {filteredPosts.length === 1 ? "articolo" : "articoli"}
+              </span>
+            </div>
+            {availableCats.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {availableCats.map((c) => {
+                  const active = activeCats.includes(c);
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => toggleCat(c)}
+                      className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {loading ? (
           <PostCardSkeletonGrid count={6} />
         ) : posts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground font-body">
             Nessun articolo pubblicato ancora.
           </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground font-body">
+            Nessun articolo trovato con questi filtri.
+          </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
               <ArticleCard key={post.id} post={post} authorName={resolveAuthorName(nameMap, post.user_id, post.author_name)} />
             ))}
           </div>
