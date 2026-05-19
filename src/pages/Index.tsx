@@ -9,7 +9,7 @@ const Index = () => {
   const { t } = useTranslation();
   const features = [
     { icon: MapPin, key: "mapping", link: "/mappatura" },
-    { icon: Users, key: "community", link: "/chi-siamo" },
+    { icon: Users, key: "community", link: "/la-rete" },
     { icon: BookOpen, key: "stories", link: "/magazine" },
   ] as const;
   const stats = [
