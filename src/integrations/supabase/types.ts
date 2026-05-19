@@ -61,6 +61,7 @@ export type Database = {
           id: string
           published_at: string
           reply_to_id: string | null
+          scheduled_for: string | null
           slug: string
           status: string
           title: string
@@ -77,6 +78,7 @@ export type Database = {
           id?: string
           published_at?: string
           reply_to_id?: string | null
+          scheduled_for?: string | null
           slug: string
           status?: string
           title: string
@@ -93,6 +95,7 @@ export type Database = {
           id?: string
           published_at?: string
           reply_to_id?: string | null
+          scheduled_for?: string | null
           slug?: string
           status?: string
           title?: string
@@ -470,6 +473,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      publish_scheduled_posts: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "author" | "coordinatore"
