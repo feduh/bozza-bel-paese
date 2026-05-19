@@ -38,12 +38,15 @@ const ArticoloEditor = () => {
   const [errs, setErrs] = useState<FieldErrors>({});
   const [globalError, setGlobalError] = useState("");
   const [myRoles, setMyRoles] = useState<string[]>([]);
-  const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "published">("draft");
+  const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "scheduled" | "published">("draft");
   const [replyTo, setReplyTo] = useState<string | null>(replyToParam);
   const [parent, setParent] = useState<ParentMeta | null>(null);
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [catOpen, setCatOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<string>(""); // YYYY-MM-DD
+  const [scheduleTime, setScheduleTime] = useState<string>(""); // HH:MM (only :00 / :30)
   const lastSavedRef = useRef<string>("");
 
   const [form, setForm] = useState({
