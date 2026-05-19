@@ -9,7 +9,7 @@ const Index = () => {
   const { t } = useTranslation();
   const features = [
     { icon: MapPin, key: "mapping", link: "/mappatura" },
-    { icon: Users, key: "community", link: "/chi-siamo" },
+    { icon: Users, key: "community", link: "/la-rete" },
     { icon: BookOpen, key: "stories", link: "/magazine" },
   ] as const;
   const stats = [
@@ -63,7 +63,7 @@ const Index = () => {
                 {t("home.ctaMap")} <ArrowRight size={18} />
               </Link>
               <Link
-                to="/chi-siamo"
+                to="/la-rete"
                 className="inline-flex items-center gap-2 px-6 py-3 border border-primary-foreground/30 text-primary-foreground rounded-md font-body font-medium hover:bg-primary-foreground/10 transition-colors"
               >
                 {t("home.ctaAbout")}

@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "./hooks/useAuth";
@@ -16,7 +16,7 @@ import NotFound from "./pages/NotFound";
 
 // Lazy: every other route is code-split into its own chunk
 const RealityDetail = lazy(() => import("./pages/RealityDetail"));
-const ChiSiamo = lazy(() => import("./pages/ChiSiamo"));
+
 const CosaFacciamo = lazy(() => import("./pages/CosaFacciamo"));
 const Mappatura = lazy(() => import("./pages/Mappatura"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -55,7 +55,7 @@ const App = () => (
               <Routes>
                 <Route element={<Layout />}>
                   <Route path="/" element={<Index />} />
-                  <Route path="/chi-siamo" element={<ChiSiamo />} />
+                  <Route path="/chi-siamo" element={<Navigate to="/la-rete" replace />} />
                   <Route path="/cosa-facciamo" element={<CosaFacciamo />} />
                   <Route path="/mappatura" element={<Mappatura />} />
                   <Route path="/realta/:id" element={<RealityDetail />} />
