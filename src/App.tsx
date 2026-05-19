@@ -16,7 +16,7 @@ import NotFound from "./pages/NotFound";
 
 // Lazy: every other route is code-split into its own chunk
 const RealityDetail = lazy(() => import("./pages/RealityDetail"));
-const ChiSiamo = lazy(() => import("./pages/ChiSiamo"));
+
 const CosaFacciamo = lazy(() => import("./pages/CosaFacciamo"));
 const Mappatura = lazy(() => import("./pages/Mappatura"));
 const Blog = lazy(() => import("./pages/Blog"));
