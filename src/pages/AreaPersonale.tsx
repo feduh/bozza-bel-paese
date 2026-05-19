@@ -119,7 +119,7 @@ const AreaPersonale = () => {
 
     const { data: mine } = await supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, status, category, published_at, reply_to_id")
+      .select("id, slug, title, excerpt, status, category, published_at, scheduled_for, reply_to_id")
       .eq("user_id", user.id)
       .order("published_at", { ascending: false });
     setPosts((mine as MyPost[]) ?? []);
