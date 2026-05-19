@@ -97,8 +97,14 @@ const ArticoloEditor = () => {
         content: data.content,
         coverImageUrl: data.cover_image_url ?? "",
       });
-      setCurrentStatus(data.status as "draft" | "pending" | "published");
+      setCurrentStatus(data.status as "draft" | "pending" | "scheduled" | "published");
       setReplyTo(data.reply_to_id);
+      if (data.status === "scheduled" && data.scheduled_for) {
+        const dt = new Date(data.scheduled_for);
+        const pad = (n: number) => String(n).padStart(2, "0");
+        setScheduleDate(`${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`);
+        setScheduleTime(`${pad(dt.getHours())}:${pad(dt.getMinutes())}`);
+      }
       setLoading(false);
     })();
     return () => {
