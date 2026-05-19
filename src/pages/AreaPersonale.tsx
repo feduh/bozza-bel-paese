@@ -551,6 +551,11 @@ const AreaPersonale = () => {
                               )}
                             </div>
                             <p className="font-display font-semibold">{p.title}</p>
+                            {p.status === "scheduled" && p.scheduled_for && (
+                              <p className="text-xs font-body text-sky-600 mt-1">
+                                Pubblicazione prevista: {new Date(p.scheduled_for).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" })}
+                              </p>
+                            )}
                             <p className="text-sm font-body text-muted-foreground line-clamp-1 mt-1">
                               {p.excerpt}
                             </p>
