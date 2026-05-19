@@ -55,7 +55,7 @@ const App = () => (
               <Routes>
                 <Route element={<Layout />}>
                   <Route path="/" element={<Index />} />
-                  <Route path="/chi-siamo" element={<ChiSiamo />} />
+                  <Route path="/chi-siamo" element={<Navigate to="/la-rete" replace />} />
                   <Route path="/cosa-facciamo" element={<CosaFacciamo />} />
                   <Route path="/mappatura" element={<Mappatura />} />
                   <Route path="/realta/:id" element={<RealityDetail />} />
