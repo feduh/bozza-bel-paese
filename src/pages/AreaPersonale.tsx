@@ -127,7 +127,7 @@ const AreaPersonale = () => {
     if (rs.includes("admin") || rs.includes("moderator") || rs.includes("coordinatore")) {
       const { data: queue } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, status, category, published_at, reply_to_id, author_name, user_id")
+        .select("id, slug, title, excerpt, status, category, published_at, scheduled_for, reply_to_id, author_name, user_id")
         .eq("status", "pending")
         .order("published_at", { ascending: true });
       const list = (queue as ModerationPost[]) ?? [];
