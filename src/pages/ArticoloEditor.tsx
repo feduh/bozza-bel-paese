@@ -195,7 +195,7 @@ const ArticoloEditor = () => {
     return null;
   }
 
-  const submit = async (mode: "draft" | "submit") => {
+  const submit = async (mode: "draft" | "submit" | "schedule") => {
     setErrs({});
     setGlobalError("");
 
@@ -206,10 +206,30 @@ const ArticoloEditor = () => {
       return;
     }
 
+    let scheduledIso: string | null = null;
+    if (mode === "schedule") {
+      if (!scheduleDate || !scheduleTime) {
+        setGlobalError("Seleziona data e orario di pubblicazione.");
+        return;
+      }
+      const dt = new Date(`${scheduleDate}T${scheduleTime}:00`);
+      if (isNaN(dt.getTime())) {
+        setGlobalError("Data o orario non valido.");
+        return;
+      }
+      if (dt.getTime() <= Date.now()) {
+        setGlobalError("L'orario di pubblicazione deve essere nel futuro.");
+        return;
+      }
+      scheduledIso = dt.toISOString();
+    }
+
     setSubmitting(true);
 
     const targetStatus =
-      mode === "draft" ? "draft" : isStaff ? "published" : "pending";
+      mode === "draft" ? "draft"
+      : mode === "schedule" ? "scheduled"
+      : isStaff ? "published" : "pending";
 
     // Author name from profile
     const { data: prof } = await supabase
@@ -227,6 +247,7 @@ const ArticoloEditor = () => {
         content: parsed.data.content,
         cover_image_url: parsed.data.coverImageUrl || null,
         status: targetStatus,
+        scheduled_for: scheduledIso,
       };
       if (currentStatus !== "published" && targetStatus === "published") {
         updates.published_at = new Date().toISOString();
@@ -249,8 +270,9 @@ const ArticoloEditor = () => {
         user_id: user.id,
         slug,
         status: targetStatus,
+        scheduled_for: scheduledIso,
         reply_to_id: replyTo,
-        published_at: new Date().toISOString(),
+        published_at: scheduledIso ?? new Date().toISOString(),
       };
       const { error } = await supabase.from("blog_posts").insert(payload);
       setSubmitting(false);
@@ -262,6 +284,15 @@ const ArticoloEditor = () => {
 
     navigate("/area-personale");
   };
+
+  const halfHourSlots = useMemo(() => {
+    const arr: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) arr.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    }
+    return arr;
+  }, []);
+  const todayIso = new Date().toISOString().slice(0, 10);
 
   if (loading) {
     return (
