@@ -16,10 +16,13 @@ interface SitemapEntry {
 
 const staticEntries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
-  { path: "/chi-siamo", changefreq: "monthly", priority: "0.7" },
-  { path: "/cosa-facciamo", changefreq: "monthly", priority: "0.7" },
   { path: "/mappatura", changefreq: "weekly", priority: "0.9" },
+  { path: "/la-rete", changefreq: "weekly", priority: "0.8" },
   { path: "/magazine", changefreq: "weekly", priority: "0.8" },
+  { path: "/cosa-facciamo", changefreq: "monthly", priority: "0.7" },
+  { path: "/segnala-realta", changefreq: "monthly", priority: "0.6" },
+  { path: "/contatti", changefreq: "monthly", priority: "0.5" },
+  { path: "/privacy", changefreq: "yearly", priority: "0.3" },
 ];
 
 async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
