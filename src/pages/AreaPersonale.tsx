@@ -45,9 +45,10 @@ type MyPost = {
   slug: string;
   title: string;
   excerpt: string;
-  status: "draft" | "pending" | "published";
+  status: "draft" | "pending" | "scheduled" | "published";
   category: string;
   published_at: string;
+  scheduled_for: string | null;
   reply_to_id: string | null;
 };
 
@@ -67,6 +68,7 @@ type MyPendingReality = {
 const STATUS_LABEL: Record<MyPost["status"], { label: string; tone: string; icon: typeof Clock }> = {
   draft: { label: "Bozza", tone: "bg-muted text-muted-foreground", icon: FileText },
   pending: { label: "In moderazione", tone: "bg-amber-500/15 text-amber-600 border-amber-500/30", icon: Clock },
+  scheduled: { label: "Programmato", tone: "bg-sky-500/15 text-sky-600 border-sky-500/30", icon: Clock },
   published: { label: "Pubblicato", tone: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30", icon: CheckCircle2 },
 };
 
@@ -117,7 +119,7 @@ const AreaPersonale = () => {
 
     const { data: mine } = await supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, status, category, published_at, reply_to_id")
+      .select("id, slug, title, excerpt, status, category, published_at, scheduled_for, reply_to_id")
       .eq("user_id", user.id)
       .order("published_at", { ascending: false });
     setPosts((mine as MyPost[]) ?? []);
@@ -125,7 +127,7 @@ const AreaPersonale = () => {
     if (rs.includes("admin") || rs.includes("moderator") || rs.includes("coordinatore")) {
       const { data: queue } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, status, category, published_at, reply_to_id, author_name, user_id")
+        .select("id, slug, title, excerpt, status, category, published_at, scheduled_for, reply_to_id, author_name, user_id")
         .eq("status", "pending")
         .order("published_at", { ascending: true });
       const list = (queue as ModerationPost[]) ?? [];
@@ -549,6 +551,11 @@ const AreaPersonale = () => {
                               )}
                             </div>
                             <p className="font-display font-semibold">{p.title}</p>
+                            {p.status === "scheduled" && p.scheduled_for && (
+                              <p className="text-xs font-body text-sky-600 mt-1">
+                                Pubblicazione prevista: {new Date(p.scheduled_for).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" })}
+                              </p>
+                            )}
                             <p className="text-sm font-body text-muted-foreground line-clamp-1 mt-1">
                               {p.excerpt}
                             </p>

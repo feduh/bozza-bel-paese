@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
@@ -38,12 +38,15 @@ const ArticoloEditor = () => {
   const [errs, setErrs] = useState<FieldErrors>({});
   const [globalError, setGlobalError] = useState("");
   const [myRoles, setMyRoles] = useState<string[]>([]);
-  const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "published">("draft");
+  const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "scheduled" | "published">("draft");
   const [replyTo, setReplyTo] = useState<string | null>(replyToParam);
   const [parent, setParent] = useState<ParentMeta | null>(null);
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [catOpen, setCatOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<string>(""); // YYYY-MM-DD
+  const [scheduleTime, setScheduleTime] = useState<string>(""); // HH:MM (only :00 / :30)
   const lastSavedRef = useRef<string>("");
 
   const [form, setForm] = useState({
@@ -94,8 +97,14 @@ const ArticoloEditor = () => {
         content: data.content,
         coverImageUrl: data.cover_image_url ?? "",
       });
-      setCurrentStatus(data.status as "draft" | "pending" | "published");
+      setCurrentStatus(data.status as "draft" | "pending" | "scheduled" | "published");
       setReplyTo(data.reply_to_id);
+      if (data.status === "scheduled" && data.scheduled_for) {
+        const dt = new Date(data.scheduled_for);
+        const pad = (n: number) => String(n).padStart(2, "0");
+        setScheduleDate(`${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`);
+        setScheduleTime(`${pad(dt.getHours())}:${pad(dt.getMinutes())}`);
+      }
       setLoading(false);
     })();
     return () => {
@@ -186,7 +195,7 @@ const ArticoloEditor = () => {
     return null;
   }
 
-  const submit = async (mode: "draft" | "submit") => {
+  const submit = async (mode: "draft" | "submit" | "schedule") => {
     setErrs({});
     setGlobalError("");
 
@@ -197,10 +206,30 @@ const ArticoloEditor = () => {
       return;
     }
 
+    let scheduledIso: string | null = null;
+    if (mode === "schedule") {
+      if (!scheduleDate || !scheduleTime) {
+        setGlobalError("Seleziona data e orario di pubblicazione.");
+        return;
+      }
+      const dt = new Date(`${scheduleDate}T${scheduleTime}:00`);
+      if (isNaN(dt.getTime())) {
+        setGlobalError("Data o orario non valido.");
+        return;
+      }
+      if (dt.getTime() <= Date.now()) {
+        setGlobalError("L'orario di pubblicazione deve essere nel futuro.");
+        return;
+      }
+      scheduledIso = dt.toISOString();
+    }
+
     setSubmitting(true);
 
     const targetStatus =
-      mode === "draft" ? "draft" : isStaff ? "published" : "pending";
+      mode === "draft" ? "draft"
+      : mode === "schedule" ? "scheduled"
+      : isStaff ? "published" : "pending";
 
     // Author name from profile
     const { data: prof } = await supabase
@@ -218,6 +247,7 @@ const ArticoloEditor = () => {
         content: parsed.data.content,
         cover_image_url: parsed.data.coverImageUrl || null,
         status: targetStatus,
+        scheduled_for: scheduledIso,
       };
       if (currentStatus !== "published" && targetStatus === "published") {
         updates.published_at = new Date().toISOString();
@@ -240,8 +270,9 @@ const ArticoloEditor = () => {
         user_id: user.id,
         slug,
         status: targetStatus,
+        scheduled_for: scheduledIso,
         reply_to_id: replyTo,
-        published_at: new Date().toISOString(),
+        published_at: scheduledIso ?? new Date().toISOString(),
       };
       const { error } = await supabase.from("blog_posts").insert(payload);
       setSubmitting(false);
@@ -253,6 +284,15 @@ const ArticoloEditor = () => {
 
     navigate("/area-personale");
   };
+
+  const halfHourSlots = useMemo(() => {
+    const arr: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) arr.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    }
+    return arr;
+  }, []);
+  const todayIso = new Date().toISOString().slice(0, 10);
 
   if (loading) {
     return (
@@ -442,6 +482,70 @@ const ArticoloEditor = () => {
               <Send size={14} />
               {isStaff ? "Pubblica" : "Invia per pubblicazione"}
             </button>
+            {isStaff && (
+              <Popover open={scheduleOpen} onOpenChange={setScheduleOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-input font-body font-medium text-sm hover:border-primary/40 transition-colors disabled:opacity-50"
+                  >
+                    <CalendarClock size={14} />
+                    {currentStatus === "scheduled" ? "Riprogramma" : "Programma"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-80 p-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-body font-medium mb-1">Data</label>
+                    <input
+                      type="date"
+                      value={scheduleDate}
+                      min={todayIso}
+                      onChange={(e) => setScheduleDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-body font-medium mb-1">Orario (slot di 30 min)</label>
+                    <select
+                      value={scheduleTime}
+                      onChange={(e) => setScheduleTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                    >
+                      <option value="">Seleziona…</option>
+                      {halfHourSlots.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-xs font-body text-muted-foreground">
+                    L'articolo verrà pubblicato automaticamente all'orario indicato.
+                  </p>
+                  <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                    <button
+                      type="button"
+                      onClick={() => setScheduleOpen(false)}
+                      className="px-3 py-1.5 rounded-md text-xs font-body border border-input"
+                    >
+                      Annulla
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setScheduleOpen(false); submit("schedule"); }}
+                      disabled={submitting || !scheduleDate || !scheduleTime}
+                      className="px-3 py-1.5 rounded-md text-xs font-body bg-primary text-primary-foreground disabled:opacity-50"
+                    >
+                      Conferma
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+            {currentStatus === "scheduled" && scheduleDate && scheduleTime && (
+              <span className="text-xs font-body text-sky-600 inline-flex items-center gap-1">
+                <CalendarClock size={12} /> Programmato per {scheduleDate} {scheduleTime}
+              </span>
+            )}
             {autoSaveState !== "idle" && (
               <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
                 {autoSaveState === "saving" ? (
