@@ -7,7 +7,7 @@ const Footer = () => {
     { to: "/la-rete", label: "La nostra rete" },
     { to: "/cosa-facciamo", label: t("nav.what") },
     { to: "/mappatura", label: t("nav.map") },
-    { to: "/la-rete", label: "La rete" },
+    
     { to: "/magazine", label: t("nav.magazine") },
     { to: "/segnala-realta", label: "Segnala una realtà" },
     { to: "/contatti", label: "Contatti" },
