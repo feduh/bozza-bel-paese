@@ -482,6 +482,70 @@ const ArticoloEditor = () => {
               <Send size={14} />
               {isStaff ? "Pubblica" : "Invia per pubblicazione"}
             </button>
+            {isStaff && (
+              <Popover open={scheduleOpen} onOpenChange={setScheduleOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-input font-body font-medium text-sm hover:border-primary/40 transition-colors disabled:opacity-50"
+                  >
+                    <CalendarClock size={14} />
+                    {currentStatus === "scheduled" ? "Riprogramma" : "Programma"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-80 p-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-body font-medium mb-1">Data</label>
+                    <input
+                      type="date"
+                      value={scheduleDate}
+                      min={todayIso}
+                      onChange={(e) => setScheduleDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-body font-medium mb-1">Orario (slot di 30 min)</label>
+                    <select
+                      value={scheduleTime}
+                      onChange={(e) => setScheduleTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                    >
+                      <option value="">Seleziona…</option>
+                      {halfHourSlots.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-xs font-body text-muted-foreground">
+                    L'articolo verrà pubblicato automaticamente all'orario indicato.
+                  </p>
+                  <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                    <button
+                      type="button"
+                      onClick={() => setScheduleOpen(false)}
+                      className="px-3 py-1.5 rounded-md text-xs font-body border border-input"
+                    >
+                      Annulla
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setScheduleOpen(false); submit("schedule"); }}
+                      disabled={submitting || !scheduleDate || !scheduleTime}
+                      className="px-3 py-1.5 rounded-md text-xs font-body bg-primary text-primary-foreground disabled:opacity-50"
+                    >
+                      Conferma
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+            {currentStatus === "scheduled" && scheduleDate && scheduleTime && (
+              <span className="text-xs font-body text-sky-600 inline-flex items-center gap-1">
+                <CalendarClock size={12} /> Programmato per {scheduleDate} {scheduleTime}
+              </span>
+            )}
             {autoSaveState !== "idle" && (
               <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
                 {autoSaveState === "saving" ? (
