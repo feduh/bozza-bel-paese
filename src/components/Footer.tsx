@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 const Footer = () => {
   const { t } = useTranslation();
   const links = [
-    { to: "/chi-siamo", label: t("nav.about") },
+    { to: "/la-rete", label: "La nostra rete" },
     { to: "/cosa-facciamo", label: t("nav.what") },
     { to: "/mappatura", label: t("nav.map") },
     { to: "/la-rete", label: "La rete" },
