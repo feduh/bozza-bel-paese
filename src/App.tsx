@@ -8,6 +8,7 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/Layout";
 import RouteFallback from "./components/RouteFallback";
+import ScrollToTop from "./components/ScrollToTop";
 import { RequireAuth, RequireRole } from "./components/RouteGuards";
 
 // Eager: Home and 404 — needed for fast first paint and error states
