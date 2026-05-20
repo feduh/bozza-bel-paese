@@ -52,6 +52,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route element={<Layout />}>
