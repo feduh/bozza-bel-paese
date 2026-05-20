@@ -84,6 +84,7 @@ const AreaPersonale = () => {
   const [moderationQueue, setModerationQueue] = useState<ModerationPost[]>([]);
   const [myPendingRealities, setMyPendingRealities] = useState<MyPendingReality[]>([]);
   const [modNameMap, setModNameMap] = useState<Record<string, string>>({});
+  const [scheduledItems, setScheduledItems] = useState<ScheduledItem[]>([]);
   const [showNewReality, setShowNewReality] = useState(false);
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
