@@ -41,6 +41,12 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://il-bel-paese.lovable.app/realta/e66892c8-e457-466b-8761-aa18e8ff1956</loc>
+    <lastmod>2026-05-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000001</loc>
     <lastmod>2026-05-14</lastmod>
     <changefreq>monthly</changefreq>
@@ -91,6 +97,12 @@
   <url>
     <loc>https://il-bel-paese.lovable.app/magazine/recensione-officina-idee</loc>
     <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/prova-1wo1xg</loc>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
