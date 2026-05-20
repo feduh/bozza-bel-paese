@@ -561,6 +561,26 @@ const AreaPersonale = () => {
               </section>
             )}
 
+            {/* Calendario pubblicazioni programmate */}
+            <section className="p-8 rounded-lg bg-card border border-sky-500/30">
+              <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
+                <CalendarClock size={20} className="text-sky-600" />
+                Calendario pubblicazioni
+                <span className="text-base font-body text-muted-foreground">
+                  ({scheduledItems.length})
+                </span>
+              </h2>
+              <p className="text-sm font-body text-muted-foreground mb-6">
+                {myRoles.includes("admin")
+                  ? "I tuoi articoli programmati e quelli dei coordinatori della rete."
+                  : "I tuoi articoli con pubblicazione programmata."}
+              </p>
+              <ScheduledTimeline
+                items={scheduledItems}
+                showAuthor={myRoles.includes("admin")}
+              />
+            </section>
+
             {/* I miei articoli */}
             <section className="p-8 rounded-lg bg-card border border-border">
               <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
