@@ -14,9 +14,11 @@ import {
   ExternalLink,
   MapPin,
   Hourglass,
+  CalendarClock,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import RealityForm from "@/components/RealityForm";
+import ScheduledTimeline, { type ScheduledItem } from "@/components/ScheduledTimeline";
 import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
 import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
 
