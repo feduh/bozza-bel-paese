@@ -149,6 +149,56 @@ const AreaPersonale = () => {
       setMyPendingRealities((pending as MyPendingReality[]) ?? []);
     }
 
+    // Scheduled timeline: own scheduled, plus (admin) all coordinator scheduled
+    const scheduled: ScheduledItem[] = [];
+    const ownScheduled = ((mine as MyPost[]) ?? []).filter(
+      (p) => p.status === "scheduled" && p.scheduled_for,
+    );
+    for (const p of ownScheduled) {
+      scheduled.push({
+        id: p.id,
+        title: p.title,
+        scheduled_for: p.scheduled_for as string,
+        isMine: true,
+      });
+    }
+    if (rs.includes("admin")) {
+      const { data: coordRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "coordinatore");
+      const coordIds = (coordRoles ?? [])
+        .map((r: { user_id: string }) => r.user_id)
+        .filter((uid: string) => uid !== user.id);
+      if (coordIds.length > 0) {
+        const { data: coordScheduled } = await supabase
+          .from("blog_posts")
+          .select("id, title, scheduled_for, author_name, user_id")
+          .eq("status", "scheduled")
+          .in("user_id", coordIds);
+        const names = await fetchAuthorNames(
+          (coordScheduled ?? []).map((p: { user_id: string }) => p.user_id),
+        );
+        for (const p of (coordScheduled ?? []) as Array<{
+          id: string;
+          title: string;
+          scheduled_for: string;
+          author_name: string;
+          user_id: string;
+        }>) {
+          if (!p.scheduled_for) continue;
+          scheduled.push({
+            id: p.id,
+            title: p.title,
+            scheduled_for: p.scheduled_for,
+            author_name: resolveAuthorName(names, p.user_id, p.author_name),
+            isMine: false,
+          });
+        }
+      }
+    }
+    setScheduledItems(scheduled);
+
     setLoading(false);
   };
 
