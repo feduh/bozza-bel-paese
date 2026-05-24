@@ -49,6 +49,27 @@ const ArticoloEditor = () => {
   const [scheduleTime, setScheduleTime] = useState<string>(""); // HH:MM (only :00 / :30)
   const lastSavedRef = useRef<string>("");
 
+  // Copyright declaration state
+  type CopyrightDeclaration = {
+    imagesOrigin: "own" | "cc" | "purchased" | "public_domain" | "mixed" | "";
+    imagesCredits: string;
+    textOrigin: "original" | "with_citations" | "translation" | "";
+    quotesAttributed: boolean;
+    aiGenerated: boolean;
+    rightsConfirmed: boolean;
+  };
+  const [copyright, setCopyright] = useState<CopyrightDeclaration>({
+    imagesOrigin: "",
+    imagesCredits: "",
+    textOrigin: "",
+    quotesAttributed: false,
+    aiGenerated: false,
+    rightsConfirmed: false,
+  });
+  const [copyrightOpen, setCopyrightOpen] = useState(false);
+  const [copyrightChecking, setCopyrightChecking] = useState(false);
+  const [copyrightResult, setCopyrightResult] = useState<{ status: "ok" | "blocked"; notes: string } | null>(null);
+
   const [form, setForm] = useState({
     title: "",
     category: "",
