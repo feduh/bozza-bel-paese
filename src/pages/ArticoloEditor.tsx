@@ -549,7 +549,122 @@ const ArticoloEditor = () => {
               maxLength={50000}
               invalid={!!errs.content}
             />
-            <FieldError id="err-content" message={errs.content} />
+          </div>
+
+          {/* Copyright declaration */}
+          <div className="pt-4 border-t border-border">
+            <button
+              type="button"
+              onClick={() => setCopyrightOpen((v) => !v)}
+              className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-md border border-input bg-background hover:border-primary/40 transition-colors"
+              aria-expanded={copyrightOpen}
+            >
+              <span className="inline-flex items-center gap-2 text-sm font-body font-medium">
+                {copyrightResult?.status === "ok" ? (
+                  <ShieldCheck size={16} className="text-secondary" />
+                ) : copyrightResult?.status === "blocked" ? (
+                  <ShieldAlert size={16} className="text-destructive" />
+                ) : (
+                  <ShieldCheck size={16} className="text-muted-foreground" />
+                )}
+                Dichiarazione copyright
+                {copyrightResult?.status === "ok" && (
+                  <span className="text-xs text-secondary font-normal">— verificata</span>
+                )}
+                {copyrightResult?.status === "blocked" && (
+                  <span className="text-xs text-destructive font-normal">— bloccata</span>
+                )}
+              </span>
+              <ChevronDown size={16} className={`text-muted-foreground transition-transform ${copyrightOpen ? "rotate-180" : ""}`} />
+            </button>
+            {copyrightOpen && (
+              <div className="mt-3 p-4 rounded-md border border-input bg-muted/30 space-y-4">
+                <p className="text-xs font-body text-muted-foreground">
+                  Obbligatoria per inviare o programmare la pubblicazione. La verifica AI può bloccare l'articolo se rileva problemi di copyright (watermark, plagio evidente).
+                </p>
+
+                <div>
+                  <label className="block text-xs font-body font-medium mb-1">Origine immagini *</label>
+                  <select
+                    value={copyright.imagesOrigin}
+                    onChange={(e) => setCopyright({ ...copyright, imagesOrigin: e.target.value as CopyrightDeclaration["imagesOrigin"] })}
+                    className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  >
+                    <option value="">Seleziona…</option>
+                    <option value="own">Realizzate da me / con mio permesso</option>
+                    <option value="cc">Creative Commons (con attribuzione)</option>
+                    <option value="public_domain">Pubblico dominio</option>
+                    <option value="purchased">Acquistate / con licenza</option>
+                    <option value="mixed">Mista (specificare nei crediti)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-body font-medium mb-1">Crediti immagini (autori, licenze, URL fonte)</label>
+                  <textarea
+                    value={copyright.imagesCredits}
+                    onChange={(e) => setCopyright({ ...copyright, imagesCredits: e.target.value })}
+                    rows={2}
+                    maxLength={1000}
+                    placeholder="Es. Foto: Mario Rossi — CC BY-SA 4.0 · Cover: Wikimedia Commons"
+                    className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-body font-medium mb-1">Origine testo *</label>
+                  <select
+                    value={copyright.textOrigin}
+                    onChange={(e) => setCopyright({ ...copyright, textOrigin: e.target.value as CopyrightDeclaration["textOrigin"] })}
+                    className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  >
+                    <option value="">Seleziona…</option>
+                    <option value="original">Testo originale</option>
+                    <option value="with_citations">Originale con citazioni attribuite</option>
+                    <option value="translation">Traduzione autorizzata</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-body cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={copyright.quotesAttributed}
+                      onChange={(e) => setCopyright({ ...copyright, quotesAttributed: e.target.checked })}
+                      className="rounded"
+                    />
+                    Tutte le citazioni sono correttamente attribuite alla fonte
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-body cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={copyright.aiGenerated}
+                      onChange={(e) => setCopyright({ ...copyright, aiGenerated: e.target.checked })}
+                      className="rounded"
+                    />
+                    Il contenuto è stato generato (anche in parte) con AI generativa
+                  </label>
+                  <label className="flex items-start gap-2 text-sm font-body cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={copyright.rightsConfirmed}
+                      onChange={(e) => setCopyright({ ...copyright, rightsConfirmed: e.target.checked })}
+                      className="rounded mt-0.5"
+                    />
+                    <span>
+                      <strong>Confermo</strong> di possedere o di avere licenza per pubblicare tutti i contenuti (testo e immagini) di questo articolo, e di assumermi la responsabilità di eventuali violazioni. *
+                    </span>
+                  </label>
+                </div>
+
+                {copyrightResult && (
+                  <div className={`p-3 rounded-md text-xs font-body ${copyrightResult.status === "ok" ? "bg-secondary/10 text-secondary border border-secondary/30" : "bg-destructive/10 text-destructive border border-destructive/30"}`}>
+                    <strong>{copyrightResult.status === "ok" ? "Verifica superata." : "Verifica NON superata."}</strong>
+                    {copyrightResult.notes && <> {copyrightResult.notes}</>}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3 flex-wrap pt-4 border-t border-border">
