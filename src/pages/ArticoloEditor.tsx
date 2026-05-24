@@ -748,6 +748,11 @@ const ArticoloEditor = () => {
                 <CalendarClock size={12} /> Programmato per {scheduleDate} {scheduleTime}
               </span>
             )}
+            {copyrightChecking && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
+                <Loader2 size={12} className="animate-spin" /> Verifica copyright in corso…
+              </span>
+            )}
             {autoSaveState !== "idle" && (
               <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
                 {autoSaveState === "saving" ? (
