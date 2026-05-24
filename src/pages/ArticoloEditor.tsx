@@ -126,6 +126,25 @@ const ArticoloEditor = () => {
         setScheduleDate(`${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`);
         setScheduleTime(`${pad(dt.getHours())}:${pad(dt.getMinutes())}`);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const decl = (data as any).copyright_declaration;
+      if (decl && typeof decl === "object") {
+        setCopyright({
+          imagesOrigin: decl.imagesOrigin ?? "",
+          imagesCredits: decl.imagesCredits ?? "",
+          textOrigin: decl.textOrigin ?? "",
+          quotesAttributed: !!decl.quotesAttributed,
+          aiGenerated: !!decl.aiGenerated,
+          rightsConfirmed: !!decl.rightsConfirmed,
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const checkStatus = (data as any).copyright_check_status;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const checkNotes = (data as any).copyright_check_notes;
+      if (checkStatus && checkStatus !== "pending") {
+        setCopyrightResult({ status: checkStatus, notes: checkNotes ?? "" });
+      }
       setLoading(false);
     })();
     return () => {
