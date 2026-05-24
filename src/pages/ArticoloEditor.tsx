@@ -264,6 +264,51 @@ const ArticoloEditor = () => {
       scheduledIso = dt.toISOString();
     }
 
+    // Copyright gate: required for submit/schedule (not for plain draft)
+    let copyrightPayloadForDb: Record<string, unknown> = {};
+    if (mode !== "draft") {
+      if (!copyright.imagesOrigin || !copyright.textOrigin || !copyright.rightsConfirmed) {
+        setGlobalError("Compila la dichiarazione di copyright e conferma di avere i diritti prima di inviare o programmare.");
+        setCopyrightOpen(true);
+        return;
+      }
+      setCopyrightChecking(true);
+      try {
+        const { data: checkData, error: checkErr } = await supabase.functions.invoke("copyright-check", {
+          body: {
+            title: parsed.data.title,
+            excerpt: parsed.data.excerpt,
+            content: parsed.data.content,
+            coverImageUrl: parsed.data.coverImageUrl || null,
+            declaration: copyright,
+          },
+        });
+        setCopyrightChecking(false);
+        if (checkErr) {
+          setGlobalError(`Verifica copyright non disponibile: ${checkErr.message}`);
+          return;
+        }
+        const result = checkData as { status: "ok" | "blocked"; notes?: string; error?: string } | null;
+        if (!result || result.status !== "ok") {
+          setCopyrightResult({ status: "blocked", notes: result?.notes || result?.error || "Verifica non superata." });
+          setGlobalError("Verifica copyright NON superata. Modifica il contenuto o la dichiarazione e riprova.");
+          setCopyrightOpen(true);
+          return;
+        }
+        setCopyrightResult({ status: "ok", notes: result.notes || "" });
+        copyrightPayloadForDb = {
+          copyright_declaration: copyright,
+          copyright_check_status: "ok",
+          copyright_check_notes: result.notes || null,
+          copyright_checked_at: new Date().toISOString(),
+        };
+      } catch (e) {
+        setCopyrightChecking(false);
+        setGlobalError(`Errore verifica copyright: ${e instanceof Error ? e.message : "ignoto"}`);
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     const targetStatus =
@@ -288,6 +333,7 @@ const ArticoloEditor = () => {
         cover_image_url: parsed.data.coverImageUrl || null,
         status: targetStatus,
         scheduled_for: scheduledIso,
+        ...copyrightPayloadForDb,
       };
       if (currentStatus !== "published" && targetStatus === "published") {
         updates.published_at = new Date().toISOString();
@@ -313,6 +359,7 @@ const ArticoloEditor = () => {
         scheduled_for: scheduledIso,
         reply_to_id: replyTo,
         published_at: scheduledIso ?? new Date().toISOString(),
+        ...copyrightPayloadForDb,
       };
       const { error } = await supabase.from("blog_posts").insert(payload);
       setSubmitting(false);
