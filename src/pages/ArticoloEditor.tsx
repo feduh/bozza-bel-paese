@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock, ShieldCheck, ShieldAlert } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
@@ -48,6 +48,27 @@ const ArticoloEditor = () => {
   const [scheduleDate, setScheduleDate] = useState<string>(""); // YYYY-MM-DD
   const [scheduleTime, setScheduleTime] = useState<string>(""); // HH:MM (only :00 / :30)
   const lastSavedRef = useRef<string>("");
+
+  // Copyright declaration state
+  type CopyrightDeclaration = {
+    imagesOrigin: "own" | "cc" | "purchased" | "public_domain" | "mixed" | "";
+    imagesCredits: string;
+    textOrigin: "original" | "with_citations" | "translation" | "";
+    quotesAttributed: boolean;
+    aiGenerated: boolean;
+    rightsConfirmed: boolean;
+  };
+  const [copyright, setCopyright] = useState<CopyrightDeclaration>({
+    imagesOrigin: "",
+    imagesCredits: "",
+    textOrigin: "",
+    quotesAttributed: false,
+    aiGenerated: false,
+    rightsConfirmed: false,
+  });
+  const [copyrightOpen, setCopyrightOpen] = useState(false);
+  const [copyrightChecking, setCopyrightChecking] = useState(false);
+  const [copyrightResult, setCopyrightResult] = useState<{ status: "ok" | "blocked"; notes: string } | null>(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -104,6 +125,25 @@ const ArticoloEditor = () => {
         const pad = (n: number) => String(n).padStart(2, "0");
         setScheduleDate(`${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`);
         setScheduleTime(`${pad(dt.getHours())}:${pad(dt.getMinutes())}`);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const decl = (data as any).copyright_declaration;
+      if (decl && typeof decl === "object") {
+        setCopyright({
+          imagesOrigin: decl.imagesOrigin ?? "",
+          imagesCredits: decl.imagesCredits ?? "",
+          textOrigin: decl.textOrigin ?? "",
+          quotesAttributed: !!decl.quotesAttributed,
+          aiGenerated: !!decl.aiGenerated,
+          rightsConfirmed: !!decl.rightsConfirmed,
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const checkStatus = (data as any).copyright_check_status;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const checkNotes = (data as any).copyright_check_notes;
+      if (checkStatus && checkStatus !== "pending") {
+        setCopyrightResult({ status: checkStatus, notes: checkNotes ?? "" });
       }
       setLoading(false);
     })();
@@ -224,6 +264,51 @@ const ArticoloEditor = () => {
       scheduledIso = dt.toISOString();
     }
 
+    // Copyright gate: required for submit/schedule (not for plain draft)
+    let copyrightPayloadForDb: Record<string, unknown> = {};
+    if (mode !== "draft") {
+      if (!copyright.imagesOrigin || !copyright.textOrigin || !copyright.rightsConfirmed) {
+        setGlobalError("Compila la dichiarazione di copyright e conferma di avere i diritti prima di inviare o programmare.");
+        setCopyrightOpen(true);
+        return;
+      }
+      setCopyrightChecking(true);
+      try {
+        const { data: checkData, error: checkErr } = await supabase.functions.invoke("copyright-check", {
+          body: {
+            title: parsed.data.title,
+            excerpt: parsed.data.excerpt,
+            content: parsed.data.content,
+            coverImageUrl: parsed.data.coverImageUrl || null,
+            declaration: copyright,
+          },
+        });
+        setCopyrightChecking(false);
+        if (checkErr) {
+          setGlobalError(`Verifica copyright non disponibile: ${checkErr.message}`);
+          return;
+        }
+        const result = checkData as { status: "ok" | "blocked"; notes?: string; error?: string } | null;
+        if (!result || result.status !== "ok") {
+          setCopyrightResult({ status: "blocked", notes: result?.notes || result?.error || "Verifica non superata." });
+          setGlobalError("Verifica copyright NON superata. Modifica il contenuto o la dichiarazione e riprova.");
+          setCopyrightOpen(true);
+          return;
+        }
+        setCopyrightResult({ status: "ok", notes: result.notes || "" });
+        copyrightPayloadForDb = {
+          copyright_declaration: copyright,
+          copyright_check_status: "ok",
+          copyright_check_notes: result.notes || null,
+          copyright_checked_at: new Date().toISOString(),
+        };
+      } catch (e) {
+        setCopyrightChecking(false);
+        setGlobalError(`Errore verifica copyright: ${e instanceof Error ? e.message : "ignoto"}`);
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     const targetStatus =
@@ -248,6 +333,7 @@ const ArticoloEditor = () => {
         cover_image_url: parsed.data.coverImageUrl || null,
         status: targetStatus,
         scheduled_for: scheduledIso,
+        ...copyrightPayloadForDb,
       };
       if (currentStatus !== "published" && targetStatus === "published") {
         updates.published_at = new Date().toISOString();
@@ -273,6 +359,7 @@ const ArticoloEditor = () => {
         scheduled_for: scheduledIso,
         reply_to_id: replyTo,
         published_at: scheduledIso ?? new Date().toISOString(),
+        ...copyrightPayloadForDb,
       };
       const { error } = await supabase.from("blog_posts").insert(payload);
       setSubmitting(false);
@@ -462,7 +549,122 @@ const ArticoloEditor = () => {
               maxLength={50000}
               invalid={!!errs.content}
             />
-            <FieldError id="err-content" message={errs.content} />
+          </div>
+
+          {/* Copyright declaration */}
+          <div className="pt-4 border-t border-border">
+            <button
+              type="button"
+              onClick={() => setCopyrightOpen((v) => !v)}
+              className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-md border border-input bg-background hover:border-primary/40 transition-colors"
+              aria-expanded={copyrightOpen}
+            >
+              <span className="inline-flex items-center gap-2 text-sm font-body font-medium">
+                {copyrightResult?.status === "ok" ? (
+                  <ShieldCheck size={16} className="text-secondary" />
+                ) : copyrightResult?.status === "blocked" ? (
+                  <ShieldAlert size={16} className="text-destructive" />
+                ) : (
+                  <ShieldCheck size={16} className="text-muted-foreground" />
+                )}
+                Dichiarazione copyright
+                {copyrightResult?.status === "ok" && (
+                  <span className="text-xs text-secondary font-normal">— verificata</span>
+                )}
+                {copyrightResult?.status === "blocked" && (
+                  <span className="text-xs text-destructive font-normal">— bloccata</span>
+                )}
+              </span>
+              <ChevronDown size={16} className={`text-muted-foreground transition-transform ${copyrightOpen ? "rotate-180" : ""}`} />
+            </button>
+            {copyrightOpen && (
+              <div className="mt-3 p-4 rounded-md border border-input bg-muted/30 space-y-4">
+                <p className="text-xs font-body text-muted-foreground">
+                  Obbligatoria per inviare o programmare la pubblicazione. La verifica AI può bloccare l'articolo se rileva problemi di copyright (watermark, plagio evidente).
+                </p>
+
+                <div>
+                  <label className="block text-xs font-body font-medium mb-1">Origine immagini *</label>
+                  <select
+                    value={copyright.imagesOrigin}
+                    onChange={(e) => setCopyright({ ...copyright, imagesOrigin: e.target.value as CopyrightDeclaration["imagesOrigin"] })}
+                    className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  >
+                    <option value="">Seleziona…</option>
+                    <option value="own">Realizzate da me / con mio permesso</option>
+                    <option value="cc">Creative Commons (con attribuzione)</option>
+                    <option value="public_domain">Pubblico dominio</option>
+                    <option value="purchased">Acquistate / con licenza</option>
+                    <option value="mixed">Mista (specificare nei crediti)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-body font-medium mb-1">Crediti immagini (autori, licenze, URL fonte)</label>
+                  <textarea
+                    value={copyright.imagesCredits}
+                    onChange={(e) => setCopyright({ ...copyright, imagesCredits: e.target.value })}
+                    rows={2}
+                    maxLength={1000}
+                    placeholder="Es. Foto: Mario Rossi — CC BY-SA 4.0 · Cover: Wikimedia Commons"
+                    className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-body font-medium mb-1">Origine testo *</label>
+                  <select
+                    value={copyright.textOrigin}
+                    onChange={(e) => setCopyright({ ...copyright, textOrigin: e.target.value as CopyrightDeclaration["textOrigin"] })}
+                    className="w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  >
+                    <option value="">Seleziona…</option>
+                    <option value="original">Testo originale</option>
+                    <option value="with_citations">Originale con citazioni attribuite</option>
+                    <option value="translation">Traduzione autorizzata</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-body cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={copyright.quotesAttributed}
+                      onChange={(e) => setCopyright({ ...copyright, quotesAttributed: e.target.checked })}
+                      className="rounded"
+                    />
+                    Tutte le citazioni sono correttamente attribuite alla fonte
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-body cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={copyright.aiGenerated}
+                      onChange={(e) => setCopyright({ ...copyright, aiGenerated: e.target.checked })}
+                      className="rounded"
+                    />
+                    Il contenuto è stato generato (anche in parte) con AI generativa
+                  </label>
+                  <label className="flex items-start gap-2 text-sm font-body cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={copyright.rightsConfirmed}
+                      onChange={(e) => setCopyright({ ...copyright, rightsConfirmed: e.target.checked })}
+                      className="rounded mt-0.5"
+                    />
+                    <span>
+                      <strong>Confermo</strong> di possedere o di avere licenza per pubblicare tutti i contenuti (testo e immagini) di questo articolo, e di assumermi la responsabilità di eventuali violazioni. *
+                    </span>
+                  </label>
+                </div>
+
+                {copyrightResult && (
+                  <div className={`p-3 rounded-md text-xs font-body ${copyrightResult.status === "ok" ? "bg-secondary/10 text-secondary border border-secondary/30" : "bg-destructive/10 text-destructive border border-destructive/30"}`}>
+                    <strong>{copyrightResult.status === "ok" ? "Verifica superata." : "Verifica NON superata."}</strong>
+                    {copyrightResult.notes && <> {copyrightResult.notes}</>}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3 flex-wrap pt-4 border-t border-border">
@@ -544,6 +746,11 @@ const ArticoloEditor = () => {
             {currentStatus === "scheduled" && scheduleDate && scheduleTime && (
               <span className="text-xs font-body text-sky-600 inline-flex items-center gap-1">
                 <CalendarClock size={12} /> Programmato per {scheduleDate} {scheduleTime}
+              </span>
+            )}
+            {copyrightChecking && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
+                <Loader2 size={12} className="animate-spin" /> Verifica copyright in corso…
               </span>
             )}
             {autoSaveState !== "idle" && (
