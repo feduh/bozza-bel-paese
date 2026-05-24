@@ -55,6 +55,10 @@ export type Database = {
           author_name: string
           category: string
           content: string
+          copyright_check_notes: string | null
+          copyright_check_status: string
+          copyright_checked_at: string | null
+          copyright_declaration: Json | null
           cover_image_url: string | null
           created_at: string
           excerpt: string
@@ -72,6 +76,10 @@ export type Database = {
           author_name: string
           category: string
           content?: string
+          copyright_check_notes?: string | null
+          copyright_check_status?: string
+          copyright_checked_at?: string | null
+          copyright_declaration?: Json | null
           cover_image_url?: string | null
           created_at?: string
           excerpt: string
@@ -89,6 +97,10 @@ export type Database = {
           author_name?: string
           category?: string
           content?: string
+          copyright_check_notes?: string | null
+          copyright_check_status?: string
+          copyright_checked_at?: string | null
+          copyright_declaration?: Json | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string
