@@ -1,97 +1,52 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import {
   User as UserIcon,
-  Plus,
-  Edit3,
-  Trash2,
-  Clock,
-  CheckCircle2,
   FileText,
   ShieldCheck,
-  ExternalLink,
   MapPin,
-  Hourglass,
   CalendarClock,
+  Clock,
 } from "lucide-react";
 import SEO from "@/components/SEO";
-import RealityForm from "@/components/RealityForm";
-import ScheduledTimeline, { type ScheduledItem } from "@/components/ScheduledTimeline";
-import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
+import type { ScheduledItem } from "@/components/ScheduledTimeline";
 import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
-
-type Profile = {
-  id: string;
-  user_id: string;
-  display_name: string;
-  bio: string;
-  avatar_url: string | null;
-  website: string | null;
-  social_instagram: string | null;
-  social_twitter: string | null;
-  social_linkedin: string | null;
-  reality_id: string | null;
-  affiliation: string | null;
-  public_email: string | null;
-  consent_public: boolean;
-  member_type: string | null;
-  role_collective: string | null;
-  role_real_life: string | null;
-  figure_category: string | null;
-};
-
-type MyPost = {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  status: "draft" | "pending" | "scheduled" | "published";
-  category: string;
-  published_at: string;
-  scheduled_for: string | null;
-  reply_to_id: string | null;
-};
-
-type ModerationPost = MyPost & { author_name: string; user_id: string };
-
-type RealityRef = { id: string; name: string };
-
-type MyPendingReality = {
-  id: string;
-  name: string;
-  city: string;
-  region: string | null;
-  auto_confirm_at: string | null;
-  created_at: string;
-};
-
-const STATUS_LABEL: Record<MyPost["status"], { label: string; tone: string; icon: typeof Clock }> = {
-  draft: { label: "Bozza", tone: "bg-muted text-muted-foreground", icon: FileText },
-  pending: { label: "In moderazione", tone: "bg-amber-500/15 text-amber-600 border-amber-500/30", icon: Clock },
-  scheduled: { label: "Programmato", tone: "bg-sky-500/15 text-sky-600 border-sky-500/30", icon: Clock },
-  published: { label: "Pubblicato", tone: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30", icon: CheckCircle2 },
-};
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import PanelProfilo from "@/components/area/PanelProfilo";
+import PanelArticoli from "@/components/area/PanelArticoli";
+import PanelCalendario from "@/components/area/PanelCalendario";
+import PanelModerazione from "@/components/area/PanelModerazione";
+import PanelRealta from "@/components/area/PanelRealta";
+import type {
+  AreaProfile,
+  AreaPost,
+  AreaModerationPost,
+  AreaPendingReality,
+  AreaRealityRef,
+} from "@/components/area/types";
 
 const AreaPersonale = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [reality, setReality] = useState<RealityRef | null>(null);
-  const [posts, setPosts] = useState<MyPost[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [profile, setProfile] = useState<AreaProfile | null>(null);
+  const [reality, setReality] = useState<AreaRealityRef | null>(null);
+  const [posts, setPosts] = useState<AreaPost[]>([]);
   const [myRoles, setMyRoles] = useState<string[]>([]);
-  const [moderationQueue, setModerationQueue] = useState<ModerationPost[]>([]);
-  const [myPendingRealities, setMyPendingRealities] = useState<MyPendingReality[]>([]);
+  const [moderationQueue, setModerationQueue] = useState<AreaModerationPost[]>([]);
+  const [myPendingRealities, setMyPendingRealities] = useState<AreaPendingReality[]>([]);
   const [modNameMap, setModNameMap] = useState<Record<string, string>>({});
   const [scheduledItems, setScheduledItems] = useState<ScheduledItem[]>([]);
-  const [showNewReality, setShowNewReality] = useState(false);
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
 
   const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
-  const canProposeRealities = myRoles.includes("admin") || myRoles.includes("coordinatore");
+  const isAdmin = myRoles.includes("admin");
+  const canProposeRealities = isAdmin || myRoles.includes("coordinatore");
 
   const loadAll = async () => {
     if (!user) return;
@@ -102,7 +57,7 @@ const AreaPersonale = () => {
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
-    setProfile(prof as Profile | null);
+    setProfile(prof as AreaProfile | null);
 
     if (prof?.reality_id) {
       const { data: r } = await supabase
@@ -110,7 +65,7 @@ const AreaPersonale = () => {
         .select("id, name")
         .eq("id", prof.reality_id)
         .maybeSingle();
-      setReality((r as RealityRef | null) ?? null);
+      setReality((r as AreaRealityRef | null) ?? null);
     }
 
     const { data: roles } = await supabase
@@ -122,18 +77,18 @@ const AreaPersonale = () => {
 
     const { data: mine } = await supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, status, category, published_at, scheduled_for, reply_to_id")
+      .select("id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id")
       .eq("user_id", user.id)
       .order("published_at", { ascending: false });
-    setPosts((mine as MyPost[]) ?? []);
+    setPosts((mine as AreaPost[]) ?? []);
 
     if (rs.includes("admin") || rs.includes("moderator") || rs.includes("coordinatore")) {
       const { data: queue } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, status, category, published_at, scheduled_for, reply_to_id, author_name, user_id")
+        .select("id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id, author_name, user_id")
         .eq("status", "pending")
         .order("published_at", { ascending: true });
-      const list = (queue as ModerationPost[]) ?? [];
+      const list = (queue as AreaModerationPost[]) ?? [];
       setModerationQueue(list);
       const names = await fetchAuthorNames(list.map((p) => p.user_id));
       setModNameMap(names);
@@ -146,12 +101,11 @@ const AreaPersonale = () => {
         .eq("created_by", user.id)
         .eq("confirmed_status", "pendente")
         .order("created_at", { ascending: false });
-      setMyPendingRealities((pending as MyPendingReality[]) ?? []);
+      setMyPendingRealities((pending as AreaPendingReality[]) ?? []);
     }
 
-    // Scheduled timeline: own scheduled, plus (admin) all coordinator scheduled
     const scheduled: ScheduledItem[] = [];
-    const ownScheduled = ((mine as MyPost[]) ?? []).filter(
+    const ownScheduled = ((mine as AreaPost[]) ?? []).filter(
       (p) => p.status === "scheduled" && p.scheduled_for,
     );
     for (const p of ownScheduled) {
@@ -207,75 +161,32 @@ const AreaPersonale = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleAvatarUpload = async (file: File) => {
-    if (!user || !profile) return;
-    setSavingProfile(true);
-    setProfileMsg("");
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-    if (upErr) {
-      setProfileMsg(`Errore upload: ${upErr.message}`);
-      setSavingProfile(false);
-      return;
+  // Tab definitions based on role
+  const tabs = useMemo(() => {
+    const t: Array<{ value: string; label: string; icon: typeof UserIcon; badge?: number }> = [
+      { value: "profilo", label: "Profilo", icon: UserIcon },
+      { value: "calendario", label: "Calendario", icon: CalendarClock, badge: scheduledItems.length || undefined },
+      { value: "articoli", label: "Articoli", icon: FileText, badge: posts.length || undefined },
+    ];
+    if (canProposeRealities) {
+      t.push({ value: "realta", label: "Realtà", icon: MapPin, badge: myPendingRealities.length || undefined });
     }
-    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-    setProfile({ ...profile, avatar_url: pub.publicUrl });
-    setSavingProfile(false);
-    setProfileMsg("✅ Foto caricata. Ricorda di salvare il profilo.");
-  };
-
-  const handleProfileSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!profile || !user) return;
-    setSavingProfile(true);
-    setProfileMsg("");
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        display_name: profile.display_name,
-        bio: profile.bio,
-        avatar_url: profile.avatar_url || null,
-        website: profile.website || null,
-        social_instagram: profile.social_instagram || null,
-        social_twitter: profile.social_twitter || null,
-        social_linkedin: profile.social_linkedin || null,
-        affiliation: profile.reality_id ? null : (profile.affiliation || null),
-        public_email: profile.public_email || null,
-        consent_public: !!profile.consent_public,
-        member_type: isStaff ? (profile.member_type || null) : "autore",
-        role_collective: isStaff ? (profile.role_collective || null) : null,
-        role_real_life: profile.role_real_life || null,
-        figure_category: profile.figure_category || null,
-      })
-      .eq("user_id", user.id);
-    setSavingProfile(false);
-    setProfileMsg(error ? `Errore: ${error.message}` : "✅ Profilo aggiornato");
-  };
-
-  const deletePost = async (id: string) => {
-    if (!confirm("Eliminare definitivamente questo articolo?")) return;
-    const { error } = await supabase.from("blog_posts").delete().eq("id", id);
-    if (error) {
-      alert(`Errore: ${error.message}`);
-    } else {
-      loadAll();
+    if (isStaff) {
+      t.push({ value: "moderazione", label: "Moderazione", icon: Clock, badge: moderationQueue.length || undefined });
     }
-  };
-
-  const moderateAction = async (id: string, action: "publish" | "reject" | "delete") => {
-    if (action === "delete") {
-      if (!confirm("Eliminare l'articolo?")) return;
-      await supabase.from("blog_posts").delete().eq("id", id);
-    } else if (action === "publish") {
-      await supabase
-        .from("blog_posts")
-        .update({ status: "published", published_at: new Date().toISOString() })
-        .eq("id", id);
-    } else {
-      await supabase.from("blog_posts").update({ status: "draft" }).eq("id", id);
+    if (isAdmin) {
+      t.push({ value: "admin", label: "Admin", icon: ShieldCheck });
     }
-    loadAll();
+    return t;
+  }, [canProposeRealities, isStaff, isAdmin, posts.length, scheduledItems.length, myPendingRealities.length, moderationQueue.length]);
+
+  const tabFromUrl = searchParams.get("tab");
+  const activeTab = tabs.some((t) => t.value === tabFromUrl) ? (tabFromUrl as string) : "profilo";
+
+  const setActiveTab = (v: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("tab", v);
+    setSearchParams(next, { replace: true });
   };
 
   if (!user) {
@@ -285,437 +196,99 @@ const AreaPersonale = () => {
 
   return (
     <div className="py-16">
-      <SEO title="Area personale" description="Gestisci il tuo profilo e i tuoi articoli." canonicalPath="/area-personale" />
-      <div className="editorial-container max-w-4xl">
+      <SEO title="Area personale" description="Dashboard: profilo, calendario, articoli e moderazione." canonicalPath="/area-personale" />
+      <div className="editorial-container max-w-5xl">
         <h1 className="editorial-heading mb-2">
           La <span className="italic text-primary">tua area</span>
         </h1>
-        <p className="editorial-body text-muted-foreground mb-12">
-          Profilo, articoli e — se sei staff — coda di moderazione.
+        <p className="editorial-body text-muted-foreground mb-8">
+          Dashboard personale: scegli una sezione dal menù qui sotto.
         </p>
 
         {loading || !profile ? (
           <div className="text-center py-20 text-muted-foreground font-body">Caricamento…</div>
         ) : (
-          <div className="space-y-12">
-            {/* Profilo */}
-            <section className="p-8 rounded-lg bg-card border border-border">
-              <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-                <h2 className="font-display text-xl font-semibold flex items-center gap-2">
-                  <UserIcon size={20} /> Profilo
-                </h2>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {myRoles.map((r) => (
-                    <span
-                      key={r}
-                      className="inline-flex items-center gap-1 text-xs font-body px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20"
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <div className="sticky top-16 z-10 -mx-4 px-4 py-3 bg-background/85 backdrop-blur border-b border-border">
+              <TabsList className="h-auto flex flex-wrap gap-1 bg-muted/60 p-1">
+                {tabs.map((t) => {
+                  const Icon = t.icon;
+                  return (
+                    <TabsTrigger
+                      key={t.value}
+                      value={t.value}
+                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2 font-body"
                     >
-                      <ShieldCheck size={12} /> {r}
-                    </span>
-                  ))}
-                  {reality && (
-                    <span className="text-xs font-body px-2.5 py-1 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
-                      {reality.name}
-                    </span>
-                  )}
-                  {!reality && profile.affiliation && (
-                    <span className="text-xs font-body px-2.5 py-1 rounded-full bg-accent/10 text-accent-foreground border border-accent/20">
-                      {profile.affiliation}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <form onSubmit={handleProfileSave} className="space-y-4">
-                {/* Avatar upload */}
-                <div className="flex items-center gap-4">
-                  {profile.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover bg-muted border border-border" />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-2xl border border-border">
-                      {(profile.display_name || "?").charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <label className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-input bg-background text-sm font-body cursor-pointer hover:border-primary/40 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) handleAvatarUpload(f);
-                        }}
-                      />
-                      Carica foto
-                    </label>
-                    <p className="text-xs text-muted-foreground font-body mt-1">JPG/PNG, max ~2MB consigliato</p>
-                  </div>
-                </div>
+                      <Icon size={14} />
+                      <span>{t.label}</span>
+                      {t.badge !== undefined && (
+                        <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] font-bold bg-background/70 text-foreground border border-border data-[state=active]:bg-primary-foreground/20">
+                          {t.badge}
+                        </span>
+                      )}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Field
-                    label="Nome visualizzato"
-                    value={profile.display_name}
-                    onChange={(v) => setProfile({ ...profile, display_name: v })}
-                    required
-                  />
-                  {isStaff && (
-                    <Field
-                      label="Ruolo dentro il collettivo"
-                      value={profile.role_collective ?? ""}
-                      onChange={(v) => setProfile({ ...profile, role_collective: v })}
-                      placeholder="es. coordinamento editoriale"
-                    />
-                  )}
-                </div>
+            <TabsContent value="profilo" className="mt-0">
+              <PanelProfilo
+                profile={profile}
+                setProfile={setProfile}
+                reality={reality}
+                myRoles={myRoles}
+                userId={user.id}
+                saving={savingProfile}
+                setSaving={setSavingProfile}
+                msg={profileMsg}
+                setMsg={setProfileMsg}
+              />
+            </TabsContent>
 
-                <div>
-                  <label className="block text-sm font-body font-medium mb-2">Bio</label>
-                  <textarea
-                    value={profile.bio}
-                    onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                    rows={3}
-                    maxLength={500}
-                    className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                  />
-                </div>
+            <TabsContent value="calendario" className="mt-0">
+              <PanelCalendario items={scheduledItems} showAuthor={isAdmin} />
+            </TabsContent>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Field label="Ruolo nella vita reale" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
-                  <div>
-                    <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
-                    <select
-                      value={profile.figure_category ?? ""}
-                      onChange={(e) => setProfile({ ...profile, figure_category: e.target.value })}
-                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="">— non specificata —</option>
-                      {FIGURE_CATEGORIES.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+            <TabsContent value="articoli" className="mt-0">
+              <PanelArticoli posts={posts} isStaff={isStaff} onChanged={loadAll} />
+            </TabsContent>
 
-                {!profile.reality_id && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Field
-                      label="Affiliazione"
-                      value={profile.affiliation ?? ""}
-                      onChange={(v) => setProfile({ ...profile, affiliation: v })}
-                      placeholder="es. Università di Bologna, MAXXI…"
-                    />
-                  </div>
-                )}
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Field label="Email pubblica" value={profile.public_email ?? ""} onChange={(v) => setProfile({ ...profile, public_email: v })} placeholder="visibile sul profilo pubblico" />
-                  <Field label="Sito web" value={profile.website ?? ""} onChange={(v) => setProfile({ ...profile, website: v })} placeholder="https://…" />
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  <Field label="Instagram" value={profile.social_instagram ?? ""} onChange={(v) => setProfile({ ...profile, social_instagram: v })} />
-                  <Field label="LinkedIn" value={profile.social_linkedin ?? ""} onChange={(v) => setProfile({ ...profile, social_linkedin: v })} placeholder="https://linkedin.com/in/…" />
-                  <Field label="Twitter / X" value={profile.social_twitter ?? ""} onChange={(v) => setProfile({ ...profile, social_twitter: v })} />
-                </div>
-
-                <label className="flex items-start gap-3 p-4 rounded-md border border-border bg-muted/30 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!profile.consent_public}
-                    onChange={(e) => setProfile({ ...profile, consent_public: e.target.checked })}
-                    className="mt-1"
-                  />
-                  <span className="text-sm font-body">
-                    <strong>Acconsento alla pubblicazione del mio profilo</strong> nella pagina pubblica della rete /
-                    chi siamo. I dati condivisi (nome, foto, bio, ruoli, email pubblica, social) saranno visibili a
-                    chiunque visiti il sito, per favorire connessioni e collaborazioni.
-                  </span>
-                </label>
-                {profileMsg && <p className="text-sm font-body text-muted-foreground">{profileMsg}</p>}
-                <button
-                  type="submit"
-                  disabled={savingProfile}
-                  className="px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {savingProfile ? "Salvataggio…" : "Salva profilo"}
-                </button>
-              </form>
-            </section>
-
-            {/* Proponi nuova realtà (coordinatori + admin) */}
             {canProposeRealities && (
-              <section className="p-8 rounded-lg bg-card border border-border">
-                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-                  <h2 className="font-display text-xl font-semibold flex items-center gap-2">
-                    <MapPin size={20} /> Proponi una nuova realtà
-                  </h2>
-                  <button
-                    onClick={() => setShowNewReality((s) => !s)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
-                  >
-                    <Plus size={14} /> {showNewReality ? "Chiudi form" : "Nuova realtà"}
-                  </button>
-                </div>
-                {showNewReality && (
-                  <RealityForm
-                    mode={myRoles.includes("admin") ? "admin" : "coordinatore"}
-                    onCreated={() => { setShowNewReality(false); loadAll(); }}
-                  />
-                )}
-
-                {myPendingRealities.length > 0 && (
-                  <div className="mt-8">
-                    <h3 className="font-display text-sm font-semibold mb-3 flex items-center gap-2">
-                      <Hourglass size={14} className="text-amber-600" /> Le tue proposte in verifica
-                    </h3>
-                    <div className="space-y-2">
-                      {myPendingRealities.map((r) => {
-                        const ms = r.auto_confirm_at ? new Date(r.auto_confirm_at).getTime() - Date.now() : 0;
-                        const hours = Math.max(0, Math.floor(ms / 3600000));
-                        const mins = Math.max(0, Math.floor((ms % 3600000) / 60000));
-                        const ready = ms <= 0;
-                        return (
-                          <div key={r.id} className="p-3 rounded-md border border-amber-500/30 bg-amber-500/5 flex items-center justify-between gap-3 flex-wrap">
-                            <div className="min-w-0">
-                              <p className="font-body font-medium text-sm">{r.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {r.city}{r.region ? ` · ${r.region}` : ""} ·{" "}
-                                {ready ? "in pubblicazione automatica" : `pubblicazione tra ${hours}h ${mins}m`}
-                              </p>
-                            </div>
-                            <Link
-                              to={`/realta/${r.id}`}
-                              className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors"
-                            >
-                              Anteprima
-                            </Link>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </section>
+              <TabsContent value="realta" className="mt-0">
+                <PanelRealta isAdmin={isAdmin} pending={myPendingRealities} onCreated={loadAll} />
+              </TabsContent>
             )}
-
 
             {isStaff && (
-              <section className="p-8 rounded-lg bg-card border border-amber-500/30">
-                <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
-                  <Clock size={20} className="text-amber-600" /> Coda di moderazione
-                  <span className="text-base font-body text-muted-foreground">
-                    ({moderationQueue.length})
-                  </span>
-                </h2>
-                {moderationQueue.length === 0 ? (
-                  <p className="text-sm text-muted-foreground font-body italic">
-                    Nessun articolo in attesa di moderazione.
+              <TabsContent value="moderazione" className="mt-0">
+                <PanelModerazione queue={moderationQueue} nameMap={modNameMap} onChanged={loadAll} />
+              </TabsContent>
+            )}
+
+            {isAdmin && (
+              <TabsContent value="admin" className="mt-0">
+                <section className="p-8 rounded-lg bg-card border border-border">
+                  <h2 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
+                    <ShieldCheck size={20} /> Strumenti admin
+                  </h2>
+                  <p className="font-body text-sm text-muted-foreground mb-6">
+                    Gestione utenti, realtà, segnalazioni, contatti e audit log sono nel pannello dedicato.
                   </p>
-                ) : (
-                  <div className="space-y-3">
-                    {moderationQueue.map((p) => (
-                      <div key={p.id} className="p-4 rounded-md border border-border bg-background">
-                        <div className="flex items-start justify-between gap-4 flex-wrap">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-display font-semibold mb-1">{p.title}</p>
-                            <p className="text-xs text-muted-foreground font-body mb-1">
-                              di {resolveAuthorName(modNameMap, p.user_id, p.author_name)} · {p.category}
-                              {p.reply_to_id && " · risposta"}
-                            </p>
-                            <p className="text-sm font-body text-muted-foreground line-clamp-2">
-                              {p.excerpt}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Link
-                              to={`/area-personale/articolo/${p.id}/modifica`}
-                              className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors"
-                            >
-                              Apri
-                            </Link>
-                            <button
-                              onClick={() => moderateAction(p.id, "publish")}
-                              className="text-xs font-body px-3 py-1.5 rounded-md bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
-                            >
-                              Pubblica
-                            </button>
-                            <button
-                              onClick={() => moderateAction(p.id, "reject")}
-                              className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-amber-500/40 transition-colors"
-                            >
-                              Rimanda in bozza
-                            </button>
-                            <button
-                              onClick={() => moderateAction(p.id, "delete")}
-                              className="text-xs font-body px-3 py-1.5 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
+                  <Link
+                    to="/admin"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-secondary text-secondary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
+                  >
+                    <ShieldCheck size={14} /> Apri Pannello Admin
+                  </Link>
+                </section>
+              </TabsContent>
             )}
-
-            {/* Calendario pubblicazioni programmate */}
-            <section className="p-8 rounded-lg bg-card border border-sky-500/30">
-              <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
-                <CalendarClock size={20} className="text-sky-600" />
-                Calendario pubblicazioni
-                <span className="text-base font-body text-muted-foreground">
-                  ({scheduledItems.length})
-                </span>
-              </h2>
-              <p className="text-sm font-body text-muted-foreground mb-6">
-                {myRoles.includes("admin")
-                  ? "I tuoi articoli programmati e quelli dei coordinatori della rete."
-                  : "I tuoi articoli con pubblicazione programmata."}
-              </p>
-              <ScheduledTimeline
-                items={scheduledItems}
-                showAuthor={myRoles.includes("admin")}
-              />
-            </section>
-
-            {/* I miei articoli */}
-            <section className="p-8 rounded-lg bg-card border border-border">
-              <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-                <h2 className="font-display text-xl font-semibold flex items-center gap-2">
-                  <FileText size={20} /> I miei articoli
-                </h2>
-                <Link
-                  to="/area-personale/articolo/nuovo"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
-                >
-                  <Plus size={14} /> Nuovo articolo
-                </Link>
-              </div>
-              {posts.length === 0 ? (
-                <p className="text-sm text-muted-foreground font-body italic">
-                  Non hai ancora scritto articoli.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {posts.map((p) => {
-                    const s = STATUS_LABEL[p.status];
-                    const Icon = s.icon;
-                    const canEdit = p.status !== "published" || isStaff;
-                    return (
-                      <div key={p.id} className="p-4 rounded-md border border-border bg-background">
-                        <div className="flex items-start justify-between gap-4 flex-wrap">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span
-                                className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full border ${s.tone}`}
-                              >
-                                <Icon size={10} /> {s.label}
-                              </span>
-                              <span className="text-xs font-body text-muted-foreground">
-                                {p.category}
-                              </span>
-                              {p.reply_to_id && (
-                                <span className="text-[10px] uppercase tracking-widest font-bold text-secondary">
-                                  · risposta
-                                </span>
-                              )}
-                            </div>
-                            <p className="font-display font-semibold">{p.title}</p>
-                            {p.status === "scheduled" && p.scheduled_for && (
-                              <p className="text-xs font-body text-sky-600 mt-1">
-                                Pubblicazione prevista: {new Date(p.scheduled_for).toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" })}
-                              </p>
-                            )}
-                            <p className="text-sm font-body text-muted-foreground line-clamp-1 mt-1">
-                              {p.excerpt}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {p.status === "published" && (
-                              <Link
-                                to={`/magazine/${p.slug}`}
-                                className="p-2 rounded-md border border-border hover:border-primary/40 transition-colors"
-                                title="Vedi pubblicato"
-                              >
-                                <ExternalLink size={14} />
-                              </Link>
-                            )}
-                            {canEdit && (
-                              <Link
-                                to={`/area-personale/articolo/${p.id}/modifica`}
-                                className="p-2 rounded-md border border-border hover:border-primary/40 transition-colors"
-                                title="Modifica"
-                              >
-                                <Edit3 size={14} />
-                              </Link>
-                            )}
-                            {(p.status !== "published" || isStaff) && (
-                              <button
-                                onClick={() => deletePost(p.id)}
-                                className="p-2 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
-                                title="Elimina"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-
-            {myRoles.includes("admin") && (
-              <section className="p-6 rounded-lg bg-card border border-border">
-                <p className="font-body text-sm text-muted-foreground mb-3">
-                  Strumenti amministrativi (gestione utenti e realtà):
-                </p>
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
-                >
-                  <ShieldCheck size={14} /> Pannello Admin
-                </Link>
-              </section>
-            )}
-          </div>
+          </Tabs>
         )}
       </div>
     </div>
   );
 };
-
-const Field = ({
-  label,
-  value,
-  onChange,
-  required,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  required?: boolean;
-  placeholder?: string;
-}) => (
-  <div>
-    <label className="block text-sm font-body font-medium mb-2">
-      {label} {required && "*"}
-    </label>
-    <input
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      required={required}
-      placeholder={placeholder}
-      maxLength={255}
-      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-    />
-  </div>
-);
 
 export default AreaPersonale;
