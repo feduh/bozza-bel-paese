@@ -8,6 +8,7 @@ import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
 import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
+import SystemStatusPanel from "@/components/admin/SystemStatusPanel";
 import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 type RealityRef = { id: string; name: string; city: string };
@@ -101,6 +102,9 @@ const Admin = () => {
         <p className="editorial-body text-muted-foreground mb-12">
           Gestisci i coordinatori del blog e del sito.
         </p>
+
+        {/* System status */}
+        <SystemStatusPanel />
 
         {/* Invite form */}
         <div className="p-8 rounded-lg bg-card border border-border mb-12">
