@@ -46,7 +46,7 @@ const inviteSchema = z.object({
     .trim()
     .min(2, "Il nome deve avere almeno 2 caratteri")
     .max(100, "Il nome può avere al massimo 100 caratteri"),
-  role: z.enum(["author", "moderator"]).default("author"),
+  role: z.enum(["author", "coordinatore"]).default("author"),
   reality_id: z.string().uuid().nullable().optional(),
   affiliation: z.string().trim().min(2).max(120).nullable().optional(),
 });
