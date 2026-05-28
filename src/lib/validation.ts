@@ -87,7 +87,7 @@ export const inviteSchema = (t: TFunction) =>
       displayName: z.string().trim().min(2, t("validation.nameMin")),
       email: z.string().trim().toLowerCase().email(t("validation.email")),
       password: z.string().min(8, t("validation.passwordMin")),
-      role: z.enum(["author", "moderator"]),
+      role: z.enum(["author", "coordinatore"]),
       authorType: z.enum(["reality", "external", "none"]).optional(),
       realityId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
       affiliation: z.preprocess(
