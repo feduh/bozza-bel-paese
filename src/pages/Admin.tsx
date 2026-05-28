@@ -20,7 +20,7 @@ const Admin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [role, setRole] = useState<"author" | "moderator">("author");
+  const [role, setRole] = useState<"author" | "coordinatore">("author");
   const [authorType, setAuthorType] = useState<"reality" | "external" | "none">("reality");
   const [realityId, setRealityId] = useState("");
   const [affiliation, setAffiliation] = useState("");
@@ -173,7 +173,7 @@ const Admin = () => {
                 <select
                   value={role}
                   onChange={(e) => {
-                    const v = e.target.value as "author" | "moderator";
+                    const v = e.target.value as "author" | "coordinatore";
                     setRole(v);
                     if (v !== "author") {
                       setRealityId("");
@@ -183,12 +183,12 @@ const Admin = () => {
                   className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="author">Autore (scrive sul Magazine)</option>
-                  <option value="moderator">Coordinatore (collettivo)</option>
+                  <option value="coordinatore">Coordinatore (collettivo)</option>
                 </select>
                 <p className="text-xs text-muted-foreground font-body mt-1">
                   {role === "author"
                     ? "Può scrivere articoli (con moderazione) e gestire il proprio profilo."
-                    : "Può editare la mappa, pubblicare direttamente sul Magazine e moderare."}
+                    : "Può proporre realtà sulla mappa, pubblicare direttamente sul Magazine e moderare i contenuti degli autori."}
                 </p>
               </div>
             </div>
