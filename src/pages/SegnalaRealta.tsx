@@ -105,6 +105,7 @@ const SegnalaRealta = () => {
         </div>
 
         <form onSubmit={submit} className="space-y-5 p-8 rounded-lg bg-card border border-border" noValidate>
+          <input {...antiSpam.honeypotProps} />
           <div>
             <label htmlFor="r-name" className="block text-sm font-body font-medium mb-1.5">
               Nome della realtà <span className="text-destructive">*</span>
