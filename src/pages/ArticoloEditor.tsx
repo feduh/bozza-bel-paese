@@ -780,6 +780,46 @@ const ArticoloEditor = () => {
             )}
           </div>
         </form>
+
+        {/* Anteprima articolo */}
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-body text-xs uppercase tracking-wider text-muted-foreground">
+                Anteprima — come apparirà sul Magazine
+              </DialogTitle>
+            </DialogHeader>
+            <article className="space-y-6">
+              {form.coverImageUrl && (
+                <img
+                  src={form.coverImageUrl}
+                  alt={form.title || "Copertina"}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              )}
+              {form.category && (
+                <p className="font-body text-xs uppercase tracking-wider text-primary">
+                  {form.category}
+                </p>
+              )}
+              <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight">
+                {form.title || "Titolo dell'articolo"}
+              </h1>
+              {form.excerpt && (
+                <p className="font-body text-lg text-muted-foreground italic border-l-2 border-primary pl-4">
+                  {form.excerpt}
+                </p>
+              )}
+              <div className="prose prose-lg max-w-none dark:prose-invert font-body prose-headings:font-display prose-a:text-primary">
+                {form.content ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{form.content}</ReactMarkdown>
+                ) : (
+                  <p className="text-muted-foreground italic">Nessun contenuto.</p>
+                )}
+              </div>
+            </article>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
