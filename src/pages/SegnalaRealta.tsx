@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import SEO from "@/components/SEO";
 import { Send, CheckCircle2, MapPinPlus } from "lucide-react";
+import { useAntiSpam } from "@/lib/antiSpam";
 
 const SegnalaRealta = () => {
   const { user } = useAuth();
@@ -18,12 +19,18 @@ const SegnalaRealta = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const antiSpam = useAntiSpam("company_name");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (name.trim().length < 2) {
       setError("Il nome della realtà è obbligatorio.");
+      return;
+    }
+    if (!antiSpam.passes()) {
+      // Silently mark success to discourage bots; nothing is written.
+      setSuccess(true);
       return;
     }
     setSubmitting(true);
@@ -98,6 +105,7 @@ const SegnalaRealta = () => {
         </div>
 
         <form onSubmit={submit} className="space-y-5 p-8 rounded-lg bg-card border border-border" noValidate>
+          <input {...antiSpam.honeypotProps} />
           <div>
             <label htmlFor="r-name" className="block text-sm font-body font-medium mb-1.5">
               Nome della realtà <span className="text-destructive">*</span>

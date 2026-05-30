@@ -3,16 +3,24 @@ import { Mail, MapPin, Send, Loader2, Instagram } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { toast } from "@/hooks/use-toast";
+import { useAntiSpam } from "@/lib/antiSpam";
 
 const Contatti = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const antiSpam = useAntiSpam();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast({ title: "Campi mancanti", description: "Nome, email e messaggio sono obbligatori.", variant: "destructive" });
+      return;
+    }
+    if (!antiSpam.passes()) {
+      // Silent reject for bots; show generic feedback so we don't tip them off.
+      setSent(true);
+      setForm({ name: "", email: "", subject: "", message: "" });
       return;
     }
     setSubmitting(true);
@@ -96,6 +104,8 @@ const Contatti = () => {
                 Grazie! Abbiamo ricevuto il tuo messaggio. Ti scriviamo presto.
               </div>
             )}
+            {/* honeypot anti-spam */}
+            <input {...antiSpam.honeypotProps} />
             <div className="grid sm:grid-cols-2 gap-5">
               <label className="block">
                 <span className="font-body text-sm font-medium mb-1.5 block">Nome *</span>

@@ -3,8 +3,11 @@ import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock, ShieldCheck, ShieldAlert, Eye } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import SEO from "@/components/SEO";
 import FieldError from "@/components/FieldError";
 import MarkdownEditor from "@/components/editor/MarkdownEditor";
@@ -44,6 +47,7 @@ const ArticoloEditor = () => {
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [catOpen, setCatOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleDate, setScheduleDate] = useState<string>(""); // YYYY-MM-DD
   const [scheduleTime, setScheduleTime] = useState<string>(""); // HH:MM (only :00 / :30)
@@ -684,6 +688,13 @@ const ArticoloEditor = () => {
               <Send size={14} />
               {isStaff ? "Pubblica" : "Invia per pubblicazione"}
             </button>
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-input font-body font-medium text-sm hover:border-primary/40 transition-colors"
+            >
+              <Eye size={14} /> Anteprima
+            </button>
             <Popover open={scheduleOpen} onOpenChange={setScheduleOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -769,6 +780,46 @@ const ArticoloEditor = () => {
             )}
           </div>
         </form>
+
+        {/* Anteprima articolo */}
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-body text-xs uppercase tracking-wider text-muted-foreground">
+                Anteprima — come apparirà sul Magazine
+              </DialogTitle>
+            </DialogHeader>
+            <article className="space-y-6">
+              {form.coverImageUrl && (
+                <img
+                  src={form.coverImageUrl}
+                  alt={form.title || "Copertina"}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              )}
+              {form.category && (
+                <p className="font-body text-xs uppercase tracking-wider text-primary">
+                  {form.category}
+                </p>
+              )}
+              <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight">
+                {form.title || "Titolo dell'articolo"}
+              </h1>
+              {form.excerpt && (
+                <p className="font-body text-lg text-muted-foreground italic border-l-2 border-primary pl-4">
+                  {form.excerpt}
+                </p>
+              )}
+              <div className="prose prose-lg max-w-none dark:prose-invert font-body prose-headings:font-display prose-a:text-primary">
+                {form.content ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{form.content}</ReactMarkdown>
+                ) : (
+                  <p className="text-muted-foreground italic">Nessun contenuto.</p>
+                )}
+              </div>
+            </article>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
