@@ -47,6 +47,7 @@ const ArticoloEditor = () => {
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [catOpen, setCatOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleDate, setScheduleDate] = useState<string>(""); // YYYY-MM-DD
   const [scheduleTime, setScheduleTime] = useState<string>(""); // HH:MM (only :00 / :30)
