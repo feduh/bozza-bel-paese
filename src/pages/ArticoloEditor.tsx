@@ -688,6 +688,13 @@ const ArticoloEditor = () => {
               <Send size={14} />
               {isStaff ? "Pubblica" : "Invia per pubblicazione"}
             </button>
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-input font-body font-medium text-sm hover:border-primary/40 transition-colors"
+            >
+              <Eye size={14} /> Anteprima
+            </button>
             <Popover open={scheduleOpen} onOpenChange={setScheduleOpen}>
               <PopoverTrigger asChild>
                 <button
