@@ -104,6 +104,9 @@ const Contatti = () => {
                 Grazie! Abbiamo ricevuto il tuo messaggio. Ti scriviamo presto.
               </div>
             )}
+            )}
+            {/* honeypot anti-spam */}
+            <input {...antiSpam.honeypotProps} />
             <div className="grid sm:grid-cols-2 gap-5">
               <label className="block">
                 <span className="font-body text-sm font-medium mb-1.5 block">Nome *</span>
