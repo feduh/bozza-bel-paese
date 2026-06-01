@@ -80,19 +80,29 @@ const Mappatura = () => {
     fetchRealities();
   }, []);
 
-  // Sync URL ↔ state
+  // Sync state → URL (debounced for search)
   useEffect(() => {
-    if (bucketFilter === "all") {
-      if (searchParams.get("sezione")) {
-        searchParams.delete("sezione");
-        setSearchParams(searchParams, { replace: true });
+    const id = setTimeout(() => {
+      const next = new URLSearchParams(searchParams);
+      const setOrDel = (key: string, val: string, defaultVal: string) => {
+        if (val && val !== defaultVal) next.set(key, val);
+        else next.delete(key);
+      };
+      setOrDel("sezione", bucketFilter, "all");
+      setOrDel("regione", regionFilter, "all");
+      setOrDel("categoria", categoryFilter, "all");
+      setOrDel("disciplina", disciplineFilter, "all");
+      setOrDel("q", search.trim(), "");
+      setOrDel("vista", view, "map");
+      setOrDel("annoMin", yearMin, "");
+      setOrDel("annoMax", yearMax, "");
+      if (next.toString() !== searchParams.toString()) {
+        setSearchParams(next, { replace: true });
       }
-    } else if (searchParams.get("sezione") !== bucketFilter) {
-      searchParams.set("sezione", bucketFilter);
-      setSearchParams(searchParams, { replace: true });
-    }
+    }, 250);
+    return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bucketFilter]);
+  }, [bucketFilter, regionFilter, categoryFilter, disciplineFilter, search, view, yearMin, yearMax]);
 
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
