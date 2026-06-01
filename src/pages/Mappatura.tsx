@@ -41,20 +41,23 @@ type SortMode = "default" | "az" | "za" | "latest";
 const Mappatura = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialBucket = (searchParams.get("sezione") as Bucket | null) ?? null;
 
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<"list" | "map">("map");
-  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(initialBucket ?? "all");
-  const [regionFilter, setRegionFilter] = useState<string>("all");
-  const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [view, setView] = useState<"list" | "map">(
+    (searchParams.get("vista") as "list" | "map" | null) === "list" ? "list" : "map"
+  );
+  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
+    (searchParams.get("sezione") as Bucket | null) ?? "all"
+  );
+  const [regionFilter, setRegionFilter] = useState<string>(searchParams.get("regione") ?? "all");
+  const [disciplineFilter, setDisciplineFilter] = useState<string>(searchParams.get("disciplina") ?? "all");
+  const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
   const [sortMode, setSortMode] = useState<SortMode>("default");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
-  const [yearMin, setYearMin] = useState<string>("");
-  const [yearMax, setYearMax] = useState<string>("");
+  const [yearMin, setYearMin] = useState<string>(searchParams.get("annoMin") ?? "");
+  const [yearMax, setYearMax] = useState<string>(searchParams.get("annoMax") ?? "");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
 
@@ -77,19 +80,29 @@ const Mappatura = () => {
     fetchRealities();
   }, []);
 
-  // Sync URL ↔ state
+  // Sync state → URL (debounced for search)
   useEffect(() => {
-    if (bucketFilter === "all") {
-      if (searchParams.get("sezione")) {
-        searchParams.delete("sezione");
-        setSearchParams(searchParams, { replace: true });
+    const id = setTimeout(() => {
+      const next = new URLSearchParams(searchParams);
+      const setOrDel = (key: string, val: string, defaultVal: string) => {
+        if (val && val !== defaultVal) next.set(key, val);
+        else next.delete(key);
+      };
+      setOrDel("sezione", bucketFilter, "all");
+      setOrDel("regione", regionFilter, "all");
+      setOrDel("categoria", categoryFilter, "all");
+      setOrDel("disciplina", disciplineFilter, "all");
+      setOrDel("q", search.trim(), "");
+      setOrDel("vista", view, "map");
+      setOrDel("annoMin", yearMin, "");
+      setOrDel("annoMax", yearMax, "");
+      if (next.toString() !== searchParams.toString()) {
+        setSearchParams(next, { replace: true });
       }
-    } else if (searchParams.get("sezione") !== bucketFilter) {
-      searchParams.set("sezione", bucketFilter);
-      setSearchParams(searchParams, { replace: true });
-    }
+    }, 250);
+    return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bucketFilter]);
+  }, [bucketFilter, regionFilter, categoryFilter, disciplineFilter, search, view, yearMin, yearMax]);
 
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
