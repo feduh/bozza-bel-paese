@@ -41,20 +41,23 @@ type SortMode = "default" | "az" | "za" | "latest";
 const Mappatura = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialBucket = (searchParams.get("sezione") as Bucket | null) ?? null;
 
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<"list" | "map">("map");
-  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(initialBucket ?? "all");
-  const [regionFilter, setRegionFilter] = useState<string>("all");
-  const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [view, setView] = useState<"list" | "map">(
+    (searchParams.get("vista") as "list" | "map" | null) === "list" ? "list" : "map"
+  );
+  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
+    (searchParams.get("sezione") as Bucket | null) ?? "all"
+  );
+  const [regionFilter, setRegionFilter] = useState<string>(searchParams.get("regione") ?? "all");
+  const [disciplineFilter, setDisciplineFilter] = useState<string>(searchParams.get("disciplina") ?? "all");
+  const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
   const [sortMode, setSortMode] = useState<SortMode>("default");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
-  const [yearMin, setYearMin] = useState<string>("");
-  const [yearMax, setYearMax] = useState<string>("");
+  const [yearMin, setYearMin] = useState<string>(searchParams.get("annoMin") ?? "");
+  const [yearMax, setYearMax] = useState<string>(searchParams.get("annoMax") ?? "");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
 
