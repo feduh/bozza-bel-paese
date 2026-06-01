@@ -82,6 +82,8 @@ const Navbar = () => {
           </div>
 
           {user ? (
+            <>
+              <NotificationsBell />
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label="Menu utente"
