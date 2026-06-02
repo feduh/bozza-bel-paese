@@ -197,6 +197,7 @@ const ArticoloEditor = () => {
           .eq("id", editingId);
         if (!error) {
           lastSavedRef.current = snapshot;
+          setLastSavedAt(new Date());
           setAutoSaveState("saved");
           setTimeout(() => setAutoSaveState("idle"), 2000);
         } else {
@@ -224,13 +225,14 @@ const ArticoloEditor = () => {
         if (!error && data) {
           setEditingId(data.id);
           lastSavedRef.current = snapshot;
+          setLastSavedAt(new Date());
           setAutoSaveState("saved");
           setTimeout(() => setAutoSaveState("idle"), 2000);
         } else {
           setAutoSaveState("idle");
         }
       }
-    }, 30000);
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, [form, user, loading, submitting, currentStatus, editingId, replyTo]);
