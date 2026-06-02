@@ -358,7 +358,7 @@ const Mappatura = () => {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
-          {view === "list" && (
+          {view !== "map" && (
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
