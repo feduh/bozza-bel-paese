@@ -46,6 +46,7 @@ const ArticoloEditor = () => {
   const [parent, setParent] = useState<ParentMeta | null>(null);
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [catOpen, setCatOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
@@ -196,6 +197,7 @@ const ArticoloEditor = () => {
           .eq("id", editingId);
         if (!error) {
           lastSavedRef.current = snapshot;
+          setLastSavedAt(new Date());
           setAutoSaveState("saved");
           setTimeout(() => setAutoSaveState("idle"), 2000);
         } else {
@@ -223,13 +225,14 @@ const ArticoloEditor = () => {
         if (!error && data) {
           setEditingId(data.id);
           lastSavedRef.current = snapshot;
+          setLastSavedAt(new Date());
           setAutoSaveState("saved");
           setTimeout(() => setAutoSaveState("idle"), 2000);
         } else {
           setAutoSaveState("idle");
         }
       }
-    }, 30000);
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, [form, user, loading, submitting, currentStatus, editingId, replyTo]);
@@ -764,7 +767,7 @@ const ArticoloEditor = () => {
                 <Loader2 size={12} className="animate-spin" /> Verifica copyright in corso…
               </span>
             )}
-            {autoSaveState !== "idle" && (
+            {autoSaveState !== "idle" ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
                 {autoSaveState === "saving" ? (
                   <><Loader2 size={12} className="animate-spin" /> Salvataggio bozza…</>
@@ -772,7 +775,12 @@ const ArticoloEditor = () => {
                   <><Check size={12} className="text-secondary" /> Bozza salvata</>
                 )}
               </span>
-            )}
+            ) : lastSavedAt ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-body text-muted-foreground" aria-live="polite">
+                <Check size={12} className="text-muted-foreground/60" />
+                Ultima bozza salvata alle {lastSavedAt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            ) : null}
             {!isStaff && (
               <p className="text-xs text-muted-foreground font-body w-full">
                 Il tuo articolo verrà rivisto da un membro dello staff prima della pubblicazione.
