@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, List, Map, ArrowRight, X, ChevronDown, Navigation, Loader2 } from "lucide-react";
+import { MapPin, List, Map, ArrowRight, X, ChevronDown, Navigation, Loader2, LayoutGrid, ImageOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,10 +32,12 @@ type Reality = {
   lng: number;
   website: string | null;
   category: string | null;
+  image_url: string | null;
   created_at: string;
   tags: string[];
 };
 
+type ViewMode = "list" | "map" | "magazine";
 type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
@@ -44,9 +46,10 @@ const Mappatura = () => {
 
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<"list" | "map">(
-    (searchParams.get("vista") as "list" | "map" | null) === "list" ? "list" : "map"
-  );
+  const [view, setView] = useState<ViewMode>(() => {
+    const v = searchParams.get("vista");
+    return v === "list" || v === "magazine" ? v : "map";
+  });
   const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
     (searchParams.get("sezione") as Bucket | null) ?? "all"
   );
@@ -144,7 +147,7 @@ const Mappatura = () => {
     });
 
     // Explicit sort (only meaningful in list view) wins over geo-sort
-    if (view === "list" && sortMode !== "default") {
+    if (view !== "map" && sortMode !== "default") {
       const sorted = [...list];
       if (sortMode === "az") sorted.sort((a, b) => a.name.localeCompare(b.name, "it"));
       else if (sortMode === "za") sorted.sort((a, b) => b.name.localeCompare(a.name, "it"));
@@ -304,11 +307,20 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
               <List size={16} aria-hidden="true" /> {t("map.view.list")}
+            </button>
+            <button
+              onClick={() => setView("magazine")}
+              aria-pressed={view === "magazine"}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
+                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <LayoutGrid size={16} aria-hidden="true" /> Magazine
             </button>
           </div>
           <label className="flex-1">
@@ -346,7 +358,7 @@ const Mappatura = () => {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
-          {view === "list" && (
+          {view !== "map" && (
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
@@ -488,6 +500,67 @@ const Mappatura = () => {
                   <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
                     {t("home.discover")} <ArrowRight size={14} />
                   </span>
+                </Link>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div className="col-span-full text-center py-16 text-muted-foreground font-body">
+                {t("map.empty")}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Magazine view: editorial card grid with cover images */}
+        {view === "magazine" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filtered.map((r) => {
+              const cat = getCategory(r.type, r.status);
+              const cfg = categoryConfig[cat];
+              const Icon = cfg.icon;
+              return (
+                <Link
+                  to={`/realta/${r.id}`}
+                  key={r.id}
+                  className="group flex flex-col rounded-lg overflow-hidden bg-card border border-border hover:border-primary/40 hover:shadow-lg transition-all"
+                >
+                  <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                    {r.image_url ? (
+                      <img
+                        src={r.image_url}
+                        alt={r.name}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted via-muted to-muted-foreground/10">
+                        <ImageOff size={32} className="text-muted-foreground/40" aria-hidden="true" />
+                      </div>
+                    )}
+                    <span className={`absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${cfg.badgeClass}`}>
+                      <Icon size={11} /> {cfg.label}
+                    </span>
+                  </div>
+                  <div className="flex-1 flex flex-col p-5">
+                    {r.category && (
+                      <p className="text-[10px] uppercase tracking-wider text-primary font-body font-semibold mb-2">{r.category}</p>
+                    )}
+                    <h3 className="font-display text-lg font-semibold mb-2 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                      {r.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground font-body flex items-center gap-1 mb-3">
+                      <MapPin size={11} /> {r.city}, {r.region}
+                      <span className="ml-auto">
+                        {r.year_founded}{r.year_closed ? `–${r.year_closed}` : ""}
+                      </span>
+                    </p>
+                    <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+                      {r.description}
+                    </p>
+                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                      {t("home.discover")} <ArrowRight size={14} />
+                    </span>
+                  </div>
                 </Link>
               );
             })}
