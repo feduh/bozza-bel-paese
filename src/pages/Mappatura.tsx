@@ -32,10 +32,12 @@ type Reality = {
   lng: number;
   website: string | null;
   category: string | null;
+  image_url: string | null;
   created_at: string;
   tags: string[];
 };
 
+type ViewMode = "list" | "map" | "magazine";
 type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
@@ -44,9 +46,10 @@ const Mappatura = () => {
 
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<"list" | "map">(
-    (searchParams.get("vista") as "list" | "map" | null) === "list" ? "list" : "map"
-  );
+  const [view, setView] = useState<ViewMode>(() => {
+    const v = searchParams.get("vista");
+    return v === "list" || v === "magazine" ? v : "map";
+  });
   const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
     (searchParams.get("sezione") as Bucket | null) ?? "all"
   );
