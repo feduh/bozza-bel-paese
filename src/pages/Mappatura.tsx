@@ -307,11 +307,20 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
               <List size={16} aria-hidden="true" /> {t("map.view.list")}
+            </button>
+            <button
+              onClick={() => setView("magazine")}
+              aria-pressed={view === "magazine"}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
+                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <LayoutGrid size={16} aria-hidden="true" /> Magazine
             </button>
           </div>
           <label className="flex-1">
