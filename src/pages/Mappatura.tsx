@@ -147,7 +147,7 @@ const Mappatura = () => {
     });
 
     // Explicit sort (only meaningful in list view) wins over geo-sort
-    if (view === "list" && sortMode !== "default") {
+    if (view !== "map" && sortMode !== "default") {
       const sorted = [...list];
       if (sortMode === "az") sorted.sort((a, b) => a.name.localeCompare(b.name, "it"));
       else if (sortMode === "za") sorted.sort((a, b) => b.name.localeCompare(a.name, "it"));
