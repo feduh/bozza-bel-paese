@@ -81,6 +81,21 @@ export const realitySchema = (t: TFunction) =>
 
 export type RealityInput = z.infer<ReturnType<typeof realitySchema>>;
 
+const FIGURE_CATEGORY_VALUES = [
+  "Istituzione",
+  "Università",
+  "Ricercatore indipendente",
+  "Curatore indipendente",
+  "Artista",
+  "Critico",
+  "Giornalista",
+  "Studente",
+  "Gallerista",
+  "Editore",
+  "Designer",
+  "Altro",
+] as const;
+
 export const inviteSchema = (t: TFunction) =>
   z
     .object({
@@ -94,6 +109,22 @@ export const inviteSchema = (t: TFunction) =>
         emptyToUndefined,
         z.string().trim().min(2).max(120).optional(),
       ),
+      memberType: z.preprocess(
+        emptyToUndefined,
+        z.enum(["coordinatore", "autore"]).optional(),
+      ),
+      figureCategory: z.preprocess(
+        emptyToUndefined,
+        z.enum(FIGURE_CATEGORY_VALUES).optional(),
+      ),
+      roleRealLife: z.preprocess(
+        emptyToUndefined,
+        z.string().trim().max(120).optional(),
+      ),
+      roleCollective: z.preprocess(
+        emptyToUndefined,
+        z.string().trim().max(120).optional(),
+      ),
     })
     .refine(
       (d) => d.role !== "author" || d.authorType !== "reality" || !!d.realityId,
@@ -105,6 +136,7 @@ export const inviteSchema = (t: TFunction) =>
     );
 
 export type InviteInput = z.infer<ReturnType<typeof inviteSchema>>;
+
 
 // ---------- article schema ----------
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { UserPlus, Eye, EyeOff, MapPinPlus } from "lucide-react";
+import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
 import RealityForm from "@/components/RealityForm";
 import FieldError from "@/components/FieldError";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
@@ -25,6 +26,10 @@ const Admin = () => {
   const [authorType, setAuthorType] = useState<"reality" | "external" | "none">("reality");
   const [realityId, setRealityId] = useState("");
   const [affiliation, setAffiliation] = useState("");
+  const [memberType, setMemberType] = useState<"" | "coordinatore" | "autore">("");
+  const [figureCategory, setFigureCategory] = useState("");
+  const [roleRealLife, setRoleRealLife] = useState("");
+  const [roleCollective, setRoleCollective] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -57,6 +62,10 @@ const Admin = () => {
       authorType: role === "author" ? authorType : undefined,
       realityId: role === "author" && authorType === "reality" ? realityId : undefined,
       affiliation: role === "author" && authorType === "external" ? affiliation : undefined,
+      memberType: role === "coordinatore" ? (memberType || undefined) : undefined,
+      figureCategory: figureCategory || undefined,
+      roleRealLife: roleRealLife || undefined,
+      roleCollective: role === "coordinatore" ? (roleCollective || undefined) : undefined,
     });
     if (!parsed.success) {
       setErrs(fieldErrors(parsed.error));
@@ -73,6 +82,10 @@ const Admin = () => {
         role: parsed.data.role,
         reality_id: parsed.data.realityId ?? null,
         affiliation: parsed.data.affiliation ?? null,
+        member_type: parsed.data.memberType ?? null,
+        figure_category: parsed.data.figureCategory ?? null,
+        role_real_life: parsed.data.roleRealLife ?? null,
+        role_collective: parsed.data.roleCollective ?? null,
       },
     });
 
@@ -89,7 +102,12 @@ const Admin = () => {
       setAuthorType("reality");
       setRealityId("");
       setAffiliation("");
+      setMemberType("");
+      setFigureCategory("");
+      setRoleRealLife("");
+      setRoleCollective("");
     }
+
     setSubmitting(false);
   };
 
@@ -274,6 +292,65 @@ const Admin = () => {
                 )}
               </div>
             )}
+
+            <div className="pt-2 border-t border-border/60">
+              <p className="text-xs text-muted-foreground font-body mb-3">
+                Dati profilo (opzionali, modificabili poi dall'area personale).
+              </p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-body font-medium mb-2">Ruolo nella vita reale</label>
+                  <input
+                    value={roleRealLife}
+                    onChange={(e) => setRoleRealLife(e.target.value)}
+                    placeholder="es. curatrice indipendente"
+                    maxLength={120}
+                    className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
+                  <select
+                    value={figureCategory}
+                    onChange={(e) => setFigureCategory(e.target.value)}
+                    className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">— non specificata —</option>
+                    {FIGURE_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {role === "coordinatore" && (
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Tipo membro nel collettivo</label>
+                    <select
+                      value={memberType}
+                      onChange={(e) => setMemberType(e.target.value as typeof memberType)}
+                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">— non specificato —</option>
+                      {MEMBER_TYPES.map((m) => (
+                        <option key={m.value} value={m.value}>{m.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Ruolo dentro il collettivo</label>
+                    <input
+                      value={roleCollective}
+                      onChange={(e) => setRoleCollective(e.target.value)}
+                      placeholder="es. coordinamento editoriale"
+                      maxLength={120}
+                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={submitting}
