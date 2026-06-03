@@ -292,6 +292,65 @@ const Admin = () => {
                 )}
               </div>
             )}
+
+            <div className="pt-2 border-t border-border/60">
+              <p className="text-xs text-muted-foreground font-body mb-3">
+                Dati profilo (opzionali, modificabili poi dall'area personale).
+              </p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-body font-medium mb-2">Ruolo nella vita reale</label>
+                  <input
+                    value={roleRealLife}
+                    onChange={(e) => setRoleRealLife(e.target.value)}
+                    placeholder="es. curatrice indipendente"
+                    maxLength={120}
+                    className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
+                  <select
+                    value={figureCategory}
+                    onChange={(e) => setFigureCategory(e.target.value)}
+                    className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">— non specificata —</option>
+                    {FIGURE_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {role === "coordinatore" && (
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Tipo membro nel collettivo</label>
+                    <select
+                      value={memberType}
+                      onChange={(e) => setMemberType(e.target.value as typeof memberType)}
+                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="">— non specificato —</option>
+                      {MEMBER_TYPES.map((m) => (
+                        <option key={m.value} value={m.value}>{m.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-body font-medium mb-2">Ruolo dentro il collettivo</label>
+                    <input
+                      value={roleCollective}
+                      onChange={(e) => setRoleCollective(e.target.value)}
+                      placeholder="es. coordinamento editoriale"
+                      maxLength={120}
+                      className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={submitting}
