@@ -139,7 +139,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, password, display_name, role, reality_id, affiliation } = parseResult.data;
+    const {
+      email,
+      password,
+      display_name,
+      role,
+      reality_id,
+      affiliation,
+      member_type,
+      figure_category,
+      role_real_life,
+      role_collective,
+    } = parseResult.data;
 
     // Admin client to create user
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
@@ -167,7 +178,12 @@ Deno.serve(async (req) => {
       display_name,
       reality_id: role === "author" ? reality_id ?? null : null,
       affiliation: role === "author" && !reality_id ? affiliation ?? null : null,
+      member_type: role === "coordinatore" ? member_type ?? null : "autore",
+      figure_category: figure_category ?? null,
+      role_real_life: role_real_life ?? null,
+      role_collective: role === "coordinatore" ? role_collective ?? null : null,
     });
+
 
     if (profileError) {
       console.error("Profile creation error:", profileError);
