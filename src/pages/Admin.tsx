@@ -26,6 +26,10 @@ const Admin = () => {
   const [authorType, setAuthorType] = useState<"reality" | "external" | "none">("reality");
   const [realityId, setRealityId] = useState("");
   const [affiliation, setAffiliation] = useState("");
+  const [memberType, setMemberType] = useState<"" | "coordinatore" | "autore">("");
+  const [figureCategory, setFigureCategory] = useState("");
+  const [roleRealLife, setRoleRealLife] = useState("");
+  const [roleCollective, setRoleCollective] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
