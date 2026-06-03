@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { UserPlus, Eye, EyeOff, MapPinPlus } from "lucide-react";
+import { FIGURE_CATEGORIES, MEMBER_TYPES } from "@/lib/categories";
 import RealityForm from "@/components/RealityForm";
 import FieldError from "@/components/FieldError";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
