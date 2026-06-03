@@ -62,6 +62,10 @@ const Admin = () => {
       authorType: role === "author" ? authorType : undefined,
       realityId: role === "author" && authorType === "reality" ? realityId : undefined,
       affiliation: role === "author" && authorType === "external" ? affiliation : undefined,
+      memberType: role === "coordinatore" ? (memberType || undefined) : undefined,
+      figureCategory: figureCategory || undefined,
+      roleRealLife: roleRealLife || undefined,
+      roleCollective: role === "coordinatore" ? (roleCollective || undefined) : undefined,
     });
     if (!parsed.success) {
       setErrs(fieldErrors(parsed.error));
@@ -78,6 +82,10 @@ const Admin = () => {
         role: parsed.data.role,
         reality_id: parsed.data.realityId ?? null,
         affiliation: parsed.data.affiliation ?? null,
+        member_type: parsed.data.memberType ?? null,
+        figure_category: parsed.data.figureCategory ?? null,
+        role_real_life: parsed.data.roleRealLife ?? null,
+        role_collective: parsed.data.roleCollective ?? null,
       },
     });
 
@@ -94,7 +102,12 @@ const Admin = () => {
       setAuthorType("reality");
       setRealityId("");
       setAffiliation("");
+      setMemberType("");
+      setFigureCategory("");
+      setRoleRealLife("");
+      setRoleCollective("");
     }
+
     setSubmitting(false);
   };
 
