@@ -49,6 +49,26 @@ const inviteSchema = z.object({
   role: z.enum(["author", "coordinatore"]).default("author"),
   reality_id: z.string().uuid().nullable().optional(),
   affiliation: z.string().trim().min(2).max(120).nullable().optional(),
+  member_type: z.enum(["coordinatore", "autore"]).nullable().optional(),
+  figure_category: z
+    .enum([
+      "Istituzione",
+      "Università",
+      "Ricercatore indipendente",
+      "Curatore indipendente",
+      "Artista",
+      "Critico",
+      "Giornalista",
+      "Studente",
+      "Gallerista",
+      "Editore",
+      "Designer",
+      "Altro",
+    ])
+    .nullable()
+    .optional(),
+  role_real_life: z.string().trim().max(120).nullable().optional(),
+  role_collective: z.string().trim().max(120).nullable().optional(),
 });
 
 Deno.serve(async (req) => {
