@@ -257,6 +257,10 @@ const AreaPersonale = () => {
               <PanelArticoli posts={posts} isStaff={isStaff} onChanged={loadAll} />
             </TabsContent>
 
+            <TabsContent value="preferiti" className="mt-0">
+              <PanelPreferiti userId={user.id} />
+            </TabsContent>
+
             {canProposeRealities && (
               <TabsContent value="realta" className="mt-0">
                 <PanelRealta isAdmin={isAdmin} pending={myPendingRealities} onCreated={loadAll} />
