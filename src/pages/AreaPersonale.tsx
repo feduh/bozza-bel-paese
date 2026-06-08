@@ -169,6 +169,7 @@ const AreaPersonale = () => {
       { value: "profilo", label: "Profilo", icon: UserIcon },
       { value: "calendario", label: "Calendario", icon: CalendarClock, badge: scheduledItems.length || undefined },
       { value: "articoli", label: "Articoli", icon: FileText, badge: posts.length || undefined },
+      { value: "preferiti", label: "Preferiti", icon: Bookmark },
     ];
     if (canProposeRealities) {
       t.push({ value: "realta", label: "Realtà", icon: MapPin, badge: myPendingRealities.length || undefined });
