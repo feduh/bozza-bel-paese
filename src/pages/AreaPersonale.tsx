@@ -9,6 +9,7 @@ import {
   MapPin,
   CalendarClock,
   Clock,
+  Bookmark,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
@@ -19,6 +20,7 @@ import PanelArticoli from "@/components/area/PanelArticoli";
 import PanelCalendario from "@/components/area/PanelCalendario";
 import PanelModerazione from "@/components/area/PanelModerazione";
 import PanelRealta from "@/components/area/PanelRealta";
+import PanelPreferiti from "@/components/area/PanelPreferiti";
 import type {
   AreaProfile,
   AreaPost,
