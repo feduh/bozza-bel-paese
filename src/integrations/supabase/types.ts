@@ -366,6 +366,35 @@ export type Database = {
         }
         Relationships: []
       }
+      reality_bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          reality_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reality_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reality_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reality_bookmarks_reality_id_fkey"
+            columns: ["reality_id"]
+            isOneToOne: false
+            referencedRelation: "realities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reality_images: {
         Row: {
           caption: string | null
