@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import MapFallback from "@/components/MapFallback";
 import SEO from "@/components/SEO";
+import BookmarkButton from "@/components/BookmarkButton";
 import {
   type DbRealityType,
   type RealityStatus,
@@ -540,6 +541,12 @@ const Mappatura = () => {
                     <span className={`absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${cfg.badgeClass}`}>
                       <Icon size={11} /> {cfg.label}
                     </span>
+                    <div
+                      className="absolute top-3 right-3"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      <BookmarkButton realityId={r.id} variant="compact" />
+                    </div>
                   </div>
                   <div className="flex-1 flex flex-col p-5">
                     {r.category && (

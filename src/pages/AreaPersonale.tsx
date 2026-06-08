@@ -9,6 +9,7 @@ import {
   MapPin,
   CalendarClock,
   Clock,
+  Bookmark,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
@@ -19,6 +20,7 @@ import PanelArticoli from "@/components/area/PanelArticoli";
 import PanelCalendario from "@/components/area/PanelCalendario";
 import PanelModerazione from "@/components/area/PanelModerazione";
 import PanelRealta from "@/components/area/PanelRealta";
+import PanelPreferiti from "@/components/area/PanelPreferiti";
 import type {
   AreaProfile,
   AreaPost,
@@ -167,6 +169,7 @@ const AreaPersonale = () => {
       { value: "profilo", label: "Profilo", icon: UserIcon },
       { value: "calendario", label: "Calendario", icon: CalendarClock, badge: scheduledItems.length || undefined },
       { value: "articoli", label: "Articoli", icon: FileText, badge: posts.length || undefined },
+      { value: "preferiti", label: "Preferiti", icon: Bookmark },
     ];
     if (canProposeRealities) {
       t.push({ value: "realta", label: "Realtà", icon: MapPin, badge: myPendingRealities.length || undefined });
@@ -252,6 +255,10 @@ const AreaPersonale = () => {
 
             <TabsContent value="articoli" className="mt-0">
               <PanelArticoli posts={posts} isStaff={isStaff} onChanged={loadAll} />
+            </TabsContent>
+
+            <TabsContent value="preferiti" className="mt-0">
+              <PanelPreferiti userId={user.id} />
             </TabsContent>
 
             {canProposeRealities && (
