@@ -10,6 +10,7 @@ import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
 import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
 import SystemStatusPanel from "@/components/admin/SystemStatusPanel";
+import AnalyticsDashboardPanel from "@/components/admin/AnalyticsDashboardPanel";
 import { inviteSchema, fieldErrors, type FieldErrors } from "@/lib/validation";
 
 type RealityRef = { id: string; name: string; city: string };
@@ -123,6 +124,9 @@ const Admin = () => {
 
         {/* System status */}
         <SystemStatusPanel />
+
+        {/* Analytics dashboard */}
+        <AnalyticsDashboardPanel />
 
         {/* Invite form */}
         <div className="p-8 rounded-lg bg-card border border-border mb-12">
