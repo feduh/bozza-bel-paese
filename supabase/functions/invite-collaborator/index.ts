@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify the calling user is admin
+    // Verify the calling user is admin or coordinator
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Non autorizzato" }), {
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Client with caller's token to check admin role
+    // Client with caller's token to check roles
     const callerClient = createClient(
       supabaseUrl,
       Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!,
@@ -106,20 +106,30 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role
+    // Check roles: admins can invite authors and coordinators,
+    // coordinators can invite authors only.
     const { data: isAdmin } = await callerClient.rpc("has_role", {
       _user_id: caller.id,
       _role: "admin",
     });
 
+    let isCoordinator = false;
     if (!isAdmin) {
+      const { data: coord } = await callerClient.rpc("has_role", {
+        _user_id: caller.id,
+        _role: "coordinatore",
+      });
+      isCoordinator = !!coord;
+    }
+
+    if (!isAdmin && !isCoordinator) {
       return new Response(
-        JSON.stringify({ error: "Solo gli admin possono invitare coordinatori" }),
+        JSON.stringify({ error: "Non hai i permessi per invitare nuovi membri" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Rate limiting per admin user
+    // Rate limiting per calling user
     if (isRateLimited(caller.id)) {
       return new Response(
         JSON.stringify({ error: "Troppi inviti. Riprova tra un minuto." }),
@@ -151,6 +161,14 @@ Deno.serve(async (req) => {
       role_real_life,
       role_collective,
     } = parseResult.data;
+
+    // Coordinators can only create authors — only admins can create coordinators
+    if (!isAdmin && role !== "author") {
+      return new Response(
+        JSON.stringify({ error: "Solo gli admin possono invitare coordinatori" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Admin client to create user
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
