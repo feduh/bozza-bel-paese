@@ -10,6 +10,7 @@ import {
   CalendarClock,
   Clock,
   Bookmark,
+  UserPlus,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
@@ -21,6 +22,7 @@ import PanelCalendario from "@/components/area/PanelCalendario";
 import PanelModerazione from "@/components/area/PanelModerazione";
 import PanelRealta from "@/components/area/PanelRealta";
 import PanelPreferiti from "@/components/area/PanelPreferiti";
+import InviteMemberForm from "@/components/InviteMemberForm";
 import type {
   AreaProfile,
   AreaPost,
@@ -49,6 +51,7 @@ const AreaPersonale = () => {
   const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
   const isAdmin = myRoles.includes("admin");
   const canProposeRealities = isAdmin || myRoles.includes("coordinatore");
+  const canInviteMembers = isAdmin || myRoles.includes("coordinatore");
 
   const loadAll = async () => {
     if (!user) return;
@@ -174,6 +177,9 @@ const AreaPersonale = () => {
     if (canProposeRealities) {
       t.push({ value: "realta", label: "Realtà", icon: MapPin, badge: myPendingRealities.length || undefined });
     }
+    if (canInviteMembers) {
+      t.push({ value: "membri", label: "Membri", icon: UserPlus });
+    }
     if (isStaff) {
       t.push({ value: "moderazione", label: "Moderazione", icon: Clock, badge: moderationQueue.length || undefined });
     }
@@ -264,6 +270,22 @@ const AreaPersonale = () => {
             {canProposeRealities && (
               <TabsContent value="realta" className="mt-0">
                 <PanelRealta isAdmin={isAdmin} pending={myPendingRealities} onCreated={loadAll} />
+              </TabsContent>
+            )}
+
+            {canInviteMembers && (
+              <TabsContent value="membri" className="mt-0">
+                <section className="p-8 rounded-lg bg-card border border-border">
+                  <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
+                    <UserPlus size={20} /> {isAdmin ? "Invita nuovo membro" : "Invita nuovo autore"}
+                  </h2>
+                  <p className="font-body text-sm text-muted-foreground mb-6">
+                    {isAdmin
+                      ? "Crea un account per un nuovo autore o coordinatore del collettivo."
+                      : "Crea un account per un nuovo autore del Magazine. Solo l'admin può invitare coordinatori."}
+                  </p>
+                  <InviteMemberForm allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]} />
+                </section>
               </TabsContent>
             )}
 
