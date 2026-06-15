@@ -68,7 +68,7 @@ const RealityDetail = () => {
       setLoading(false);
     };
     fetch();
-  }, [id, user]);
+  }, [id, user, isEn]);
 
   if (loading) {
     return <RealityDetailSkeleton />;
