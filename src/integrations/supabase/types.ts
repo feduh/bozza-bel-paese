@@ -160,6 +160,162 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string | null
+          id: string
+          issue_id: string
+          recipient_email: string
+          sent_at: string | null
+          status: string
+          subscriber_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          issue_id: string
+          recipient_email: string
+          sent_at?: string | null
+          status?: string
+          subscriber_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          issue_id?: string
+          recipient_email?: string
+          sent_at?: string | null
+          status?: string
+          subscriber_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_deliveries_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_deliveries_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_issues: {
+        Row: {
+          content_blocks: Json
+          created_at: string
+          created_by: string | null
+          failed_count: number
+          id: string
+          preheader: string | null
+          scheduled_for: string | null
+          sent_at: string | null
+          sent_count: number
+          status: string
+          subject: string
+          title: string
+          total_recipients: number
+          updated_at: string
+        }
+        Insert: {
+          content_blocks?: Json
+          created_at?: string
+          created_by?: string | null
+          failed_count?: number
+          id?: string
+          preheader?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject: string
+          title: string
+          total_recipients?: number
+          updated_at?: string
+        }
+        Update: {
+          content_blocks?: Json
+          created_at?: string
+          created_by?: string | null
+          failed_count?: number
+          id?: string
+          preheader?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string
+          title?: string
+          total_recipients?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          bounced_at: string | null
+          confirmation_token: string
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          last_error: string | null
+          locale: string
+          source: string
+          status: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          bounced_at?: string | null
+          confirmation_token?: string
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          last_error?: string | null
+          locale?: string
+          source?: string
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          bounced_at?: string | null
+          confirmation_token?: string
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          last_error?: string | null
+          locale?: string
+          source?: string
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -556,6 +712,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      newsletter_enqueue_issue: { Args: { _issue_id: string }; Returns: number }
       publish_scheduled_posts: { Args: never; Returns: number }
     }
     Enums: {
