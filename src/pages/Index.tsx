@@ -2,11 +2,22 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import heroImage from "@/assets/hero-art.jpg";
 import SEO from "@/components/SEO";
-import SmartImage from "@/components/SmartImage";
 import CountUp from "@/components/CountUp";
+import WordRotate from "@/components/home/WordRotate";
+import LiveTicker, { FALLBACK as TICKER_FALLBACK } from "@/components/home/LiveTicker";
+import Marquee from "@/components/home/Marquee";
 import { supabase } from "@/integrations/supabase/client";
+
+const ROTATING_WORDS = [
+  "collettivi",
+  "atelier",
+  "festival",
+  "spazi",
+  "movimenti",
+  "fondazioni",
+  "realtà",
+];
 
 const Index = () => {
   const { t } = useTranslation();
@@ -27,6 +38,23 @@ const Index = () => {
     },
   });
 
+  const { data: latest } = useQuery({
+    queryKey: ["home-latest-realities"],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("realities")
+        .select("name, city, region")
+        .eq("confirmed_status", "confermato")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error || !data || data.length === 0) {
+        return TICKER_FALLBACK.map((r) => ({ name: r.name, city: r.city, region: r.region }));
+      }
+      return data as { name: string; city: string; region: string }[];
+    },
+  });
+
   const features = [
     { num: "01", section: "Cartografia", key: "mapping", link: "/mappatura", inverted: false },
     { num: "02", section: "Network",     key: "community", link: "/la-rete", inverted: true },
@@ -39,6 +67,8 @@ const Index = () => {
     { num: liveStats?.members ?? null, key: "members", color: "text-foreground" },
     { num: liveStats?.articles ?? null, key: "articles", color: "text-secondary" },
   ] as const;
+
+  const tickerItems = latest ?? [];
 
   return (
     <div className="bg-background">
@@ -56,19 +86,37 @@ const Index = () => {
         }}
       />
 
-      <div className="editorial-container py-12 md:py-20 space-y-16 md:space-y-24">
+      <div className="editorial-container py-10 md:py-16 space-y-12 md:space-y-20">
 
         {/* ============ HERO ============ */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          <div className="lg:col-span-7 space-y-8">
-            <div className="inline-block bg-card brutalist-border px-3 py-1 micro-label">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+          <div className="lg:col-span-7 space-y-8 relative">
+            {/* Dot pattern background */}
+            <div
+              className="absolute -inset-4 -z-10 opacity-40 pointer-events-none"
+              aria-hidden
+              style={{
+                backgroundImage: "radial-gradient(hsl(var(--foreground)) 1px, transparent 1.5px)",
+                backgroundSize: "18px 18px",
+                maskImage: "linear-gradient(to bottom, black 30%, transparent 90%)",
+                WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 90%)",
+              }}
+            />
+
+            <div className="inline-flex items-center gap-2 bg-card brutalist-border px-3 py-1 micro-label">
+              <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse" />
               Archivio Editoriale · Vol. 01
             </div>
 
             <h1 className="editorial-heading">
-              {t("home.title")} <br />
-              <span className="text-primary">{t("home.titleAccent")}</span>{" "}
-              <span className="ink-highlight">d'Italia</span>
+              <span className="block">Mappiamo</span>
+              <span className="block text-primary">
+                <WordRotate words={ROTATING_WORDS} />
+              </span>
+              <span className="block">
+                artistici{" "}
+                <span className="ink-highlight">d'Italia</span>
+              </span>
             </h1>
 
             <p className="editorial-body max-w-xl">
@@ -85,33 +133,30 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Visual area destra */}
+          {/* Live Ticker al posto della foto */}
           <div className="lg:col-span-5 relative">
-            <div className="aspect-[4/5] brutalist-border bg-foreground overflow-hidden relative shadow-brutalist-lg">
-              <SmartImage
-                src={heroImage}
-                alt="Arte contemporanea italiana"
-                priority
-                wrapperClassName="w-full h-full"
-                className="w-full h-full object-cover opacity-80"
-              />
-              {/* Scanline overlay */}
-              <div
-                className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
-                style={{
-                  background:
-                    "repeating-linear-gradient(0deg, transparent, transparent 2px, hsl(var(--secondary) / 0.4) 3px)",
-                }}
-              />
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                <span className="micro-label text-background">COORD · 41.9028° N, 12.4964° E</span>
-              </div>
-            </div>
-            {/* Badge acqua angolo */}
-            <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-20 h-20 md:w-24 md:h-24 bg-secondary brutalist-border flex items-center justify-center text-center micro-label leading-tight">
-              Live<br/>Archive
+            <LiveTicker />
+            <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-20 h-20 md:w-24 md:h-24 bg-secondary brutalist-border flex items-center justify-center text-center micro-label leading-tight rotate-3">
+              Live<br/>Feed
             </div>
           </div>
+        </section>
+
+        {/* ============ MARQUEE FULL-WIDTH (testata) ============ */}
+        <section className="-mx-6 md:-mx-10 border-y-2 border-foreground bg-foreground text-background py-4">
+          <Marquee speedSec={60}>
+            {tickerItems.map((r, i) => (
+              <span key={i} className="flex items-center gap-4 whitespace-nowrap">
+                <span className="text-secondary text-2xl" aria-hidden>✦</span>
+                <span className="text-xl md:text-2xl uppercase" style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.01em" }}>
+                  {r.name}
+                </span>
+                <span className="micro-label text-background/60">
+                  {r.city} · {r.region}
+                </span>
+              </span>
+            ))}
+          </Marquee>
         </section>
 
         {/* ============ FEATURES ============ */}
