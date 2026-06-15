@@ -16,7 +16,7 @@ interface Pin {
   name: string;
   city: string | null;
   region: string | null;
-  category: string | null;
+  categories: string[];
   year_founded: number | null;
   slug: string | null;
   lat: number;
@@ -44,7 +44,7 @@ const DroneHero = () => {
     queryFn: async (): Promise<Pin[]> => {
       const { data, error } = await supabase
         .from("realities")
-        .select("id, name, city, region, category, year_founded, slug, lat, lng")
+        .select("id, name, city, region, category, categories, year_founded, slug, lat, lng")
         .eq("confirmed_status", "confermato")
         .not("lat", "is", null)
         .not("lng", "is", null)
@@ -55,9 +55,13 @@ const DroneHero = () => {
         .filter((r) => typeof r.lat === "number" && typeof r.lng === "number")
         .map((r) => {
           const [x, y] = project(r.lat, r.lng);
+          const cats: string[] =
+            Array.isArray(r.categories) && r.categories.length > 0
+              ? r.categories
+              : (r.category ? [r.category] : []);
           return {
             id: r.id, name: r.name, city: r.city, region: r.region,
-            category: r.category, year_founded: r.year_founded,
+            categories: cats, year_founded: r.year_founded,
             slug: r.slug, lat: r.lat, lng: r.lng, x, y,
           } as Pin;
         });
