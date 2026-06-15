@@ -76,19 +76,45 @@ const DroneHero = () => {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const updateFromPoint = (clientX: number, clientY: number) => {
     const rect = panelRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     cursor.current.x = x;
     cursor.current.y = y;
-    // mappa la posizione del mouse nel viewBox dell'Europa, con un piccolo padding:
-    // muovendo il cursore si naviga dall'Italia al resto d'Europa mantenendo il parallasse
     const nx = Math.min(1, Math.max(0, x / rect.width));
     const ny = Math.min(1, Math.max(0, y / rect.height));
     target.current.x = 0.42 + nx * 0.18;
     target.current.y = 0.60 + ny * 0.22;
+  };
+
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    updateFromPoint(e.clientX, e.clientY);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (!t) return;
+    setHovering(true);
+    const rect = panelRef.current?.getBoundingClientRect();
+    if (rect) {
+      cursor.current.lastX = t.clientX - rect.left;
+      cursor.current.lastY = t.clientY - rect.top;
+    }
+    updateFromPoint(t.clientX, t.clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (!t) return;
+    updateFromPoint(t.clientX, t.clientY);
+  };
+
+  const handleTouchEnd = () => {
+    setHovering(false);
+    target.current.x = PIEMONTE.x;
+    target.current.y = PIEMONTE.y;
   };
 
   // ---- rotating word ----
@@ -114,7 +140,7 @@ const DroneHero = () => {
   return (
     <div
       ref={panelRef}
-      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none"
+      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none touch-none"
       style={{ cursor: hovering ? "none" : "auto" }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
@@ -123,6 +149,10 @@ const DroneHero = () => {
         target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       <svg
         viewBox={`0 0 ${panel.w} ${panel.h}`}
