@@ -26,7 +26,7 @@ const Privacy = () => {
             <h2 className="font-display text-xl font-semibold mb-3">1. Titolare del trattamento</h2>
             <p>
               Il titolare del trattamento è il collettivo <strong>Il Bel Paese</strong>. Per qualsiasi richiesta
-              relativa ai dati personali puoi scriverci a <a href="mailto:info@artivive.it" className="text-primary hover:underline">info@artivive.it</a>.
+              relativa ai dati personali puoi scriverci a <a href="mailto:info.ilbelpaese@gmail.com" className="text-primary hover:underline">info.ilbelpaese@gmail.com</a>.
             </p>
           </section>
 
@@ -84,7 +84,7 @@ const Privacy = () => {
             <p>
               In qualsiasi momento puoi richiedere accesso, rettifica, cancellazione, limitazione o portabilità
               dei tuoi dati, oltre a revocare il consenso prestato. Scrivici a
-              <a href="mailto:info@artivive.it" className="text-primary hover:underline"> info@artivive.it</a> e
+              <a href="mailto:info.ilbelpaese@gmail.com" className="text-primary hover:underline"> info.ilbelpaese@gmail.com</a> e
               risponderemo entro 30 giorni.
             </p>
             <p>Puoi inoltre proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noreferrer" className="text-primary hover:underline">garanteprivacy.it</a>).</p>

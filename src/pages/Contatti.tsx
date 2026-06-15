@@ -73,8 +73,8 @@ const Contatti = () => {
                 <Mail size={18} className="text-primary mt-0.5" aria-hidden="true" />
                 <div>
                   <p className="font-body text-sm font-semibold">Email</p>
-                  <a href="mailto:info@artivive.it" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">
-                    info@artivive.it
+                  <a href="mailto:info.ilbelpaese@gmail.com" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">
+                    info.ilbelpaese@gmail.com
                   </a>
                 </div>
               </div>
