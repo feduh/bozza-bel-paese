@@ -140,7 +140,7 @@ const DroneHero = () => {
   return (
     <div
       ref={panelRef}
-      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none"
+      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none touch-none"
       style={{ cursor: hovering ? "none" : "auto" }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
@@ -149,6 +149,10 @@ const DroneHero = () => {
         target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       <svg
         viewBox={`0 0 ${panel.w} ${panel.h}`}
