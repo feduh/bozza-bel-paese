@@ -5,7 +5,7 @@ import { EUROPE_PATH, EUROPE_VB } from "./europePath";
 import LogoPittogramma from "@/components/LogoPittogramma";
 
 /**
- * DroneHero — hero editoriale con mappa vettoriale dell'Italia
+ * DroneHero — hero editoriale con mappa vettoriale dell'Europa
  * che reagisce in parallasse al movimento del cursore-razzo.
  * Nessun pin reale, nessuna query al database: è puro racconto visivo.
  */
