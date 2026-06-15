@@ -32,6 +32,8 @@ const AutoreProfilo = lazy(() => import("./pages/AutoreProfilo"));
 const SegnalaRealta = lazy(() => import("./pages/SegnalaRealta"));
 const Contatti = lazy(() => import("./pages/Contatti"));
 const Privacy = lazy(() => import("./pages/Privacy"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const Termini = lazy(() => import("./pages/Termini"));
 const PasswordDimenticata = lazy(() => import("./pages/PasswordDimenticata"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
@@ -69,6 +71,8 @@ const App = () => (
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />
                   <Route path="/contatti" element={<Contatti />} />
                   <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/cookie-policy" element={<CookiePolicy />} />
+                  <Route path="/termini" element={<Termini />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/password-dimenticata" element={<PasswordDimenticata />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
