@@ -182,19 +182,15 @@ const DroneHero = () => {
 
       {/* top bar */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-4 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] pointer-events-none">
-        <div className="flex items-center gap-2 text-secondary">
-          <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
+        <div className="flex items-center gap-2 text-[#8B5CFF]">
+          <span className="w-2 h-2 bg-[#8B5CFF] rounded-full animate-pulse" />
           Drone · IT · Live
         </div>
-        <div className="text-background/70 hidden md:block">MMXXVI</div>
+        <div className="text-[#8B5CFF]/70 hidden md:block">MMXXVI</div>
       </div>
 
       {/* manifesto */}
       <div className="absolute left-5 md:left-8 bottom-6 md:bottom-10 max-w-[640px] space-y-4 pointer-events-none">
-        <div className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] pointer-events-auto">
-          <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full" />
-          Archivio Editoriale · Vol. 01
-        </div>
         <h1
           className="text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.95] tracking-tight"
           style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.03em" }}
@@ -251,7 +247,10 @@ const DroneHero = () => {
           }}
           aria-hidden
         >
-          <LogoPittogramma className="w-10 h-10 text-secondary drop-shadow-[0_0_8px_hsl(var(--secondary)/0.7)]" />
+          <LogoPittogramma
+            className="w-10 h-10 text-secondary drop-shadow-[0_0_8px_hsl(var(--secondary)/0.7)]"
+            flameClassName="text-[#FF8C00] drop-shadow-[0_0_6px_rgba(255,140,0,0.7)]"
+          />
         </div>
       )}
     </div>
