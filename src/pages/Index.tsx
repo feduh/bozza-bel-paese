@@ -4,20 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import SEO from "@/components/SEO";
 import CountUp from "@/components/CountUp";
-import WordRotate from "@/components/home/WordRotate";
-import LiveTicker, { FALLBACK as TICKER_FALLBACK } from "@/components/home/LiveTicker";
+import DroneHero from "@/components/home/DroneHero";
 import Marquee from "@/components/home/Marquee";
 import { supabase } from "@/integrations/supabase/client";
-
-const ROTATING_WORDS = [
-  "collettivi",
-  "atelier",
-  "festival",
-  "spazi",
-  "movimenti",
-  "fondazioni",
-  "realtà",
-];
 
 const Index = () => {
   const { t } = useTranslation();
@@ -48,9 +37,7 @@ const Index = () => {
         .eq("confirmed_status", "confermato")
         .order("created_at", { ascending: false })
         .limit(20);
-      if (error || !data || data.length === 0) {
-        return TICKER_FALLBACK.map((r) => ({ name: r.name, city: r.city, region: r.region }));
-      }
+      if (error || !data) return [] as { name: string; city: string; region: string }[];
       return data as { name: string; city: string; region: string }[];
     },
   });
