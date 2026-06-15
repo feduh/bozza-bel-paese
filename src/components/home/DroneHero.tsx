@@ -352,7 +352,7 @@ const DroneHero = () => {
               <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground truncate">
                 {active.city ?? "—"}
                 {active.region ? ` · ${active.region}` : ""}
-                {active.category ? ` · ${active.category}` : ""}
+                {active.categories.length > 0 ? ` · ${active.categories.join(" · ")}` : ""}
                 {active.year_founded ? ` · EST. ${active.year_founded}` : ""}
               </div>
             </>
