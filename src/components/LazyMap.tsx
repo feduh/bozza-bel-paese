@@ -96,7 +96,7 @@ const ClusterLayer = ({ markers, cluster }: { markers: MarkerData[]; cluster: bo
 
     markers.forEach((m) => {
       const marker = L.marker([m.lat, m.lng], {
-        icon: buildIcon(m.color ?? "hsl(270 60% 58%)", !!m.outline),
+        icon: buildIcon(m.color ?? "#8B5CFF", !!m.outline),
       });
 
       // Build popup HTML from popupContent if it's a React element with simple content,
