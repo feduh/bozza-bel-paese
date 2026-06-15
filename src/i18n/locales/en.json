@@ -61,7 +61,7 @@
     "stats": {
       "mapped": "Realities mapped",
       "regions": "Regions covered",
-      "vanished": "Spaces that were",
+      "members": "Network members",
       "articles": "Articles published"
     }
   },
