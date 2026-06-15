@@ -87,8 +87,8 @@ const DroneHero = () => {
     // muovendo il cursore si naviga dall'Italia al resto d'Europa mantenendo il parallasse
     const nx = Math.min(1, Math.max(0, x / rect.width));
     const ny = Math.min(1, Math.max(0, y / rect.height));
-    target.current.x = 0.40 + nx * 0.30;
-    target.current.y = 0.65 + ny * 0.25;
+    target.current.x = 0.42 + nx * 0.18;
+    target.current.y = 0.60 + ny * 0.22;
   };
 
   // ---- rotating word ----
