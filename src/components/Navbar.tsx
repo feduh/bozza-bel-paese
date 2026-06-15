@@ -27,10 +27,10 @@ const Navbar = () => {
   // Link primari nella navbar (cuore pulsante del progetto)
   const primaryLinks = [
     { to: "/mappatura", label: t("nav.map") },
-    { to: "/la-rete", label: "La nostra rete" },
+    { to: "/la-rete", label: t("nav.network") },
     { to: "/magazine", label: t("nav.magazine") },
     { to: "/cosa-facciamo", label: t("nav.what") },
-    { to: "/contatti", label: "Contatti" },
+    { to: "/contatti", label: t("nav.contacts") },
   ];
 
   useEffect(() => {
@@ -89,7 +89,7 @@ const Navbar = () => {
               <NotificationsBell />
             <DropdownMenu>
               <DropdownMenuTrigger
-                aria-label="Menu utente"
+                aria-label={t("nav.userMenu")}
                 className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-sm font-body font-semibold hover:bg-primary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 {userInitial}
@@ -101,7 +101,7 @@ const Navbar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/area-personale" className="cursor-pointer">
-                    <UserIcon size={14} className="mr-2" /> Area personale
+                    <UserIcon size={14} className="mr-2" /> {t("nav.personalArea")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -165,7 +165,7 @@ const Navbar = () => {
                 onClick={() => setOpen(false)}
                 className="block font-body text-sm font-medium text-secondary uppercase"
               >
-                ◎ Area personale
+                ◎ {t("nav.personalArea")}
               </Link>
               <button
                 onClick={() => { signOut(); setOpen(false); }}

@@ -13,6 +13,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import SEO from "@/components/SEO";
+import { useTranslation } from "react-i18next";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
 import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -40,6 +41,7 @@ import type {
 const AreaPersonale = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [profile, setProfile] = useState<AreaProfile | null>(null);
@@ -174,26 +176,26 @@ const AreaPersonale = () => {
 
   // Tab definitions based on role
   const tabs = useMemo(() => {
-    const t: Array<{ value: string; label: string; icon: typeof UserIcon; badge?: number }> = [
-      { value: "profilo", label: "Profilo", icon: UserIcon },
-      { value: "calendario", label: "Calendario", icon: CalendarClock, badge: scheduledItems.length || undefined },
-      { value: "articoli", label: "Articoli", icon: FileText, badge: posts.length || undefined },
-      { value: "preferiti", label: "Preferiti", icon: Bookmark },
+    const tabList: Array<{ value: string; label: string; icon: typeof UserIcon; badge?: number }> = [
+      { value: "profilo", label: t("area.tabs.profile"), icon: UserIcon },
+      { value: "calendario", label: t("area.tabs.calendar"), icon: CalendarClock, badge: scheduledItems.length || undefined },
+      { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: posts.length || undefined },
+      { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
     ];
     if (canProposeRealities) {
-      t.push({ value: "realta", label: "Realtà", icon: MapPin, badge: myPendingRealities.length || undefined });
+      tabList.push({ value: "realta", label: t("area.tabs.realities"), icon: MapPin, badge: myPendingRealities.length || undefined });
     }
     if (canInviteMembers) {
-      t.push({ value: "membri", label: "Membri", icon: UserPlus });
+      tabList.push({ value: "membri", label: t("area.tabs.members"), icon: UserPlus });
     }
     if (isStaff) {
-      t.push({ value: "moderazione", label: "Moderazione", icon: Clock, badge: moderationQueue.length || undefined });
+      tabList.push({ value: "moderazione", label: t("area.tabs.moderation"), icon: Clock, badge: moderationQueue.length || undefined });
     }
     if (isAdmin) {
-      t.push({ value: "admin", label: "Admin", icon: ShieldCheck });
+      tabList.push({ value: "admin", label: t("area.tabs.admin"), icon: ShieldCheck });
     }
-    return t;
-  }, [canProposeRealities, isStaff, isAdmin, posts.length, scheduledItems.length, myPendingRealities.length, moderationQueue.length]);
+    return tabList;
+  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, posts.length, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
 
   const tabFromUrl = searchParams.get("tab");
   const activeTab = tabs.some((t) => t.value === tabFromUrl) ? (tabFromUrl as string) : "profilo";
@@ -214,31 +216,31 @@ const AreaPersonale = () => {
       <SEO title="Area personale" description="Dashboard: profilo, calendario, articoli e moderazione." canonicalPath="/area-personale" />
       <div className="editorial-container max-w-5xl">
         <h1 className="editorial-heading mb-2">
-          La <span className="italic text-primary">tua area</span>
+          {t("area.title")} <span className="italic text-primary">{t("area.titleAccent")}</span>
         </h1>
         <p className="editorial-body text-muted-foreground mb-8">
-          Dashboard personale: scegli una sezione dal menù qui sotto.
+          {t("area.lead")}
         </p>
 
         {loading || !profile ? (
-          <div className="text-center py-20 text-muted-foreground font-body">Caricamento…</div>
+          <div className="text-center py-20 text-muted-foreground font-body">{t("area.loading")}</div>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="sticky top-16 z-10 -mx-4 px-4 py-3 bg-background/85 backdrop-blur border-b border-border">
               <TabsList className="h-auto flex flex-wrap gap-1 bg-muted/60 p-1">
-                {tabs.map((t) => {
-                  const Icon = t.icon;
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
                   return (
                     <TabsTrigger
-                      key={t.value}
-                      value={t.value}
+                      key={tab.value}
+                      value={tab.value}
                       className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2 font-body"
                     >
                       <Icon size={14} />
-                      <span>{t.label}</span>
-                      {t.badge !== undefined && (
+                      <span>{tab.label}</span>
+                      {tab.badge !== undefined && (
                         <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] font-bold bg-background/70 text-foreground border border-border data-[state=active]:bg-primary-foreground/20">
-                          {t.badge}
+                          {tab.badge}
                         </span>
                       )}
                     </TabsTrigger>
@@ -283,12 +285,10 @@ const AreaPersonale = () => {
               <TabsContent value="membri" className="mt-0">
                 <section className="p-8 rounded-lg bg-card border border-border">
                   <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
-                    <UserPlus size={20} /> {isAdmin ? "Invita nuovo membro" : "Invita nuovo autore"}
+                    <UserPlus size={20} /> {isAdmin ? t("area.inviteMember") : t("area.inviteAuthor")}
                   </h2>
                   <p className="font-body text-sm text-muted-foreground mb-6">
-                    {isAdmin
-                      ? "Crea un account per un nuovo autore o coordinatore del collettivo."
-                      : "Crea un account per un nuovo autore del Magazine. Solo l'admin può invitare coordinatori."}
+                    {isAdmin ? t("area.inviteDescAdmin") : t("area.inviteDescCoord")}
                   </p>
                   <InviteMemberForm allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]} />
                 </section>
