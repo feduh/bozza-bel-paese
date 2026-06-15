@@ -722,6 +722,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_translation: {
+        Args: { _fields: Json; _id: string; _table: string }
+        Returns: undefined
+      }
       auto_confirm_pending_realities: { Args: never; Returns: number }
       get_public_stats: {
         Args: never
