@@ -38,6 +38,12 @@ const opSchema = z.discriminatedUnion("op", [
     op: z.literal("delete_user"),
     user_id: z.string().uuid(),
   }),
+  z.object({
+    op: z.literal("update_user"),
+    user_id: z.string().uuid(),
+    email: z.string().trim().email("Email non valida").max(255).optional(),
+    display_name: z.string().trim().min(1, "Nome obbligatorio").max(120).optional(),
+  }),
 ]);
 
 function json(body: unknown, status = 200) {
