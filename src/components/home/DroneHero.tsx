@@ -119,8 +119,8 @@ const DroneHero = () => {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
         setHovering(false);
-        target.current.x = 0;
-        target.current.y = 0;
+        target.current.x = PIEMONTE.x;
+        target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
     >
