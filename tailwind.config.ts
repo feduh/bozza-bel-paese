@@ -14,8 +14,15 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Playfair Display', 'Georgia', 'serif'],
-        body: ['Source Sans 3', 'Segoe UI', 'sans-serif'],
+        display: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
+        body: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
+        mono: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
+        notch: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        brutalist: '4px 4px 0 0 hsl(var(--foreground))',
+        'brutalist-lg': '6px 6px 0 0 hsl(var(--foreground))',
+        'brutalist-aqua': '6px 6px 0 0 hsl(var(--secondary))',
       },
       colors: {
         border: "hsl(var(--border))",
