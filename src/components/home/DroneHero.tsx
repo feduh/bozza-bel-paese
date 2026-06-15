@@ -25,7 +25,7 @@ const DroneHero = () => {
   const panelRef = useRef<HTMLDivElement>(null);
   const target = useRef({ x: 0, y: 0 }); // -1..1 relative to center
   const current = useRef({ x: 0, y: 0 });
-  const cursor = useRef({ x: 0, y: 0, vx: 0, vy: 0, lastX: 0, lastY: 0 });
+  const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
@@ -47,11 +47,25 @@ const DroneHero = () => {
       raf = requestAnimationFrame(tick);
       current.current.x += (target.current.x - current.current.x) * 0.08;
       current.current.y += (target.current.y - current.current.y) * 0.08;
-      // velocity for rocket tilt
-      cursor.current.vx = cursor.current.x - cursor.current.lastX;
-      cursor.current.vy = cursor.current.y - cursor.current.lastY;
-      cursor.current.lastX = cursor.current.x;
-      cursor.current.lastY = cursor.current.y;
+
+      // smoothed velocity (low-pass), derive angle only above threshold
+      const c = cursor.current;
+      const dx = c.x - c.lastX;
+      const dy = c.y - c.lastY;
+      c.lastX = c.x;
+      c.lastY = c.y;
+      c.svx += (dx - c.svx) * 0.18;
+      c.svy += (dy - c.svy) * 0.18;
+      const speed = Math.hypot(c.svx, c.svy);
+      if (speed > 1.2) {
+        const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
+        // shortest-path interpolation
+        const diff = ((targetAngle - c.angle + 540) % 360) - 180;
+        const ease = Math.min(0.25, 0.06 + speed * 0.01);
+        c.angle += diff * ease;
+      }
+      // else: tieni l'ultimo angolo (no jitter quando quasi fermo)
+
       force((n) => (n + 1) & 1023);
     };
     raf = requestAnimationFrame(tick);
@@ -80,18 +94,12 @@ const DroneHero = () => {
   const cx = panel.w / 2;
   const cy = panel.h / 2;
   const scale = Math.min((panel.h * 1.05) / VB_H, (panel.w * 0.95) / VB_W);
-  // parallax offsets in screen px
   const parX = -current.current.x * 60;
   const parY = -current.current.y * 60;
-  const tiltDeg = current.current.x * 4; // gentle rotation
+  const tiltDeg = current.current.x * 4;
   const groupTransform = `translate(${cx + parX} ${cy + parY}) rotate(${tiltDeg.toFixed(2)}) scale(${scale.toFixed(3)}) translate(${(-VB_W / 2).toFixed(2)} ${(-VB_H / 2).toFixed(2)})`;
 
-  // rocket angle: head points toward motion direction; idle = up (-90°)
-  const v = cursor.current;
-  const speed = Math.hypot(v.vx, v.vy);
-  const motionAngle = speed > 0.6 ? (Math.atan2(v.vy, v.vx) * 180) / Math.PI : -90;
-  // logo art points roughly up-right; offset so visual "tip" follows direction
-  const rocketRotation = motionAngle + 45;
+  const rocketRotation = cursor.current.angle;
 
   return (
     <div
@@ -229,7 +237,7 @@ const DroneHero = () => {
             left: cursor.current.x,
             top: cursor.current.y,
             transform: `translate(-50%, -50%) rotate(${rocketRotation.toFixed(1)}deg)`,
-            transition: "transform 80ms linear",
+            willChange: "transform, left, top",
           }}
           aria-hidden
         >
