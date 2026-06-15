@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ITALY_PATH, ITALY_VB } from "./italyPath";
 
 /**
- * DroneHero — POV satellite/drone fisso al centro dello schermo,
- * l'Italia scorre/ruota sotto. I pin sono SOLO le realtà presenti
- * nel database (confirmed_status = 'confermato' e con coordinate).
+ * DroneHero — POV satellite/drone fisso al centro. L'Italia
+ * (vettoriale) ruota e scorre sotto. I pin sono SOLO realtà reali
+ * confermate nel database e dotate di coordinate.
  */
 
 interface Pin {
@@ -20,58 +21,19 @@ interface Pin {
   slug: string | null;
   lat: number;
   lng: number;
-  /** Proiezione (x,y) nel sistema di coordinate dell'SVG Italia */
   x: number;
   y: number;
 }
 
-// Italy bounding box (gradi)
-const LAT_MAX = 47.1, LAT_MIN = 36.5, LNG_MIN = 6.6, LNG_MAX = 18.6;
+const { W: VB_W, H: VB_H, LAT_MAX, LAT_MIN, LNG_MIN, LNG_MAX } = ITALY_VB;
 
-// SVG viewBox dell'Italia
-const VB_W = 220;
-const VB_H = 340;
-
-const project = (lat: number, lng: number): [number, number] => {
-  const x = ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * VB_W;
-  const y = ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * VB_H;
-  return [x, y];
-};
-
-// Italia stilizzata, dot-matrix
-const MASK = [
-  "...........###......",
-  "..........#####.....",
-  ".........#######....",
-  "....############....",
-  "...##############...",
-  "..###############...",
-  "...##############...",
-  "....############....",
-  ".....##########.....",
-  "......########......",
-  ".......#######......",
-  "........######......",
-  ".........######.....",
-  "..........######....",
-  "...........######...",
-  "............######..",
-  ".............######.",
-  "..............#####.",
-  "..............#####.",
-  ".............######.",
-  "............#######.",
-  "...........#####....",
-  "#..........####.....",
-  "##........####......",
-  "###......###........",
-  ".###................",
+const project = (lat: number, lng: number): [number, number] => [
+  ((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * VB_W,
+  ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * VB_H,
 ];
-const MASK_COLS = MASK[0].length;
-const MASK_ROWS = MASK.length;
 
-// easing
-const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 const DroneHero = () => {
   const navigate = useNavigate();
@@ -87,67 +49,42 @@ const DroneHero = () => {
         .not("lat", "is", null)
         .not("lng", "is", null)
         .order("created_at", { ascending: false })
-        .limit(60);
+        .limit(80);
       if (error || !data) return [];
       return (data as any[])
         .filter((r) => typeof r.lat === "number" && typeof r.lng === "number")
         .map((r) => {
           const [x, y] = project(r.lat, r.lng);
           return {
-            id: r.id,
-            name: r.name,
-            city: r.city,
-            region: r.region,
-            category: r.category,
-            year_founded: r.year_founded,
-            slug: r.slug,
-            lat: r.lat,
-            lng: r.lng,
-            x,
-            y,
+            id: r.id, name: r.name, city: r.city, region: r.region,
+            category: r.category, year_founded: r.year_founded,
+            slug: r.slug, lat: r.lat, lng: r.lng, x, y,
           } as Pin;
         });
     },
   });
 
-  // dot-matrix Italy points
-  const matrixDots = useMemo(() => {
-    const dots: { x: number; y: number }[] = [];
-    const cellW = VB_W / MASK_COLS;
-    const cellH = VB_H / MASK_ROWS;
-    for (let r = 0; r < MASK_ROWS; r++) {
-      for (let c = 0; c < MASK_COLS; c++) {
-        if (MASK[r][c] === "#") {
-          dots.push({ x: c * cellW + cellW / 2, y: r * cellH + cellH / 2 });
-        }
-      }
-    }
-    return dots;
-  }, []);
-
-  // ============ Animazione "drone" ============
-  // Trasformazione corrente del layer "terra"
-  const tx = useRef(VB_W / 2);  // punto Italia (SVG coord) che vogliamo al centro
+  // ===== animation refs =====
+  const tx = useRef(VB_W / 2);
   const ty = useRef(VB_H / 2);
   const rot = useRef(0);
-
-  // target di interpolazione
   const fromX = useRef(VB_W / 2);
   const fromY = useRef(VB_H / 2);
   const fromRot = useRef(0);
   const toX = useRef(VB_W / 2);
   const toY = useRef(VB_H / 2);
   const toRot = useRef(0);
-  const segStart = useRef<number>(performance.now());
-  const segDur = useRef<number>(4000);
+  const segStart = useRef<number>(0);
+  const segDur = useRef<number>(4200);
   const dwellUntil = useRef<number>(0);
+  const pickedRef = useRef<number>(-1);
+  const baseRotStart = useRef<number>(0);
 
   const [, force] = useState(0);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
-  const pickedRef = useRef<number>(-1);
 
-  // panel size measured for the outer SVG viewBox / centering
+  // measure panel
   const panelRef = useRef<HTMLDivElement>(null);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   useEffect(() => {
@@ -160,10 +97,9 @@ const DroneHero = () => {
     return () => ro.disconnect();
   }, []);
 
-  // pick next target
+  // bootstrap first target when pins arrive
   useEffect(() => {
     if (pins.length === 0) return;
-    // first lock-on a random pin
     const i = Math.floor(Math.random() * pins.length);
     pickedRef.current = i;
     fromX.current = tx.current;
@@ -171,66 +107,69 @@ const DroneHero = () => {
     fromRot.current = rot.current;
     toX.current = pins[i].x;
     toY.current = pins[i].y;
-    toRot.current = (Math.random() - 0.5) * 28; // gradi
+    toRot.current = (Math.random() - 0.5) * 30;
     segStart.current = performance.now();
-    segDur.current = 3800;
+    baseRotStart.current = performance.now();
+    segDur.current = 4200;
     setActiveIdx(null);
   }, [pins.length]);
 
-  // animation loop
+  // single rAF loop (no React-state deps → never tears down)
+  const pinsRef = useRef<Pin[]>(pins);
+  const pausedRef = useRef(false);
+  const activeIdxRef = useRef<number | null>(null);
+  useEffect(() => { pinsRef.current = pins; }, [pins]);
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
+  useEffect(() => { activeIdxRef.current = activeIdx; }, [activeIdx]);
+
   useEffect(() => {
-    if (pins.length === 0) return;
     let raf = 0;
     const tick = (now: number) => {
-      if (!paused) {
-        const elapsed = now - segStart.current;
-        const t = Math.min(1, elapsed / segDur.current);
-        const e = easeInOutCubic(t);
-        tx.current = fromX.current + (toX.current - fromX.current) * e;
-        ty.current = fromY.current + (toY.current - fromY.current) * e;
-        rot.current = fromRot.current + (toRot.current - fromRot.current) * e;
-
-        if (t >= 1) {
-          // arrived → activate, dwell, then go next
-          if (activeIdx !== pickedRef.current) {
-            setActiveIdx(pickedRef.current);
-            dwellUntil.current = now + 2200;
-          } else if (now >= dwellUntil.current) {
-            // pick next, avoid same
-            let next = pickedRef.current;
-            if (pins.length > 1) {
-              while (next === pickedRef.current) {
-                next = Math.floor(Math.random() * pins.length);
-              }
-            }
-            pickedRef.current = next;
-            fromX.current = tx.current;
-            fromY.current = ty.current;
-            fromRot.current = rot.current;
-            toX.current = pins[next].x;
-            toY.current = pins[next].y;
-            // gentle, sometimes more pronounced rotation
-            toRot.current = rot.current + (Math.random() - 0.5) * 50;
-            segStart.current = now;
-            segDur.current = 3500 + Math.random() * 2200;
-            setActiveIdx(null);
-          }
-        }
-        force((n) => (n + 1) % 1_000_000);
-      }
       raf = requestAnimationFrame(tick);
+      const ps = pinsRef.current;
+      if (ps.length === 0) { force((n) => (n + 1) & 1023); return; }
+      if (pausedRef.current) { force((n) => (n + 1) & 1023); return; }
+
+      const elapsed = now - segStart.current;
+      const t = Math.min(1, elapsed / segDur.current);
+      const e = easeInOutCubic(t);
+      tx.current = fromX.current + (toX.current - fromX.current) * e;
+      ty.current = fromY.current + (toY.current - fromY.current) * e;
+      // base slow continuous drift on top of segment rot
+      const drift = Math.sin((now - baseRotStart.current) / 4200) * 4;
+      rot.current = fromRot.current + (toRot.current - fromRot.current) * e + drift;
+
+      if (t >= 1) {
+        if (activeIdxRef.current !== pickedRef.current) {
+          setActiveIdx(pickedRef.current);
+          dwellUntil.current = now + 2000;
+        } else if (now >= dwellUntil.current) {
+          let next = pickedRef.current;
+          if (ps.length > 1) {
+            while (next === pickedRef.current) next = Math.floor(Math.random() * ps.length);
+          }
+          pickedRef.current = next;
+          fromX.current = tx.current;
+          fromY.current = ty.current;
+          fromRot.current = rot.current - drift; // remove drift from baseline
+          toX.current = ps[next].x;
+          toY.current = ps[next].y;
+          toRot.current = fromRot.current + (Math.random() - 0.5) * 55;
+          segStart.current = now;
+          segDur.current = 3500 + Math.random() * 2200;
+          setActiveIdx(null);
+        }
+      }
+      force((n) => (n + 1) & 1023);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [pins, paused, activeIdx]);
+  }, []);
 
-  // ============ Render ============
   const cx = panel.w / 2;
   const cy = panel.h / 2;
-  // scala Italia: occupa ~75% dell'altezza del panel
-  const scale = Math.min((panel.h * 0.95) / VB_H, (panel.w * 0.85) / VB_W);
-
-  const groupTransform = `translate(${cx} ${cy}) rotate(${rot.current}) scale(${scale}) translate(${-tx.current} ${-ty.current})`;
+  const scale = Math.min((panel.h * 1.05) / VB_H, (panel.w * 0.95) / VB_W);
+  const groupTransform = `translate(${cx} ${cy}) rotate(${rot.current.toFixed(2)}) scale(${scale.toFixed(3)}) translate(${(-tx.current).toFixed(2)} ${(-ty.current).toFixed(2)})`;
 
   const active = activeIdx !== null ? pins[activeIdx] : null;
   const total = pins.length;
@@ -245,31 +184,50 @@ const DroneHero = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* ===== Mappa ruotante (LA TERRA SOTTO IL DRONE) ===== */}
       <svg
         viewBox={`0 0 ${panel.w} ${panel.h}`}
         className="absolute inset-0 w-full h-full"
-        style={{ filter: "drop-shadow(0 0 12px hsl(var(--secondary) / 0.25))" }}
+        preserveAspectRatio="xMidYMid slice"
       >
         <defs>
           <radialGradient id="dh-ping">
-            <stop offset="0%" stopColor="hsl(var(--secondary))" stopOpacity="0.55" />
+            <stop offset="0%" stopColor="hsl(var(--secondary))" stopOpacity="0.65" />
             <stop offset="100%" stopColor="hsl(var(--secondary))" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="dh-vignette" cx="50%" cy="50%" r="65%">
+          <radialGradient id="dh-vignette" cx="50%" cy="50%" r="70%">
             <stop offset="55%" stopColor="hsl(var(--foreground))" stopOpacity="0" />
             <stop offset="100%" stopColor="hsl(var(--foreground))" stopOpacity="1" />
           </radialGradient>
+          <pattern id="dh-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(var(--background) / 0.05)" strokeWidth="0.5" />
+          </pattern>
         </defs>
 
-        {/* Layer terra: tutto qui dentro viene "navigato" */}
+        {/* grid sfondo */}
+        <rect x="0" y="0" width={panel.w} height={panel.h} fill="url(#dh-grid)" />
+
+        {/* layer terra: tutto qui ruota/trasla */}
         <g transform={groupTransform}>
-          {/* dot-matrix Italia */}
-          <g fill="hsl(var(--background) / 0.32)">
-            {matrixDots.map((d, i) => (
-              <rect key={i} x={d.x - 1.4} y={d.y - 1.4} width="2.8" height="2.8" />
-            ))}
-          </g>
+          {/* Italia vettoriale — outline colorato, fill = sfondo (trasparente) */}
+          <path
+            d={ITALY_PATH}
+            fill="none"
+            stroke="hsl(var(--secondary))"
+            strokeWidth={1.1 / scale}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            style={{ filter: "drop-shadow(0 0 6px hsl(var(--secondary) / 0.45))" }}
+          />
+          {/* alone esterno tenue */}
+          <path
+            d={ITALY_PATH}
+            fill="none"
+            stroke="hsl(var(--secondary) / 0.18)"
+            strokeWidth={5 / scale}
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
 
           {/* pins */}
           {pins.map((p, i) => {
@@ -281,21 +239,16 @@ const DroneHero = () => {
                 style={{ cursor: p.slug ? "pointer" : "default" }}
               >
                 {isActive && (
-                  <circle
-                    cx={p.x}
-                    cy={p.y}
-                    r="14"
-                    fill="url(#dh-ping)"
-                    style={{ animation: "dh-ping 1.6s ease-out infinite" }}
-                  />
+                  <circle cx={p.x} cy={p.y} r="14" fill="url(#dh-ping)"
+                    style={{ animation: "dh-ping 1.6s ease-out infinite" }} />
                 )}
-                <rect
-                  x={p.x - (isActive ? 2.5 : 1.4)}
-                  y={p.y - (isActive ? 2.5 : 1.4)}
-                  width={isActive ? 5 : 2.8}
-                  height={isActive ? 5 : 2.8}
-                  fill={isActive ? "hsl(var(--secondary))" : "hsl(var(--background) / 0.85)"}
-                  style={isActive ? { filter: "drop-shadow(0 0 3px hsl(var(--secondary)))" } : undefined}
+                <circle
+                  cx={p.x} cy={p.y}
+                  r={isActive ? 2.4 : 1.3}
+                  fill={isActive ? "hsl(var(--secondary))" : "hsl(var(--background))"}
+                  stroke={isActive ? "hsl(var(--background))" : "none"}
+                  strokeWidth={0.5}
+                  style={isActive ? { filter: "drop-shadow(0 0 4px hsl(var(--secondary)))" } : undefined}
                 />
               </g>
             );
@@ -305,19 +258,19 @@ const DroneHero = () => {
         {/* vignettatura */}
         <rect x="0" y="0" width={panel.w} height={panel.h} fill="url(#dh-vignette)" pointerEvents="none" />
 
-        {/* mirino fisso al centro */}
+        {/* mirino fisso */}
         <g stroke="hsl(var(--secondary))" strokeWidth="1" fill="none" pointerEvents="none">
-          <circle cx={cx} cy={cy} r="34" strokeOpacity="0.5" />
-          <circle cx={cx} cy={cy} r="60" strokeOpacity="0.25" strokeDasharray="4 6" />
-          <line x1={cx - 50} y1={cy} x2={cx - 12} y2={cy} />
-          <line x1={cx + 12} y1={cy} x2={cx + 50} y2={cy} />
-          <line x1={cx} y1={cy - 50} x2={cx} y2={cy - 12} />
-          <line x1={cx} y1={cy + 12} x2={cx} y2={cy + 50} />
+          <circle cx={cx} cy={cy} r="38" strokeOpacity="0.55" />
+          <circle cx={cx} cy={cy} r="68" strokeOpacity="0.22" strokeDasharray="4 6" />
+          <line x1={cx - 56} y1={cy} x2={cx - 14} y2={cy} />
+          <line x1={cx + 14} y1={cy} x2={cx + 56} y2={cy} />
+          <line x1={cx} y1={cy - 56} x2={cx} y2={cy - 14} />
+          <line x1={cx} y1={cy + 14} x2={cx} y2={cy + 56} />
           <circle cx={cx} cy={cy} r="2" fill="hsl(var(--secondary))" />
         </g>
       </svg>
 
-      {/* ===== CRT scanlines ===== */}
+      {/* scanlines */}
       <div
         className="absolute inset-0 pointer-events-none opacity-25 mix-blend-overlay"
         style={{
@@ -327,7 +280,6 @@ const DroneHero = () => {
         aria-hidden
       />
 
-      {/* ===== Overlay UI ===== */}
       {/* top bar */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-4 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em]">
         <div className="flex items-center gap-2 text-secondary">
@@ -338,7 +290,7 @@ const DroneHero = () => {
         <div className="text-background/70 hidden md:block">MMXXVI</div>
       </div>
 
-      {/* bottom-left manifesto (minimal) */}
+      {/* manifesto */}
       <div className="absolute left-5 md:left-8 bottom-6 md:bottom-10 max-w-[520px] space-y-4 pointer-events-none">
         <div className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] pointer-events-auto">
           <span className="w-1.5 h-1.5 bg-secondary-foreground rounded-full" />
@@ -371,7 +323,7 @@ const DroneHero = () => {
         </div>
       </div>
 
-      {/* bottom-right target card */}
+      {/* target card */}
       <div className="absolute right-5 md:right-8 bottom-6 md:bottom-10 w-[280px] md:w-[320px] pointer-events-auto">
         <div className="bg-background text-foreground brutalist-border p-3 shadow-brutalist-aqua min-h-[110px]">
           <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-primary mb-1">
@@ -391,9 +343,7 @@ const DroneHero = () => {
                   <Link to={`/realta/${active.slug}`} className="hover:text-primary transition-colors">
                     {active.name}
                   </Link>
-                ) : (
-                  active.name
-                )}
+                ) : active.name}
               </div>
               <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground truncate">
                 {active.city ?? "—"}
