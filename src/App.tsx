@@ -76,14 +76,7 @@ const App = () => (
                   <Route path="/login" element={<Login />} />
                   <Route path="/password-dimenticata" element={<PasswordDimenticata />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route
-                    path="/admin"
-                    element={
-                      <RequireRole role="admin">
-                        <Admin />
-                      </RequireRole>
-                    }
-                  />
+                  <Route path="/admin" element={<Navigate to="/area-personale?tab=admin" replace />} />
                   <Route
                     path="/area-personale"
                     element={

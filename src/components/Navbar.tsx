@@ -102,13 +102,6 @@ const Navbar = () => {
                     <UserIcon size={14} className="mr-2" /> Area personale
                   </Link>
                 </DropdownMenuItem>
-                {isAdmin && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin" className="cursor-pointer">
-                      <Shield size={14} className="mr-2" /> {t("nav.admin")}
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer text-destructive focus:text-destructive">
                   <LogOut size={14} className="mr-2" /> {t("nav.logout")}
@@ -172,15 +165,6 @@ const Navbar = () => {
               >
                 ◎ Area personale
               </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  onClick={() => setOpen(false)}
-                  className="block font-body text-sm font-medium text-primary uppercase"
-                >
-                  ⚙ {t("nav.admin")}
-                </Link>
-              )}
               <button
                 onClick={() => { signOut(); setOpen(false); }}
                 className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
