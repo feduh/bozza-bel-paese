@@ -192,19 +192,17 @@
     @apply inline-flex items-center justify-center gap-2 px-8 py-4 brutalist-border bg-transparent text-foreground micro-label transition-colors hover:bg-foreground hover:text-background cursor-pointer;
   }
 
-  /* Highlight evidenziatore acqua sotto una parola */
+  /* Highlight evidenziatore acqua sotto una parola — gradient background, niente z-index */
   .ink-highlight {
-    @apply relative inline-block;
-  }
-  .ink-highlight::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.05em;
-    height: 0.25em;
-    background: hsl(var(--secondary));
-    z-index: -1;
+    background-image: linear-gradient(
+      to top,
+      transparent 6%,
+      hsl(var(--secondary)) 6%,
+      hsl(var(--secondary)) 32%,
+      transparent 32%
+    );
+    background-repeat: no-repeat;
+    padding-inline: 0.1em;
   }
 }
 
