@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import heroImage from "@/assets/hero-art.jpg";
 import SEO from "@/components/SEO";
 import SmartImage from "@/components/SmartImage";
+import CountUp from "@/components/CountUp";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -12,12 +15,31 @@ const Index = () => {
     { icon: Users, key: "community", link: "/la-rete" },
     { icon: BookOpen, key: "stories", link: "/magazine" },
   ] as const;
+
+  const { data: liveStats } = useQuery({
+    queryKey: ["home-stats"],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_public_stats");
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return {
+        mapped: row?.mapped ?? 0,
+        regions: row?.regions ?? 0,
+        members: row?.members ?? 0,
+        articles: row?.articles ?? 0,
+      };
+    },
+  });
+
+
   const stats = [
-    { num: "150+", key: "mapped" },
-    { num: "18", key: "regions" },
-    { num: "45", key: "vanished" },
-    { num: "30+", key: "articles" },
+    { num: liveStats?.mapped ?? null, key: "mapped" },
+    { num: liveStats?.regions ?? null, key: "regions" },
+    { num: liveStats?.members ?? null, key: "members" },
+    { num: liveStats?.articles ?? null, key: "articles" },
   ] as const;
+
 
   return (
     <div>
@@ -99,7 +121,9 @@ const Index = () => {
         <div className="editorial-container grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s) => (
             <div key={s.key}>
-              <div className="font-display text-3xl md:text-4xl font-bold text-primary">{s.num}</div>
+              <div className="font-display text-3xl md:text-4xl font-bold text-primary">
+                <CountUp end={s.num} />
+              </div>
               <div className="font-body text-sm text-muted-foreground mt-1">{t(`home.stats.${s.key}`)}</div>
             </div>
           ))}

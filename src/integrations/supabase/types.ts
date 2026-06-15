@@ -540,6 +540,15 @@ export type Database = {
     }
     Functions: {
       auto_confirm_pending_realities: { Args: never; Returns: number }
+      get_public_stats: {
+        Args: never
+        Returns: {
+          articles: number
+          mapped: number
+          members: number
+          regions: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
