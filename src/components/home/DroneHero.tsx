@@ -146,16 +146,16 @@ const DroneHero = () => {
         <g transform={groupTransform}>
           {/* alone esterno tenue */}
           <path
-            d={ITALY_PATH}
+            d={EUROPE_PATH}
             fill="none"
             stroke="hsl(var(--secondary) / 0.18)"
             strokeWidth={5 / scale}
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
-          {/* Italia vettoriale */}
+          {/* Europa vettoriale */}
           <path
-            d={ITALY_PATH}
+            d={EUROPE_PATH}
             fill="none"
             stroke="hsl(var(--secondary))"
             strokeWidth={1.1 / scale}
