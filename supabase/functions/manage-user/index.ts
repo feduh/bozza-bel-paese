@@ -213,6 +213,28 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    // ---------- UPDATE USER (email / display name) ----------
+    if (data.op === "update_user") {
+      if (!data.email && !data.display_name) {
+        return json({ error: "Nessuna modifica indicata." }, 400);
+      }
+      if (data.email) {
+        const { error } = await admin.auth.admin.updateUserById(data.user_id, {
+          email: data.email,
+          email_confirm: true,
+        });
+        if (error) return json({ error: error.message }, 400);
+      }
+      if (data.display_name) {
+        const { error } = await admin
+          .from("profiles")
+          .update({ display_name: data.display_name })
+          .eq("user_id", data.user_id);
+        if (error) return json({ error: error.message }, 500);
+      }
+      return json({ ok: true });
+    }
+
     return json({ error: "Operazione sconosciuta" }, 400);
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
