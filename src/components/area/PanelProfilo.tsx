@@ -144,7 +144,7 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Ruolo nella vita reale" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
+          <Field label="Ruolo Lavorativo" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
           <div>
             <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
             <select
