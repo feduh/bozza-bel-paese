@@ -68,12 +68,12 @@
   "about": {
     "title": "About",
     "titleAccent": "Us",
-    "seoDesc": "Il Bel Paese: the first mapping, promotion and research platform that legitimises Italys independent artistic realities.",
+    "seoDesc": "Il Bel Paese: the first mapping, promotion and research platform that legitimises Italy's independent artistic realities.",
     "p1_html": "<strong>Il Bel Paese</strong> is the first mapping, promotion and research platform that <strong>legitimises independent Italian artistic and project-based realities</strong>.",
     "p2_html": "Through a dynamic showcase and a historical archive, the project systematises these experiences to foster networks and <strong>shorten the distance between the independent scene and the institutional system</strong>.",
     "p3": "We believe independent realities — physical spaces, those without a venue, and those no longer in existence — are a collective cultural heritage that deserves recognition, memory and tools to dialogue with the rest of the art system.",
     "missionTitle": "Mission",
-    "missionDesc": "To legitimise, network and give voice to Italys independent artistic realities through mapping, promotion and research.",
+    "missionDesc": "To legitimise, network and give voice to Italy's independent artistic realities through mapping, promotion and research.",
     "visionTitle": "Vision",
     "visionDesc": "An ecosystem where independent scene and institutional world meet as equals, recognising one another as part of the same cultural landscape.",
     "forTitle": "For",
@@ -102,7 +102,7 @@
     "pillars": {
       "mapping": {
         "title": "Mapping",
-        "desc": "We identify and categorise Italys independent artistic realities into three families: Spaces (with a physical venue), Spaces without a space (itinerant, digital, nomadic) and Spaces that were (historical archive of concluded experiences)."
+        "desc": "We identify and categorise Italy's independent artistic realities into three families: Spaces (with a physical venue), Spaces without a space (itinerant, digital, nomadic) and Spaces that were (historical archive of concluded experiences)."
       },
       "promotion": {
         "title": "Promotion",
@@ -127,7 +127,7 @@
       "update": "Annual review of the status of mapped realities to keep the data alive."
     },
     "whyTitle": "Why",
-    "whyText": "Because independent realities often fly under the radar of institutions, official databases and funding routes. Documenting them, telling their stories and connecting them means restoring the legitimacy they deserve and enriching the country cultural heritage.",
+    "whyText": "Because independent realities often fly under the radar of institutions, official databases and funding routes. Documenting them, telling their stories and connecting them means restoring the legitimacy they deserve and enriching the the country's cultural heritage.",
     "ctaTitle": "Want to contribute?",
     "ctaText": "If you represent an independent artistic reality, are a researcher or an institutional partner, write to us to join the map or the magazine.",
     "ctaButton": "Write to us",
@@ -147,7 +147,7 @@
         "desc": "Articles, interviews and the replies-between-authors format with editors-in-chief as scientific guarantee."
       },
       "update": {
-        "title": "Lets update",
+        "title": "Let's update",
         "desc": "Annual review of the status of mapped realities to keep the data alive."
       }
     }
