@@ -131,7 +131,7 @@ const Magazine = () => {
               to="/area-personale"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity shrink-0"
             >
-              <Plus size={16} /> Nuovo articolo
+              <Plus size={16} /> {t("magazine.newArticle")}
             </Link>
           )}
         </div>
@@ -146,21 +146,61 @@ const Magazine = () => {
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Cerca per titolo, autore…"
+                  placeholder={t("magazine.searchPlaceholder")}
                   className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
                 />
+              </div>
+              {availableAuthors.length > 0 && (
+                <select
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  aria-label={t("magazine.filterAuthor")}
+                >
+                  <option value="">{t("magazine.allAuthors")}</option>
+                  {availableAuthors.map(([id, name]) => (
+                    <option key={id} value={id}>{name}</option>
+                  ))}
+                </select>
+              )}
+              {availableYears.length > 0 && (
+                <select
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  aria-label={t("magazine.filterYear")}
+                >
+                  <option value="">{t("magazine.allYears")}</option>
+                  {availableYears.map((y) => (
+                    <option key={y} value={String(y)}>{y}</option>
+                  ))}
+                </select>
+              )}
+              <div className="relative">
+                <ArrowDownUp size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortKey)}
+                  className="pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  aria-label={t("magazine.sortBy")}
+                >
+                  <option value="newest">{t("magazine.sortNewest")}</option>
+                  <option value="oldest">{t("magazine.sortOldest")}</option>
+                  <option value="az">{t("magazine.sortAZ")}</option>
+                  <option value="za">{t("magazine.sortZA")}</option>
+                </select>
               </div>
               {hasFilters && (
                 <button
                   type="button"
-                  onClick={() => { setActiveCats([]); setQuery(""); }}
+                  onClick={() => { setActiveCats([]); setQuery(""); setAuthor(""); setYear(""); setSort("newest"); }}
                   className="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <X size={14} /> Azzera filtri
+                  <X size={14} /> {t("magazine.clearFilters")}
                 </button>
               )}
               <span className="ml-auto text-xs font-body text-muted-foreground">
-                {filteredPosts.length} {filteredPosts.length === 1 ? "articolo" : "articoli"}
+                {filteredPosts.length} {filteredPosts.length === 1 ? t("magazine.articleOne") : t("magazine.articleOther")}
               </span>
             </div>
             {availableCats.length > 0 && (
@@ -191,11 +231,11 @@ const Magazine = () => {
           <PostCardSkeletonGrid count={6} />
         ) : posts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground font-body">
-            Nessun articolo pubblicato ancora.
+            {t("magazine.emptyAll")}
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground font-body">
-            Nessun articolo trovato con questi filtri.
+            {t("magazine.emptyFiltered")}
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
