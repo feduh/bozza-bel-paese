@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import NotificationsBell from "./NotificationsBell";
+import LogoPittogramma from "./LogoPittogramma";
 import {
   DropdownMenu,
   DropdownMenuContent,

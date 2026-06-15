@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import LogoPittogramma from "@/components/LogoPittogramma";
 
 const Footer = () => {
   const { t } = useTranslation();
