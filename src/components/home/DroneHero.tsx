@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { ITALY_PATH, ITALY_VB } from "./italyPath";
+import { EUROPE_PATH, EUROPE_VB } from "./europePath";
 import LogoPittogramma from "@/components/LogoPittogramma";
 
 /**
