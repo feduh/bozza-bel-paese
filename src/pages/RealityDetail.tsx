@@ -146,7 +146,7 @@ const RealityDetail = () => {
 
             <section>
               <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.location")}</h2>
-              <div className="rounded-lg overflow-hidden border border-border h-[400px]">
+              <div className="overflow-hidden h-[400px]">
                 <Suspense fallback={<MapFallback height="400px" />}>
                   <LazyMap
                     center={[reality.lat, reality.lng]}
