@@ -54,6 +54,8 @@ const MagazinePost = () => {
     return Math.max(1, Math.round(words / 200));
   }, [post?.content]);
 
+  const isEn = i18n.language?.startsWith("en") ?? false;
+
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -64,7 +66,15 @@ const MagazinePost = () => {
         .eq("slug", slug!)
         .maybeSingle();
       if (cancelled) return;
-      const p = data as Post | null;
+      const raw = data as (Post & { title_en?: string | null; excerpt_en?: string | null; content_en?: string | null }) | null;
+      const p: Post | null = raw
+        ? {
+            ...raw,
+            title: isEn && raw.title_en ? raw.title_en : raw.title,
+            excerpt: isEn && raw.excerpt_en ? raw.excerpt_en : raw.excerpt,
+            content: isEn && raw.content_en ? raw.content_en : raw.content,
+          }
+        : null;
       setPost(p);
 
       let parentRow: ReplyMeta | null = null;
@@ -73,11 +83,14 @@ const MagazinePost = () => {
       if (p?.reply_to_id) {
         const { data: parentData } = await supabase
           .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, user_id, published_at")
+          .select("id, slug, title, title_en, excerpt, excerpt_en, author_name, user_id, published_at")
           .eq("id", p.reply_to_id)
           .eq("status", "published")
           .maybeSingle();
-        parentRow = (parentData as ReplyMeta | null) ?? null;
+        const pr = parentData as (ReplyMeta & { title_en?: string | null; excerpt_en?: string | null }) | null;
+        parentRow = pr
+          ? { ...pr, title: isEn && pr.title_en ? pr.title_en : pr.title, excerpt: isEn && pr.excerpt_en ? pr.excerpt_en : pr.excerpt }
+          : null;
         if (!cancelled) setParent(parentRow);
       } else {
         setParent(null);
@@ -86,11 +99,16 @@ const MagazinePost = () => {
       if (p) {
         const { data: replyData } = await supabase
           .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, user_id, published_at")
+          .select("id, slug, title, title_en, excerpt, excerpt_en, author_name, user_id, published_at")
           .eq("reply_to_id", p.id)
           .eq("status", "published")
           .order("published_at", { ascending: true });
-        replyRows = (replyData as ReplyMeta[]) ?? [];
+        const rawReplies = (replyData as (ReplyMeta & { title_en?: string | null; excerpt_en?: string | null })[]) ?? [];
+        replyRows = rawReplies.map((r) => ({
+          ...r,
+          title: isEn && r.title_en ? r.title_en : r.title,
+          excerpt: isEn && r.excerpt_en ? r.excerpt_en : r.excerpt,
+        }));
         if (!cancelled) setReplies(replyRows);
       }
 
@@ -104,7 +122,7 @@ const MagazinePost = () => {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, isEn]);
 
   if (loading) return <PostDetailSkeleton />;
 
