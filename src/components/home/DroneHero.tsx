@@ -20,11 +20,16 @@ const ROTATING_WORDS = [
   "luoghi che resistono",
 ];
 
+// punto di partenza (Piemonte) e zoom della mappa
+const PIEMONTE = { x: 0.22, y: 0.14 }; // normalizzato nel viewBox dell'Italia
+const ZOOM = 2.6;
+
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
   const panelRef = useRef<HTMLDivElement>(null);
-  const target = useRef({ x: 0, y: 0 }); // -1..1 relative to center
-  const current = useRef({ x: 0, y: 0 });
+  // focus normalizzato 0..1 nel viewBox dell'Italia (dove la "telecamera" guarda)
+  const target = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
+  const current = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
@@ -45,8 +50,8 @@ const DroneHero = () => {
     let raf = 0;
     const tick = () => {
       raf = requestAnimationFrame(tick);
-      current.current.x += (target.current.x - current.current.x) * 0.08;
-      current.current.y += (target.current.y - current.current.y) * 0.08;
+      current.current.x += (target.current.x - current.current.x) * 0.07;
+      current.current.y += (target.current.y - current.current.y) * 0.07;
 
       // smoothed velocity (low-pass), derive angle only above threshold
       const c = cursor.current;
@@ -59,7 +64,6 @@ const DroneHero = () => {
       const speed = Math.hypot(c.svx, c.svy);
       if (speed > 1.2) {
         const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
-        // shortest-path interpolation
         const diff = ((targetAngle - c.angle + 540) % 360) - 180;
         const ease = Math.min(0.25, 0.06 + speed * 0.01);
         c.angle += diff * ease;
@@ -79,8 +83,12 @@ const DroneHero = () => {
     const y = e.clientY - rect.top;
     cursor.current.x = x;
     cursor.current.y = y;
-    target.current.x = (x / rect.width - 0.5) * 2;
-    target.current.y = (y / rect.height - 0.5) * 2;
+    // mappa la posizione del mouse nel viewBox dell'Italia, con un piccolo padding:
+    // muovendo il cursore si naviga dal Piemonte alla Sicilia mantenendo il parallasse
+    const nx = Math.min(1, Math.max(0, x / rect.width));
+    const ny = Math.min(1, Math.max(0, y / rect.height));
+    target.current.x = 0.08 + nx * 0.84;
+    target.current.y = 0.06 + ny * 0.9;
   };
 
   // ---- rotating word ----
@@ -93,11 +101,13 @@ const DroneHero = () => {
   // ---- compute transforms ----
   const cx = panel.w / 2;
   const cy = panel.h / 2;
-  const scale = Math.min((panel.h * 1.05) / VB_H, (panel.w * 0.95) / VB_W);
-  const parX = -current.current.x * 60;
-  const parY = -current.current.y * 60;
-  const tiltDeg = current.current.x * 4;
-  const groupTransform = `translate(${cx + parX} ${cy + parY}) rotate(${tiltDeg.toFixed(2)}) scale(${scale.toFixed(3)}) translate(${(-VB_W / 2).toFixed(2)} ${(-VB_H / 2).toFixed(2)})`;
+  const fit = Math.min(panel.h / VB_H, panel.w / VB_W);
+  const scale = fit * ZOOM;
+  const fx = current.current.x * VB_W;
+  const fy = current.current.y * VB_H;
+  // leggera inclinazione "drone" proporzionale alla distanza dal centro
+  const tiltDeg = (current.current.x - 0.5) * 3;
+  const groupTransform = `translate(${cx} ${cy}) rotate(${tiltDeg.toFixed(2)}) scale(${scale.toFixed(3)}) translate(${(-fx).toFixed(2)} ${(-fy).toFixed(2)})`;
 
   const rocketRotation = cursor.current.angle;
 
@@ -109,8 +119,8 @@ const DroneHero = () => {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
         setHovering(false);
-        target.current.x = 0;
-        target.current.y = 0;
+        target.current.x = PIEMONTE.x;
+        target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
     >
