@@ -249,7 +249,10 @@ const Magazine = () => {
   );
 };
 
-const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: string }) => (
+const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: string }) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith("en") ? "en-GB" : "it-IT";
+  return (
   <Link
     to={`/magazine/${post.slug}`}
     className="group block rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all overflow-hidden"
@@ -272,7 +275,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
         ))}
         {post.reply_to_id && (
           <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
-            <Reply size={10} /> Risposta
+            <Reply size={10} /> {t("magazine.replyTag")}
           </span>
         )}
       </div>
@@ -288,7 +291,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
         </span>
         <span className="flex items-center gap-1">
           <Calendar size={12} />
-          {new Date(post.published_at).toLocaleDateString("it-IT", {
+          {new Date(post.published_at).toLocaleDateString(locale, {
             day: "numeric",
             month: "short",
             year: "numeric",
@@ -296,10 +299,11 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
         </span>
       </div>
       <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
-        Leggi <ArrowRight size={14} />
+        {t("magazine.read")} <ArrowRight size={14} />
       </span>
     </div>
   </Link>
-);
+  );
+};
 
 export default Magazine;
