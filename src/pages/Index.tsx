@@ -73,61 +73,11 @@ const Index = () => {
         }}
       />
 
+      {/* ============ HERO — DRONE POV FULL BLEED ============ */}
+      <DroneHero />
+
       <div className="editorial-container py-10 md:py-16 space-y-12 md:space-y-20">
 
-        {/* ============ HERO ============ */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-          <div className="lg:col-span-7 space-y-8 relative">
-            {/* Dot pattern background */}
-            <div
-              className="absolute -inset-4 -z-10 opacity-40 pointer-events-none"
-              aria-hidden
-              style={{
-                backgroundImage: "radial-gradient(hsl(var(--foreground)) 1px, transparent 1.5px)",
-                backgroundSize: "18px 18px",
-                maskImage: "linear-gradient(to bottom, black 30%, transparent 90%)",
-                WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 90%)",
-              }}
-            />
-
-            <div className="inline-flex items-center gap-2 bg-card brutalist-border px-3 py-1 micro-label">
-              <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse" />
-              Archivio Editoriale · Vol. 01
-            </div>
-
-            <h1 className="editorial-heading">
-              <span className="block">Mappiamo</span>
-              <span className="block text-primary">
-                <WordRotate words={ROTATING_WORDS} />
-              </span>
-              <span className="block">
-                artistici{" "}
-                <span className="ink-highlight">d'Italia</span>
-              </span>
-            </h1>
-
-            <p className="editorial-body max-w-xl">
-              {t("home.lead")}
-            </p>
-
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Link to="/mappatura" className="btn-brutalist shadow-brutalist hover:shadow-brutalist-aqua transition-shadow">
-                {t("home.ctaMap")} <ArrowRight size={16} />
-              </Link>
-              <Link to="/la-rete" className="btn-brutalist-outline">
-                {t("home.ctaAbout")}
-              </Link>
-            </div>
-          </div>
-
-          {/* Live Ticker al posto della foto */}
-          <div className="lg:col-span-5 relative">
-            <LiveTicker />
-            <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-20 h-20 md:w-24 md:h-24 bg-secondary brutalist-border flex items-center justify-center text-center micro-label leading-tight rotate-3">
-              Live<br/>Feed
-            </div>
-          </div>
-        </section>
 
         {/* ============ MARQUEE FULL-WIDTH (testata) ============ */}
         <section className="-mx-6 md:-mx-10 border-y-2 border-foreground bg-foreground text-background py-4">
