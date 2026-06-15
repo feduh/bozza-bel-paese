@@ -83,12 +83,12 @@ const DroneHero = () => {
     const y = e.clientY - rect.top;
     cursor.current.x = x;
     cursor.current.y = y;
-    // mappa la posizione del mouse nel viewBox dell'Italia, con un piccolo padding:
-    // muovendo il cursore si naviga dal Piemonte alla Sicilia mantenendo il parallasse
+    // mappa la posizione del mouse nel viewBox dell'Europa, con un piccolo padding:
+    // muovendo il cursore si naviga dall'Italia al resto d'Europa mantenendo il parallasse
     const nx = Math.min(1, Math.max(0, x / rect.width));
     const ny = Math.min(1, Math.max(0, y / rect.height));
-    target.current.x = 0.08 + nx * 0.84;
-    target.current.y = 0.06 + ny * 0.9;
+    target.current.x = 0.40 + nx * 0.30;
+    target.current.y = 0.65 + ny * 0.25;
   };
 
   // ---- rotating word ----
