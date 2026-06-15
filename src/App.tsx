@@ -9,7 +9,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/Layout";
 import RouteFallback from "./components/RouteFallback";
 import ScrollToTop from "./components/ScrollToTop";
-import { RequireAuth, RequireRole } from "./components/RouteGuards";
+import { RequireAuth } from "./components/RouteGuards";
 
 // Eager: Home and 404 — needed for fast first paint and error states
 import Index from "./pages/Index";
@@ -23,7 +23,7 @@ const Mappatura = lazy(() => import("./pages/Mappatura"));
 const Blog = lazy(() => import("./pages/Blog"));
 const MagazinePost = lazy(() => import("./pages/MagazinePost"));
 const Login = lazy(() => import("./pages/Login"));
-const Admin = lazy(() => import("./pages/Admin"));
+
 const AreaPersonale = lazy(() => import("./pages/AreaPersonale"));
 const ArticoloEditor = lazy(() => import("./pages/ArticoloEditor"));
 const RealityGalleryAdmin = lazy(() => import("./pages/RealityGalleryAdmin"));
