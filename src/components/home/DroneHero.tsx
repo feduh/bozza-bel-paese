@@ -21,8 +21,8 @@ const ROTATING_WORDS = [
 ];
 
 // punto di partenza (Piemonte) e zoom della mappa — su Europa, Italia in primo piano
-const PIEMONTE = { x: 0.52, y: 0.80 }; // normalizzato nel viewBox Europa
-const ZOOM = 5.5;
+const PIEMONTE = { x: 0.475, y: 0.655 }; // normalizzato nel viewBox Europa (Mercator)
+const ZOOM = 4.2;
 
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
@@ -87,8 +87,8 @@ const DroneHero = () => {
     // muovendo il cursore si naviga dall'Italia al resto d'Europa mantenendo il parallasse
     const nx = Math.min(1, Math.max(0, x / rect.width));
     const ny = Math.min(1, Math.max(0, y / rect.height));
-    target.current.x = 0.40 + nx * 0.30;
-    target.current.y = 0.65 + ny * 0.25;
+    target.current.x = 0.42 + nx * 0.18;
+    target.current.y = 0.60 + ny * 0.22;
   };
 
   // ---- rotating word ----
@@ -147,18 +147,18 @@ const DroneHero = () => {
           {/* alone esterno tenue */}
           <path
             d={EUROPE_PATH}
-            fill="none"
-            stroke="hsl(var(--secondary) / 0.18)"
-            strokeWidth={5 / scale}
+            fill="hsl(var(--secondary) / 0.06)"
+            stroke="hsl(var(--secondary) / 0.25)"
+            strokeWidth={4 / scale}
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
           {/* Europa vettoriale */}
           <path
             d={EUROPE_PATH}
-            fill="none"
+            fill="hsl(var(--secondary) / 0.10)"
             stroke="hsl(var(--secondary))"
-            strokeWidth={1.1 / scale}
+            strokeWidth={1 / scale}
             strokeLinejoin="round"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
