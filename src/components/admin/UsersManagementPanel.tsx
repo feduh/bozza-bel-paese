@@ -40,6 +40,8 @@ const UsersManagementPanel = () => {
 
   // Reset password panel state (per user)
   const [pwd, setPwd] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editName, setEditName] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null));
