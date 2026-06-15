@@ -73,7 +73,11 @@ Deno.serve(async (req) => {
       update[dst] = value ? await translate(value) : null;
     }
 
-    const { error: upErr } = await admin.from(table).update(update).eq('id', id);
+    const { error: upErr } = await admin.rpc('apply_translation', {
+      _table: table,
+      _id: id,
+      _fields: update,
+    });
     if (upErr) throw upErr;
 
     return new Response(JSON.stringify({ ok: true }), {
