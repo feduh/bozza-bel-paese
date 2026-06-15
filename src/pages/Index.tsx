@@ -20,30 +20,18 @@ const Index = () => {
     queryKey: ["home-stats"],
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const [realities, members, posts] = await Promise.all([
-        supabase
-          .from("realities")
-          .select("region", { count: "exact" })
-          .eq("confirmed_status", "confermato"),
-        supabase
-          .from("profiles")
-          .select("id", { count: "exact", head: true }),
-        supabase
-          .from("blog_posts")
-          .select("id", { count: "exact", head: true })
-          .eq("status", "published"),
-      ]);
-      const regions = new Set(
-        (realities.data ?? []).map((r: any) => r.region).filter(Boolean)
-      ).size;
+      const { data, error } = await supabase.rpc("get_public_stats");
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
       return {
-        mapped: realities.count ?? 0,
-        regions,
-        members: members.count ?? 0,
-        articles: posts.count ?? 0,
+        mapped: row?.mapped ?? 0,
+        regions: row?.regions ?? 0,
+        members: row?.members ?? 0,
+        articles: row?.articles ?? 0,
       };
     },
   });
+
 
   const stats = [
     { num: liveStats?.mapped ?? null, key: "mapped" },
