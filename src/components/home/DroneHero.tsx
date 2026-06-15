@@ -189,7 +189,7 @@ const DroneHero = () => {
           className="text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.95] tracking-tight"
           style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.03em" }}
         >
-          Mappiamo le
+          Mappiamo
           <br />
           <span className="relative inline-block min-h-[1.1em] text-secondary">
             {ROTATING_WORDS.map((w, i) => (
