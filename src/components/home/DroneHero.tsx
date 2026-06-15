@@ -247,7 +247,10 @@ const DroneHero = () => {
           }}
           aria-hidden
         >
-          <LogoPittogramma className="w-10 h-10 text-secondary drop-shadow-[0_0_8px_hsl(var(--secondary)/0.7)]" />
+          <LogoPittogramma
+            className="w-10 h-10 text-secondary drop-shadow-[0_0_8px_hsl(var(--secondary)/0.7)]"
+            flameClassName="text-[#FF8C00] drop-shadow-[0_0_6px_rgba(255,140,0,0.7)]"
+          />
         </div>
       )}
     </div>
