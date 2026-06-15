@@ -197,7 +197,7 @@ const DroneHero = () => {
         >
           Mappiamo
           <br />
-          <span className="relative inline-block min-h-[1.1em] text-secondary">
+          <span className="relative inline-block min-h-[1.1em] text-[#8B5CFF]" style={{ textShadow: "0 0 18px rgba(139,92,255,0.45)" }}>
             {ROTATING_WORDS.map((w, i) => (
               <span
                 key={w}
