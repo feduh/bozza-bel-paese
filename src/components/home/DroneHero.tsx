@@ -21,8 +21,8 @@ const ROTATING_WORDS = [
 ];
 
 // punto di partenza (Piemonte) e zoom della mappa — su Europa, Italia in primo piano
-const PIEMONTE = { x: 0.52, y: 0.80 }; // normalizzato nel viewBox Europa
-const ZOOM = 5.5;
+const PIEMONTE = { x: 0.475, y: 0.655 }; // normalizzato nel viewBox Europa (Mercator)
+const ZOOM = 4.2;
 
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
