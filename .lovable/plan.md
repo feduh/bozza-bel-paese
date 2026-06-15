@@ -1,82 +1,81 @@
-## Batch 2 — Account & Sicurezza
+## Obiettivi
 
-Due aree distinte, entrambe necessarie per chiudere il loop di gestione account.
+1. **Login → area personale** (già fatto in questa risposta).
+2. **Newsletter** estendibile (articoli, realtà, podcast futuri), a costo zero per 500-1000 iscritti.
 
----
+## Provider scelto: Brevo (free)
 
-### 1. Gestione utenti esistenti (pannello Admin)
+- 0 €/mese, contatti illimitati, **300 email/giorno** sul piano gratuito.
+- Per liste >300 destinatari, l'invio viene **spezzato automaticamente in batch giornalieri** da una cron Supabase.
+- Connettore Brevo già supportato da Lovable → niente API key da gestire a mano una volta connesso.
+- Alternativa futura: passare a Brevo Lite (~7 €/mese, 20k email/mese) cambiando solo un parametro.
 
-Oggi `/admin` permette solo di **creare** collaboratori. Aggiungo un pannello completo per gestire quelli esistenti.
+## Modello dati (nuove tabelle)
 
-**Nuovo componente `UsersManagementPanel.tsx`** dentro `src/components/admin/`:
+- `newsletter_subscribers`: `email`, `user_id` (nullable, FK profiles), `status` (`pending|confirmed|unsubscribed|bounced`), `confirmation_token`, `unsubscribe_token`, `confirmed_at`, `source` (`public_form|member_auto`), `locale`.
+- `newsletter_issues`: `title`, `subject`, `preheader`, `content_blocks` (jsonb — array di blocchi tipizzati: `editorial`, `articles_auto`, `realities_auto`, `podcast`, `custom_html`, ecc.), `status` (`draft|scheduled|sending|sent|failed`), `scheduled_for`, `sent_at`, `created_by`, `sent_count`, `failed_count`.
+- `newsletter_deliveries`: `issue_id`, `subscriber_id`, `status` (`queued|sent|failed|bounced`), `sent_at`, `error`. Tabella di tracking + supporto batch giornalieri.
 
-- **Lista utenti** unisce `profiles` + `user_roles` + email da `auth.users` (recuperata via edge function con service role)
-- **Per ogni utente**:
-  - Avatar / nome / email / data creazione
-  - Badge ruoli correnti (admin / moderator / collaborator / author)
-  - Tipo (membro/autore), realtà o affiliazione
-- **Azioni**:
-  - **Cambia ruolo**: aggiungi/rimuovi `admin`, `moderator`, `collaborator`, `author` (toggle multipli — un utente può avere più ruoli)
-  - **Reset password**: l'admin imposta una nuova password temporanea per quell'utente
-  - **Sospendi / Riattiva account**: usa `auth.users.banned_until` (sospensione = banned_until = '2099-…', riattivazione = null)
-  - **Elimina account**: cancella `auth.user` + cascata su profiles/roles (con conferma dialog)
-- **Filtri**: per ruolo, per realtà, ricerca testuale su nome/email
-- **Self-protection**: un admin non può togliersi il ruolo admin né eliminarsi (evita lockout)
+Il formato `content_blocks` (jsonb tipizzato) è la chiave della scalabilità: aggiungere podcast in futuro = aggiungere un nuovo tipo di blocco, niente migrazione.
 
-**Nuova edge function `manage-user`** (`supabase/functions/manage-user/index.ts`):
-- Operazioni: `list_users`, `update_roles`, `reset_password`, `set_banned`, `delete_user`
-- Usa `SUPABASE_SERVICE_ROLE_KEY` per accedere a `auth.admin.*`
-- Verifica nel codice che il caller sia admin (via JWT + `has_role`)
-- Logga ogni azione in `admin_audit_log` (già esistente)
+RLS: subscribers solo admin/coordinatori in lettura; insert pubblico consentito al form; issues e deliveries solo admin/coordinatori.
 
----
+## Iscrizione
 
-### 2. Reset password autonomo
+- **Form pubblico** nel Footer + sezione homepage: email → riga `pending` + email di conferma con link doppio opt-in.
+- **Membri registrati**: auto-iscritti come `confirmed` alla creazione del profilo (trigger DB). Toggle "ricevi newsletter" nell'area personale per disiscriversi.
+- Endpoint pubblico `unsubscribe` con token univoco (link in fondo a ogni email).
 
-Per utenti che hanno perso la password — flow completo email-based.
+## Composizione & invio (area personale, solo admin/coordinatori)
 
-**Pagine nuove:**
-- `/password-dimenticata` (`PasswordDimenticata.tsx`): form email → `supabase.auth.resetPasswordForEmail()` con `redirectTo: /reset-password`
-- `/reset-password` (`ResetPassword.tsx`): form nuova password + conferma; valida sessione di recovery e chiama `supabase.auth.updateUser({ password })`
+Nuova sezione `Newsletter` nell'area personale, stesso pattern degli articoli:
 
-**Regole password** (validate sia client che server tramite HIBP già attivo):
-- Minimo 10 caratteri
-- Almeno 1 maiuscola, 1 minuscola, 1 numero, 1 simbolo
-- Non compromessa (HIBP, già attivo nella migration precedente)
-- Indicatore di forza visivo durante la digitazione
+- Lista bozze/programmate/inviate.
+- Editor a blocchi: editoriale (markdown), selettore articoli del magazine, selettore realtà recenti, blocco podcast (placeholder per il futuro), HTML libero.
+- Anteprima desktop/mobile.
+- "Salva bozza" / "Programma" (slot 30 min come gli articoli) / "Invia ora".
+- Stato live durante l'invio (sent/failed counter).
 
-**Modifiche a `Login.tsx`:**
-- Link "Password dimenticata?" sotto il form
+## Pipeline di invio
 
----
+1. Edge function `newsletter-render` → genera HTML finale dai `content_blocks`.
+2. Edge function `newsletter-dispatch` (cron ogni 5 min): pesca issue `scheduled` con `scheduled_for <= now()`, crea righe `newsletter_deliveries` per ogni subscriber `confirmed`, marca issue `sending`.
+3. Edge function `newsletter-send-batch` (cron ogni 5 min): legge fino a N (default 250, sotto il limite Brevo) deliveries `queued`, invia via gateway Brevo (`POST /smtp/email`), aggiorna stato. Quando le `queued` finiscono → issue `sent`.
+4. Throttling automatico se Brevo restituisce 429.
 
-### Cosa NON includo in questo batch
+## Edge functions da creare
 
-- Sincronizzazione `author_name` negli articoli al cambio nome profilo (sposto al batch successivo perché impatta sul layout articolo)
-- Notifiche email transazionali (verranno con il batch Newsletter)
-- "Magic link" come alternativa alla password (richiede setup SMTP)
+- `newsletter-subscribe` (pubblico): valida email + zod, crea pending, invia mail di conferma.
+- `newsletter-confirm` (pubblico): valida token, marca `confirmed`.
+- `newsletter-unsubscribe` (pubblico): valida token, marca `unsubscribed`.
+- `newsletter-render`: ritorna HTML preview per editor.
+- `newsletter-dispatch` + `newsletter-send-batch`: cron.
 
----
+## UI da creare/modificare
 
-### File toccati
+- `src/components/NewsletterSignup.tsx` (form footer + homepage).
+- `src/pages/NewsletterConfirm.tsx` (`/newsletter/conferma?token=…`).
+- `src/pages/NewsletterUnsubscribe.tsx` (`/newsletter/disiscriviti?token=…`).
+- `src/pages/area-personale/Newsletter.tsx` (lista issue).
+- `src/pages/area-personale/NewsletterEditor.tsx` (composizione blocchi).
+- Toggle "ricevi newsletter" nel profilo membro.
 
-**Nuovi:**
-- `src/components/admin/UsersManagementPanel.tsx`
-- `src/pages/PasswordDimenticata.tsx`
-- `src/pages/ResetPassword.tsx`
-- `supabase/functions/manage-user/index.ts`
-- Migration: validation triggers su operazioni audit, eventuale view `auth_users_view` se serve
+## Costi totali stimati
 
-**Modificati:**
-- `src/pages/Admin.tsx` (aggiunge il nuovo pannello)
-- `src/pages/Login.tsx` (link recupero)
-- `src/App.tsx` (nuove route)
-- `src/lib/validation.ts` (regole password)
+- Brevo free: **0 €/mese** fino a 300 invii/giorno.
+- Connettore Brevo: gratuito.
+- Tutto il resto (DB, edge functions, cron): incluso in Lovable Cloud.
 
----
+## Setup richiesto
 
-### Domanda per te prima di partire
+Prima di scrivere codice ti chiederò di:
+1. Connettere il connettore Brevo (1 click).
+2. Verificare un dominio mittente su Brevo (DNS, ~5 min) — necessario per non finire in spam.
 
-1. **Eliminazione account**: la voglio "hard delete" (utente + profilo + articoli vanno via) o "soft" (anonimizza profilo, mantiene articoli con autore "Utente rimosso")? Per un magazine consiglierei **soft** così la cronologia editoriale resta integra.
+## Step di implementazione
 
-2. **Reset password da admin**: l'admin sceglie lui la nuova password e la comunica all'utente (come ora per la creazione), o l'admin scatena solo un'email di recovery all'utente?
+1. Migration: tabelle + RLS + trigger auto-subscribe membri.
+2. Edge functions subscribe/confirm/unsubscribe + pagine pubbliche + form footer.
+3. Editor newsletter nell'area personale + render preview.
+4. Cron dispatch + send-batch via Brevo.
+5. Toggle preferenza nel profilo + sezione admin "iscritti".
