@@ -43,7 +43,8 @@ type ViewMode = "list" | "map" | "magazine";
 type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language?.startsWith("en") ?? false;
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [realities, setRealities] = useState<Reality[]>([]);
@@ -72,18 +73,23 @@ const Mappatura = () => {
       const { data: tagsData } = await supabase.from("reality_tags").select("*");
 
       if (realitiesData) {
-        const mapped = realitiesData.map((r) => ({
-          ...r,
-          type: r.type as DbRealityType,
-          status: ((r as { status?: string }).status ?? "attivo") as RealityStatus,
-          tags: tagsData?.filter((t) => t.reality_id === r.id).map((t) => t.tag) ?? [],
-        }));
+        const mapped = realitiesData.map((r) => {
+          const rr = r as any;
+          return {
+            ...rr,
+            name: isEn && rr.name_en ? rr.name_en : rr.name,
+            description: isEn && rr.description_en ? rr.description_en : rr.description,
+            type: rr.type as DbRealityType,
+            status: (rr.status ?? "attivo") as RealityStatus,
+            tags: tagsData?.filter((t) => t.reality_id === rr.id).map((t) => t.tag) ?? [],
+          };
+        });
         setRealities(mapped);
       }
       setLoading(false);
     };
     fetchRealities();
-  }, []);
+  }, [isEn]);
 
   // Sync state → URL (debounced for search)
   useEffect(() => {
