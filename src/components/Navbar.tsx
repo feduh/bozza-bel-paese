@@ -45,16 +45,17 @@ const Navbar = () => {
 
   return (
     <nav
-      className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border"
+      className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b-2 border-foreground"
       aria-label={t("nav.home")}
     >
       <div className="editorial-container flex items-center justify-between h-16">
         <Link
           to="/"
-          className="font-display text-xl font-bold text-primary tracking-tight"
+          className="text-xl tracking-tight text-foreground uppercase hover:text-primary transition-colors"
+          style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.02em" }}
           aria-label="Il Bel Paese — home"
         >
-          Il Bel Paese
+          ILBELPAESE
         </Link>
 
         {/* Desktop */}

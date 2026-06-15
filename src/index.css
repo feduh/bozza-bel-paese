@@ -2,79 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============ Stack Sans Notch (variable, all weights 200–700) ============ */
+@font-face {
+  font-family: 'Stack Sans Notch';
+  src: url('/__l5e/assets-v1/a5728466-7662-4fe2-8669-5267dda0698a/StackSansNotch-Variable.woff2') format('woff2-variations'),
+       url('/__l5e/assets-v1/a5728466-7662-4fe2-8669-5267dda0698a/StackSansNotch-Variable.woff2') format('woff2');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
-    --background: 260 20% 98%;
-    --foreground: 260 30% 12%;
+    /* === Il Bel Paese — Editorial Brutalist palette ===
+       Avorio #F4EFE6 · Ink #0E0B14 · Viola deep #5B2BD9 · Viola electric #8B5CFF · Acqua #2FD4C4 */
+    --background: 38 32% 93%;          /* Avorio #F4EFE6 */
+    --foreground: 260 28% 6%;          /* Ink  #0E0B14 */
 
-    --card: 260 18% 95%;
-    --card-foreground: 260 30% 12%;
+    --card: 0 0% 100%;                 /* Bianco puro su avorio */
+    --card-foreground: 260 28% 6%;
 
-    --popover: 260 20% 98%;
-    --popover-foreground: 260 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 28% 6%;
 
-    --primary: 270 60% 58%;
+    --primary: 257 71% 51%;            /* Viola deep #5B2BD9 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 174 55% 40%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 173 66% 51%;          /* Acqua #2FD4C4 */
+    --secondary-foreground: 260 28% 6%;
 
-    --muted: 260 15% 91%;
-    --muted-foreground: 260 10% 45%;
+    --muted: 38 22% 88%;               /* Avorio scurito */
+    --muted-foreground: 260 8% 32%;
 
-    --accent: 45 85% 60%;
-    --accent-foreground: 260 30% 12%;
+    --accent: 173 66% 51%;             /* Acqua come accent */
+    --accent-foreground: 260 28% 6%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 260 12% 85%;
-    --input: 260 12% 85%;
-    --ring: 270 60% 58%;
+    --border: 260 28% 6%;              /* Bordi neri brutalist */
+    --input: 260 12% 75%;
+    --ring: 257 71% 51%;
 
-    --radius: 0.75rem;
+    --radius: 0;                        /* Bordi netti, niente arrotondamenti */
 
-    --sidebar-background: 260 18% 95%;
-    --sidebar-foreground: 260 30% 12%;
-    --sidebar-primary: 270 60% 58%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 260 28% 6%;
+    --sidebar-primary: 257 71% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 15% 91%;
-    --sidebar-accent-foreground: 260 30% 12%;
-    --sidebar-border: 260 12% 85%;
-    --sidebar-ring: 270 60% 58%;
+    --sidebar-accent: 38 22% 88%;
+    --sidebar-accent-foreground: 260 28% 6%;
+    --sidebar-border: 260 28% 6%;
+    --sidebar-ring: 257 71% 51%;
 
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+    /* Tipografia: Stack Sans Notch ovunque (variable font) */
+    --font-display: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
+    --font-mono: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
+
+    /* Brutalist shadow: offset duro, no blur */
+    --shadow-brutalist: 4px 4px 0 0 hsl(var(--foreground));
+    --shadow-brutalist-lg: 6px 6px 0 0 hsl(var(--foreground));
+    --shadow-brutalist-aqua: 6px 6px 0 0 hsl(var(--secondary));
   }
 
   .dark {
-    --background: 260 25% 8%;
-    --foreground: 260 15% 92%;
-    --card: 260 22% 12%;
-    --card-foreground: 260 15% 92%;
-    --popover: 260 25% 8%;
-    --popover-foreground: 260 15% 92%;
-    --primary: 270 55% 62%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 174 45% 45%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 260 18% 18%;
-    --muted-foreground: 260 10% 58%;
-    --accent: 45 75% 55%;
-    --accent-foreground: 260 25% 8%;
-    --destructive: 0 62% 35%;
+    /* Inverte: Ink come sfondo, Avorio come testo, Viola electric come primario */
+    --background: 260 28% 6%;          /* Ink */
+    --foreground: 38 32% 93%;          /* Avorio */
+    --card: 260 25% 10%;
+    --card-foreground: 38 32% 93%;
+    --popover: 260 25% 10%;
+    --popover-foreground: 38 32% 93%;
+    --primary: 257 100% 68%;           /* Viola electric #8B5CFF */
+    --primary-foreground: 260 28% 6%;
+    --secondary: 173 66% 51%;          /* Acqua resta */
+    --secondary-foreground: 260 28% 6%;
+    --muted: 260 22% 14%;
+    --muted-foreground: 38 15% 65%;
+    --accent: 173 66% 51%;
+    --accent-foreground: 260 28% 6%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 260 15% 22%;
-    --input: 260 15% 22%;
-    --ring: 270 55% 62%;
-    --sidebar-background: 260 22% 10%;
-    --sidebar-foreground: 260 15% 92%;
-    --sidebar-primary: 270 55% 62%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 18% 18%;
-    --sidebar-accent-foreground: 260 15% 92%;
-    --sidebar-border: 260 15% 22%;
-    --sidebar-ring: 270 55% 62%;
+    --border: 38 32% 93%;
+    --input: 260 22% 20%;
+    --ring: 257 100% 68%;
+    --sidebar-background: 260 25% 10%;
+    --sidebar-foreground: 38 32% 93%;
+    --sidebar-primary: 257 100% 68%;
+    --sidebar-primary-foreground: 260 28% 6%;
+    --sidebar-accent: 260 22% 14%;
+    --sidebar-accent-foreground: 38 32% 93%;
+    --sidebar-border: 38 32% 93%;
+    --sidebar-ring: 257 100% 68%;
+    --shadow-brutalist: 4px 4px 0 0 hsl(var(--foreground));
+    --shadow-brutalist-lg: 6px 6px 0 0 hsl(var(--foreground));
+    --shadow-brutalist-aqua: 6px 6px 0 0 hsl(var(--secondary));
   }
 }
 
@@ -84,78 +107,136 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
+    font-variation-settings: 'wght' 400;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    font-variation-settings: 'wght' 700;
+    letter-spacing: -0.02em;
   }
 
-  /* Accessibility: consistent visible focus ring across the app.
-     Mouse users won't see it (focus-visible), keyboard users always will. */
+  /* Focus ring sempre netto, niente arrotondamenti */
   :focus { outline: none; }
   :focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
-    border-radius: 4px;
   }
-  /* Avoid double rings on shadcn components that already render a ring */
   [data-radix-collection-item]:focus-visible,
   [role="menuitem"]:focus-visible,
   [role="option"]:focus-visible {
     outline-offset: -2px;
   }
+
+  /* Selezione testo coerente */
+  ::selection {
+    background: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+  }
 }
 
 @layer components {
   .editorial-container {
-    @apply max-w-6xl mx-auto px-6;
+    @apply max-w-7xl mx-auto px-6 md:px-10;
   }
 
   .editorial-heading {
     font-family: var(--font-display);
-    @apply text-4xl md:text-5xl font-bold tracking-tight;
+    font-variation-settings: 'wght' 700;
+    @apply text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.9] tracking-tight;
   }
 
   .editorial-subheading {
     font-family: var(--font-display);
-    @apply text-2xl md:text-3xl font-semibold;
+    font-variation-settings: 'wght' 700;
+    @apply text-3xl md:text-5xl uppercase leading-[0.95] tracking-tight;
   }
 
   .editorial-body {
     font-family: var(--font-body);
-    @apply text-lg leading-relaxed;
+    font-variation-settings: 'wght' 400;
+    @apply text-lg md:text-xl leading-snug;
+  }
+
+  /* Micro-UI: tag, label, metadati — sempre maiuscolo, tracking ampio */
+  .micro-label {
+    font-family: var(--font-mono);
+    font-variation-settings: 'wght' 700;
+    @apply text-[10px] md:text-xs uppercase tracking-[0.2em];
+  }
+
+  /* Bordo brutalist 2px nero */
+  .brutalist-border {
+    @apply border-2 border-foreground;
+  }
+
+  /* Card brutalist con ombra dura offset */
+  .brutalist-card {
+    @apply bg-card border-2 border-foreground transition-all duration-200;
+    box-shadow: var(--shadow-brutalist);
+  }
+  .brutalist-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-brutalist-aqua);
+  }
+
+  /* CTA primario brutalist */
+  .btn-brutalist {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-4 brutalist-border bg-primary text-primary-foreground micro-label transition-colors hover:bg-[hsl(var(--primary)/0.85)] cursor-pointer;
+  }
+
+  /* CTA secondario brutalist (outline) */
+  .btn-brutalist-outline {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-4 brutalist-border bg-transparent text-foreground micro-label transition-colors hover:bg-foreground hover:text-background cursor-pointer;
+  }
+
+  /* Highlight evidenziatore acqua sotto una parola — gradient background, niente z-index */
+  .ink-highlight {
+    background-image: linear-gradient(
+      to top,
+      transparent 6%,
+      hsl(var(--secondary)) 6%,
+      hsl(var(--secondary)) 32%,
+      transparent 32%
+    );
+    background-repeat: no-repeat;
+    padding-inline: 0.1em;
   }
 }
 
-/* ============ Map styling (Il Bel Paese) ============ */
+/* ============ Map styling (Il Bel Paese) — Editorial Brutalist ============ */
 .ibp-map {
   background: hsl(var(--card));
 }
 .ibp-map .leaflet-tile-pane {
-  /* Subtly desaturate the basemap so colored markers pop */
-  filter: saturate(0.78) contrast(0.96);
+  filter: saturate(0.85) contrast(0.95);
 }
 .ibp-map .leaflet-control-zoom a {
   background: hsl(var(--card));
   color: hsl(var(--foreground));
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem !important;
+  border: 2px solid hsl(var(--foreground)) !important;
+  border-radius: 0 !important;
   margin-bottom: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 3px 3px 0 0 hsl(var(--foreground));
+  font-family: var(--font-mono);
+  font-weight: 700;
 }
 .ibp-map .leaflet-control-zoom a:hover {
-  background: hsl(var(--muted));
-  color: hsl(var(--primary));
+  background: hsl(var(--secondary));
+  color: hsl(var(--foreground));
 }
 .ibp-map .leaflet-control-attribution {
-  background: hsl(var(--card) / 0.85);
+  background: hsl(var(--card) / 0.95);
   color: hsl(var(--muted-foreground));
-  font-family: var(--font-body);
+  font-family: var(--font-mono);
   font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border: 1px solid hsl(var(--foreground));
+  border-radius: 0;
 }
 
 /* Markers */
@@ -171,7 +252,7 @@
   inset: 8px;
   border-radius: 9999px;
   background: var(--mc);
-  border: 2px solid #fff;
+  border: 2px solid hsl(var(--background));
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 .ibp-marker--solid .ibp-marker__halo {
@@ -207,13 +288,13 @@
   .ibp-marker--solid .ibp-marker__halo { animation: none; opacity: 0.35; }
 }
 
-/* Popup */
+/* Popup brutalist */
 .ibp-map .leaflet-popup-content-wrapper {
   background: hsl(var(--popover));
   color: hsl(var(--popover-foreground));
-  border-radius: 0.625rem;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
-  border: 1px solid hsl(var(--border));
+  border-radius: 0;
+  box-shadow: 4px 4px 0 0 hsl(var(--foreground));
+  border: 2px solid hsl(var(--foreground));
 }
 .ibp-map .leaflet-popup-content {
   margin: 12px 14px;
@@ -222,29 +303,27 @@
 }
 .ibp-map .leaflet-popup-tip {
   background: hsl(var(--popover));
-  border: 1px solid hsl(var(--border));
+  border: 2px solid hsl(var(--foreground));
 }
 
-/* Cluster bubbles — coerenti con la palette del progetto */
+/* Cluster bubbles */
 .ibp-cluster-wrap { background: transparent !important; border: none !important; }
 .ibp-cluster {
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: hsl(var(--primary) / 0.18);
-  border: 2px solid hsl(var(--primary));
-  color: hsl(var(--primary));
-  font-family: var(--font-display, 'Playfair Display', serif);
-  font-weight: 600;
+  background: hsl(var(--secondary));
+  border: 2px solid hsl(var(--foreground));
+  color: hsl(var(--foreground));
+  font-family: var(--font-mono);
+  font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 4px 12px -4px hsl(var(--primary) / 0.45);
-  backdrop-filter: blur(2px);
+  box-shadow: 3px 3px 0 0 hsl(var(--foreground));
   transition: transform 0.18s ease;
 }
 .ibp-cluster:hover { transform: scale(1.08); }
 .leaflet-marker-icon.ibp-cluster-wrap { z-index: 600 !important; }
-/* Override default leaflet.markercluster look */
 .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large,
 .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
   background: transparent !important;
@@ -255,11 +334,11 @@
 .ibp-user-loc { position: relative; display: block; width: 20px; height: 20px; }
 .ibp-user-loc__dot {
   position: absolute; inset: 5px; border-radius: 999px;
-  background: hsl(var(--secondary)); border: 2px solid hsl(var(--background));
-  box-shadow: 0 1px 4px hsl(var(--secondary) / 0.6);
+  background: hsl(var(--primary)); border: 2px solid hsl(var(--background));
+  box-shadow: 0 1px 4px hsl(var(--primary) / 0.6);
 }
 .ibp-user-loc__pulse {
   position: absolute; inset: 0; border-radius: 999px;
-  background: hsl(var(--secondary) / 0.4);
+  background: hsl(var(--primary) / 0.4);
   animation: ibp-pulse 1.8s ease-out infinite;
 }

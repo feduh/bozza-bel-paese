@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import heroImage from "@/assets/hero-art.jpg";
@@ -10,11 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { t } = useTranslation();
-  const features = [
-    { icon: MapPin, key: "mapping", link: "/mappatura" },
-    { icon: Users, key: "community", link: "/la-rete" },
-    { icon: BookOpen, key: "stories", link: "/magazine" },
-  ] as const;
 
   const { data: liveStats } = useQuery({
     queryKey: ["home-stats"],
@@ -32,17 +27,21 @@ const Index = () => {
     },
   });
 
-
-  const stats = [
-    { num: liveStats?.mapped ?? null, key: "mapped" },
-    { num: liveStats?.regions ?? null, key: "regions" },
-    { num: liveStats?.members ?? null, key: "members" },
-    { num: liveStats?.articles ?? null, key: "articles" },
+  const features = [
+    { num: "01", section: "Cartografia", key: "mapping", link: "/mappatura", inverted: false },
+    { num: "02", section: "Network",     key: "community", link: "/la-rete", inverted: true },
+    { num: "03", section: "Editoria",    key: "stories",   link: "/magazine", inverted: false },
   ] as const;
 
+  const stats = [
+    { num: liveStats?.mapped ?? null, key: "mapped", color: "text-foreground" },
+    { num: liveStats?.regions ?? null, key: "regions", color: "text-primary" },
+    { num: liveStats?.members ?? null, key: "members", color: "text-foreground" },
+    { num: liveStats?.articles ?? null, key: "articles", color: "text-secondary" },
+  ] as const;
 
   return (
-    <div>
+    <div className="bg-background">
       <SEO
         title="Il Bel Paese — Mappatura delle realtà artistiche italiane"
         description={t("home.lead")}
@@ -56,79 +55,129 @@ const Index = () => {
           inLanguage: "it-IT",
         }}
       />
-      {/* Hero */}
-      <section className="relative h-[80vh] min-h-[500px] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <SmartImage
-            src={heroImage}
-            alt="Arte murale italiana"
-            priority
-            wrapperClassName="w-full h-full"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent" />
-        </div>
-        <div className="relative editorial-container">
-          <div className="max-w-2xl">
-            <h1 className="editorial-heading text-primary-foreground mb-6 leading-tight">
-              {t("home.title")}<br />
-              <span className="italic text-accent">{t("home.titleAccent")}</span>
+
+      <div className="editorial-container py-12 md:py-20 space-y-16 md:space-y-24">
+
+        {/* ============ HERO ============ */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          <div className="lg:col-span-7 space-y-8">
+            <div className="inline-block bg-card brutalist-border px-3 py-1 micro-label">
+              Archivio Editoriale · Vol. 01
+            </div>
+
+            <h1 className="editorial-heading">
+              {t("home.title")} <br />
+              <span className="text-primary">{t("home.titleAccent")}</span>{" "}
+              <span className="ink-highlight">d'Italia</span>
             </h1>
-            <p className="editorial-body text-primary-foreground/80 mb-8 max-w-lg">
+
+            <p className="editorial-body max-w-xl">
               {t("home.lead")}
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                to="/mappatura"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md font-body font-medium hover:opacity-90 transition-opacity"
-              >
-                {t("home.ctaMap")} <ArrowRight size={18} />
+
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link to="/mappatura" className="btn-brutalist shadow-brutalist hover:shadow-brutalist-aqua transition-shadow">
+                {t("home.ctaMap")} <ArrowRight size={16} />
               </Link>
-              <Link
-                to="/la-rete"
-                className="inline-flex items-center gap-2 px-6 py-3 border border-primary-foreground/30 text-primary-foreground rounded-md font-body font-medium hover:bg-primary-foreground/10 transition-colors"
-              >
+              <Link to="/la-rete" className="btn-brutalist-outline">
                 {t("home.ctaAbout")}
               </Link>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Features */}
-      <section className="py-20">
-        <div className="editorial-container">
-          <h2 className="editorial-subheading text-center mb-16">
-            {t("home.sectionTitle")} <span className="italic text-primary">{t("home.sectionTitleAccent")}</span>
-          </h2>
-          <div className="grid md:grid-cols-3 gap-10">
-            {features.map((item) => (
-              <Link key={item.key} to={item.link} className="group p-8 rounded-lg bg-card border border-border hover:border-primary/30 transition-all hover:shadow-lg">
-                <item.icon className="text-primary mb-4" size={28} />
-                <h3 className="font-display text-xl font-semibold mb-3">{t(`home.features.${item.key}.title`)}</h3>
-                <p className="font-body text-muted-foreground leading-relaxed">{t(`home.features.${item.key}.desc`)}</p>
-                <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                  {t("home.discover")} <ArrowRight size={14} />
-                </span>
+          {/* Visual area destra */}
+          <div className="lg:col-span-5 relative">
+            <div className="aspect-[4/5] brutalist-border bg-foreground overflow-hidden relative shadow-brutalist-lg">
+              <SmartImage
+                src={heroImage}
+                alt="Arte contemporanea italiana"
+                priority
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover opacity-80"
+              />
+              {/* Scanline overlay */}
+              <div
+                className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
+                style={{
+                  background:
+                    "repeating-linear-gradient(0deg, transparent, transparent 2px, hsl(var(--secondary) / 0.4) 3px)",
+                }}
+              />
+              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                <span className="micro-label text-background">COORD · 41.9028° N, 12.4964° E</span>
+              </div>
+            </div>
+            {/* Badge acqua angolo */}
+            <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-20 h-20 md:w-24 md:h-24 bg-secondary brutalist-border flex items-center justify-center text-center micro-label leading-tight">
+              Live<br/>Archive
+            </div>
+          </div>
+        </section>
+
+        {/* ============ FEATURES ============ */}
+        <section>
+          <div className="flex items-end justify-between mb-8 border-b-2 border-foreground pb-4">
+            <h2 className="editorial-subheading">
+              {t("home.sectionTitle")}{" "}
+              <span className="text-primary">{t("home.sectionTitleAccent")}</span>
+            </h2>
+            <span className="micro-label hidden md:block">§ 02 / Sezioni</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {features.map((f) => (
+              <Link
+                key={f.key}
+                to={f.link}
+                className={`brutalist-card p-8 flex flex-col gap-5 group ${
+                  f.inverted ? "bg-primary text-primary-foreground" : "bg-card"
+                }`}
+              >
+                <div className={`micro-label ${f.inverted ? "text-secondary" : "text-primary"}`}>
+                  {f.num} // {f.section}
+                </div>
+                <h3 className="text-3xl md:text-4xl uppercase leading-none tracking-tight" style={{ fontVariationSettings: "'wght' 700" }}>
+                  {t(`home.features.${f.key}.title`)}
+                </h3>
+                <p className={`text-sm leading-relaxed ${f.inverted ? "text-primary-foreground/90" : "text-foreground/80"}`}>
+                  {t(`home.features.${f.key}.desc`)}
+                </p>
+                <div className={`h-[2px] w-full ${f.inverted ? "bg-primary-foreground/30" : "bg-foreground"}`} />
+                <div className="flex items-center justify-between">
+                  <span className="micro-label">{t("home.discover")}</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats */}
-      <section className="py-16 bg-card border-y border-border">
-        <div className="editorial-container grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map((s) => (
-            <div key={s.key}>
-              <div className="font-display text-3xl md:text-4xl font-bold text-primary">
-                <CountUp end={s.num} />
+        {/* ============ STATS ============ */}
+        <section className="border-y-2 border-foreground py-10 md:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((s) => (
+              <div key={s.key} className="flex flex-col">
+                <span
+                  className={`text-4xl md:text-6xl leading-none ${s.color}`}
+                  style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.04em" }}
+                >
+                  <CountUp end={s.num} />
+                </span>
+                <span className="micro-label mt-3 text-muted-foreground">
+                  {t(`home.stats.${s.key}`)}
+                </span>
               </div>
-              <div className="font-body text-sm text-muted-foreground mt-1">{t(`home.stats.${s.key}`)}</div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </section>
+
+        {/* ============ WORDMARK FOOTER ACCENT ============ */}
+        <div className="w-full flex flex-wrap justify-between items-center gap-2 text-xs uppercase tracking-[0.4em] border-b-2 border-foreground pb-3">
+          <span style={{ fontVariationSettings: "'wght' 700" }}>ILBELPAESE</span>
+          <span className="text-muted-foreground hidden sm:inline">Italian Art Archive</span>
+          <span className="text-muted-foreground">MMXXVI</span>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
