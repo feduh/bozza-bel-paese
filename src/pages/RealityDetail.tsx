@@ -19,7 +19,7 @@ import {
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
 const RealityDetail = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const { user } = useAuth();
   const [reality, setReality] = useState<any>(null);
@@ -27,12 +27,19 @@ const RealityDetail = () => {
   const [members, setMembers] = useState<Array<{ user_id: string; display_name: string; avatar_url: string | null; role_collective: string | null; member_type: string | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [canEditGallery, setCanEditGallery] = useState(false);
+  const isEn = i18n.language?.startsWith("en") ?? false;
 
   useEffect(() => {
     const fetch = async () => {
       const { data } = await supabase.from("realities").select("*").eq("id", id!).single();
       if (data) {
-        setReality(data);
+        const localized = {
+          ...data,
+          name: isEn && (data as any).name_en ? (data as any).name_en : data.name,
+          description: isEn && (data as any).description_en ? (data as any).description_en : data.description,
+          history: isEn && (data as any).history_en ? (data as any).history_en : data.history,
+        };
+        setReality(localized);
         const { data: tagsData } = await supabase.from("reality_tags").select("tag").eq("reality_id", id!);
         setTags(tagsData?.map((t) => t.tag) ?? []);
 
@@ -61,7 +68,7 @@ const RealityDetail = () => {
       setLoading(false);
     };
     fetch();
-  }, [id, user]);
+  }, [id, user, isEn]);
 
   if (loading) {
     return <RealityDetailSkeleton />;
