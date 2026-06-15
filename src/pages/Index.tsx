@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, Users, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import heroImage from "@/assets/hero-art.jpg";
 import SEO from "@/components/SEO";
 import SmartImage from "@/components/SmartImage";
+import CountUp from "@/components/CountUp";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -12,12 +15,43 @@ const Index = () => {
     { icon: Users, key: "community", link: "/la-rete" },
     { icon: BookOpen, key: "stories", link: "/magazine" },
   ] as const;
+
+  const { data: liveStats } = useQuery({
+    queryKey: ["home-stats"],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const [realities, members, posts] = await Promise.all([
+        supabase
+          .from("realities")
+          .select("region", { count: "exact" })
+          .eq("confirmed_status", "confermato"),
+        supabase
+          .from("profiles")
+          .select("id", { count: "exact", head: true }),
+        supabase
+          .from("blog_posts")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "published"),
+      ]);
+      const regions = new Set(
+        (realities.data ?? []).map((r: any) => r.region).filter(Boolean)
+      ).size;
+      return {
+        mapped: realities.count ?? 0,
+        regions,
+        members: members.count ?? 0,
+        articles: posts.count ?? 0,
+      };
+    },
+  });
+
   const stats = [
-    { num: "150+", key: "mapped" },
-    { num: "18", key: "regions" },
-    { num: "45", key: "vanished" },
-    { num: "30+", key: "articles" },
+    { num: liveStats?.mapped ?? null, key: "mapped" },
+    { num: liveStats?.regions ?? null, key: "regions" },
+    { num: liveStats?.members ?? null, key: "members" },
+    { num: liveStats?.articles ?? null, key: "articles" },
   ] as const;
+
 
   return (
     <div>
@@ -99,7 +133,9 @@ const Index = () => {
         <div className="editorial-container grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s) => (
             <div key={s.key}>
-              <div className="font-display text-3xl md:text-4xl font-bold text-primary">{s.num}</div>
+              <div className="font-display text-3xl md:text-4xl font-bold text-primary">
+                <CountUp end={s.num} />
+              </div>
               <div className="font-body text-sm text-muted-foreground mt-1">{t(`home.stats.${s.key}`)}</div>
             </div>
           ))}
