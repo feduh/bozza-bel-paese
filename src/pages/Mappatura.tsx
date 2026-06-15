@@ -33,6 +33,7 @@ type Reality = {
   lng: number;
   website: string | null;
   category: string | null;
+  categories: string[];
   image_url: string | null;
   created_at: string;
   tags: string[];
@@ -135,11 +136,14 @@ const Mappatura = () => {
       if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
-      if (categoryFilter !== "all" && r.category !== categoryFilter) return false;
+      const cats = r.categories && r.categories.length > 0
+        ? r.categories
+        : (r.category ? [r.category] : []);
+      if (categoryFilter !== "all" && !cats.includes(categoryFilter)) return false;
       if (yMin !== null && r.year_founded < yMin) return false;
       if (yMax !== null && r.year_founded > yMax) return false;
       if (q) {
-        const haystack = [r.name, r.city, r.region, r.description, r.category ?? "", ...r.tags]
+        const haystack = [r.name, r.city, r.region, r.description, ...cats, ...r.tags]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(q)) return false;
@@ -486,8 +490,10 @@ const Mappatura = () => {
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
-                  {r.category && (
-                    <p className="text-[11px] uppercase tracking-wider text-primary font-body font-semibold mb-2">{r.category}</p>
+                  {((r.categories && r.categories.length > 0) || r.category) && (
+                    <p className="text-[11px] uppercase tracking-wider text-primary font-body font-semibold mb-2">
+                      {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
+                    </p>
                   )}
                   <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
@@ -549,8 +555,10 @@ const Mappatura = () => {
                     </div>
                   </div>
                   <div className="flex-1 flex flex-col p-5">
-                    {r.category && (
-                      <p className="text-[10px] uppercase tracking-wider text-primary font-body font-semibold mb-2">{r.category}</p>
+                    {((r.categories && r.categories.length > 0) || r.category) && (
+                      <p className="text-[10px] uppercase tracking-wider text-primary font-body font-semibold mb-2">
+                        {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
+                      </p>
                     )}
                     <h3 className="font-display text-lg font-semibold mb-2 leading-tight group-hover:text-primary transition-colors line-clamp-2">
                       {r.name}
