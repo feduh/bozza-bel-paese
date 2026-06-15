@@ -38,7 +38,13 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
   const [fb, setFb] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [confirmedStatus, setConfirmedStatus] = useState<ConfirmedStatus>("pendente");
-  const [category, setCategory] = useState<string>("");
+  const [categories, setCategories] = useState<string[]>([]);
+
+  const toggleCategory = (c: string) => {
+    setCategories((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+    );
+  };
 
   const [geocoding, setGeocoding] = useState(false);
   const [geocoded, setGeocoded] = useState(false);
@@ -124,8 +130,9 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       status: effectiveStatus === "storico" ? "archiviato" : "attivo",
       created_by: user?.id ?? null,
       auto_confirm_at: autoConfirmAt,
-      category: category || null,
-    });
+      categories,
+      category: categories[0] ?? null,
+    } as any);
 
     if (insertError) {
       setError(insertError.message);
@@ -134,7 +141,7 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
       setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
       setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategory("");
+      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
       onCreated?.();
     }
     setSubmitting(false);
@@ -163,13 +170,36 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Categoria artistica</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
-          <option value="">— nessuna —</option>
-          {REALITY_CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+        <div className="flex items-baseline justify-between mb-2">
+          <label className="block text-sm font-medium">Categorie artistiche</label>
+          <span className="text-xs text-muted-foreground">
+            {categories.length === 0 ? "Nessuna selezionata" : `${categories.length} selezionate`}
+          </span>
+        </div>
+        <div className="rounded-md border border-input bg-background p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+          {REALITY_CATEGORIES.map((c) => {
+            const checked = categories.includes(c);
+            return (
+              <label
+                key={c}
+                className={`flex items-center gap-2 text-sm font-body cursor-pointer px-2 py-1.5 rounded transition-colors ${
+                  checked ? "bg-primary/10 text-foreground" : "hover:bg-muted/50"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleCategory(c)}
+                  className="accent-primary"
+                />
+                <span className="leading-tight">{c}</span>
+              </label>
+            );
+          })}
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Puoi selezionarne più di una. La prima selezionata sarà quella principale.
+        </p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">

@@ -427,6 +427,7 @@ export type Database = {
         Row: {
           address: string | null
           auto_confirm_at: string | null
+          categories: string[]
           category: string | null
           city: string
           confirmed_at: string | null
@@ -459,6 +460,7 @@ export type Database = {
         Insert: {
           address?: string | null
           auto_confirm_at?: string | null
+          categories?: string[]
           category?: string | null
           city: string
           confirmed_at?: string | null
@@ -491,6 +493,7 @@ export type Database = {
         Update: {
           address?: string | null
           auto_confirm_at?: string | null
+          categories?: string[]
           category?: string | null
           city?: string
           confirmed_at?: string | null
