@@ -14,9 +14,9 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Where to bounce after a successful login. Falls back to /blog so the
-  // historical default behaviour is preserved.
-  const from = (location.state as LocationState)?.from?.pathname || "/blog";
+  // Where to bounce after a successful login. Default = area personale.
+  const from = (location.state as LocationState)?.from?.pathname || "/area-personale";
+
 
   // Redirect already-logged-in users in an effect (avoid setState during render).
   useEffect(() => {
