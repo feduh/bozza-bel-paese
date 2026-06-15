@@ -147,18 +147,18 @@ const DroneHero = () => {
           {/* alone esterno tenue */}
           <path
             d={EUROPE_PATH}
-            fill="none"
-            stroke="hsl(var(--secondary) / 0.18)"
-            strokeWidth={5 / scale}
+            fill="hsl(var(--secondary) / 0.06)"
+            stroke="hsl(var(--secondary) / 0.25)"
+            strokeWidth={4 / scale}
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
           {/* Europa vettoriale */}
           <path
             d={EUROPE_PATH}
-            fill="none"
+            fill="hsl(var(--secondary) / 0.10)"
             stroke="hsl(var(--secondary))"
-            strokeWidth={1.1 / scale}
+            strokeWidth={1 / scale}
             strokeLinejoin="round"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
