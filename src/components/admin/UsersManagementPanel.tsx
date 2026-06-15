@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Shield, KeyRound, Ban, Trash2, RefreshCw, Search } from "lucide-react";
+import { Users, Shield, KeyRound, Ban, Trash2, RefreshCw, Search, Pencil } from "lucide-react";
 import { PASSWORD_RULES, passwordSchema, passwordStrength } from "@/lib/passwordPolicy";
 
 type AppRole = "admin" | "coordinatore" | "author";
@@ -40,6 +40,8 @@ const UsersManagementPanel = () => {
 
   // Reset password panel state (per user)
   const [pwd, setPwd] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editName, setEditName] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null));
@@ -212,7 +214,13 @@ const UsersManagementPanel = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => { setOpenId(open ? null : u.id); setPwd(""); }}
+                    onClick={() => {
+                      const next = open ? null : u.id;
+                      setOpenId(next);
+                      setPwd("");
+                      setEditEmail(u.email ?? "");
+                      setEditName(u.profile?.display_name ?? "");
+                    }}
                     className="text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
                   >
                     {open ? "Chiudi" : "Gestisci"}
@@ -221,6 +229,54 @@ const UsersManagementPanel = () => {
 
                 {open && (
                   <div className="border-t border-border p-4 space-y-5 bg-muted/30">
+                    {/* Dati account */}
+                    <div>
+                      <h3 className="text-xs font-body font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <Pencil size={12} /> Dati account
+                      </h3>
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        <label className="block">
+                          <span className="text-[11px] font-body text-muted-foreground">Nome visualizzato</span>
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            placeholder="Nome e cognome"
+                            className="mt-1 w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-[11px] font-body text-muted-foreground">Email</span>
+                          <input
+                            type="email"
+                            value={editEmail}
+                            onChange={(e) => setEditEmail(e.target.value)}
+                            placeholder="email@dominio.it"
+                            className="mt-1 w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </label>
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        <button
+                          type="button"
+                          disabled={
+                            busyId === u.id ||
+                            (editEmail.trim() === (u.email ?? "") &&
+                              editName.trim() === (u.profile?.display_name ?? ""))
+                          }
+                          onClick={async () => {
+                            const payload: Record<string, unknown> = { op: "update_user", user_id: u.id };
+                            if (editEmail.trim() && editEmail.trim() !== (u.email ?? "")) payload.email = editEmail.trim();
+                            if (editName.trim() && editName.trim() !== (u.profile?.display_name ?? "")) payload.display_name = editName.trim();
+                            await call(payload, "Dati account aggiornati");
+                          }}
+                          className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-body text-sm hover:opacity-90 disabled:opacity-50"
+                        >
+                          Salva modifiche
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Ruoli */}
                     <div>
                       <h3 className="text-xs font-body font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">

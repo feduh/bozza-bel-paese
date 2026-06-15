@@ -38,6 +38,12 @@ const opSchema = z.discriminatedUnion("op", [
     op: z.literal("delete_user"),
     user_id: z.string().uuid(),
   }),
+  z.object({
+    op: z.literal("update_user"),
+    user_id: z.string().uuid(),
+    email: z.string().trim().email("Email non valida").max(255).optional(),
+    display_name: z.string().trim().min(1, "Nome obbligatorio").max(120).optional(),
+  }),
 ]);
 
 function json(body: unknown, status = 200) {
@@ -204,6 +210,28 @@ Deno.serve(async (req) => {
       await admin.from("user_roles").delete().eq("user_id", data.user_id);
       // 3. Banna l'account così non può più loggarsi
       await admin.auth.admin.updateUserById(data.user_id, { ban_duration: "876000h" });
+      return json({ ok: true });
+    }
+
+    // ---------- UPDATE USER (email / display name) ----------
+    if (data.op === "update_user") {
+      if (!data.email && !data.display_name) {
+        return json({ error: "Nessuna modifica indicata." }, 400);
+      }
+      if (data.email) {
+        const { error } = await admin.auth.admin.updateUserById(data.user_id, {
+          email: data.email,
+          email_confirm: true,
+        });
+        if (error) return json({ error: error.message }, 400);
+      }
+      if (data.display_name) {
+        const { error } = await admin
+          .from("profiles")
+          .update({ display_name: data.display_name })
+          .eq("user_id", data.user_id);
+        if (error) return json({ error: error.message }, 500);
+      }
       return json({ ok: true });
     }
 
