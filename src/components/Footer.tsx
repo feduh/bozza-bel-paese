@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import LogoPittogramma from "@/components/LogoPittogramma";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -23,7 +24,10 @@ const Footer = () => {
       <div className="editorial-container">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-display text-lg font-bold text-primary mb-3">Il Bel Paese</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <LogoPittogramma className="w-7 h-7 text-primary" />
+              <h3 className="font-display text-lg font-bold text-primary">Il Bel Paese</h3>
+            </div>
             <p className="font-body text-sm text-muted-foreground leading-relaxed">
               {t("footer.tagline")}
             </p>

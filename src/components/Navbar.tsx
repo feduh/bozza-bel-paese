@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import NotificationsBell from "./NotificationsBell";
+import LogoPittogramma from "./LogoPittogramma";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,10 +52,11 @@ const Navbar = () => {
       <div className="editorial-container flex items-center justify-between h-16">
         <Link
           to="/"
-          className="text-xl tracking-tight text-foreground uppercase hover:text-primary transition-colors"
+          className="flex items-center gap-2 text-xl tracking-tight text-foreground uppercase hover:text-primary transition-colors"
           style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.02em" }}
           aria-label="Il Bel Paese — home"
         >
+          <LogoPittogramma className="w-8 h-8 text-primary" />
           ILBELPAESE
         </Link>
 
