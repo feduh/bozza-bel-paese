@@ -214,7 +214,13 @@ const UsersManagementPanel = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => { setOpenId(open ? null : u.id); setPwd(""); }}
+                    onClick={() => {
+                      const next = open ? null : u.id;
+                      setOpenId(next);
+                      setPwd("");
+                      setEditEmail(u.email ?? "");
+                      setEditName(u.profile?.display_name ?? "");
+                    }}
                     className="text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
                   >
                     {open ? "Chiudi" : "Gestisci"}
