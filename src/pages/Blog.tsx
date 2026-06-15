@@ -24,12 +24,17 @@ type MagazinePost = {
   status: string;
 };
 
+type SortKey = "newest" | "oldest" | "az" | "za";
+
 const Magazine = () => {
   const [posts, setPosts] = useState<MagazinePost[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [activeCats, setActiveCats] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [author, setAuthor] = useState<string>("");
+  const [year, setYear] = useState<string>("");
+  const [sort, setSort] = useState<SortKey>("newest");
   const { user } = useAuth();
   const { t } = useTranslation();
 
@@ -59,26 +64,51 @@ const Magazine = () => {
     return ARTICLE_CATEGORIES.filter((c) => set.has(c));
   }, [posts]);
 
+  const availableAuthors = useMemo(() => {
+    const set = new Map<string, string>();
+    posts.forEach((p) => {
+      const name = resolveAuthorName(nameMap, p.user_id, p.author_name);
+      if (name) set.set(p.user_id, name);
+    });
+    return Array.from(set.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+  }, [posts, nameMap]);
+
+  const availableYears = useMemo(() => {
+    const set = new Set<number>();
+    posts.forEach((p) => set.add(new Date(p.published_at).getFullYear()));
+    return Array.from(set).sort((a, b) => b - a);
+  }, [posts]);
+
   const filteredPosts = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return posts.filter((p) => {
+    const list = posts.filter((p) => {
       if (activeCats.length > 0) {
         const cats = parseCategories(p.category);
         if (!activeCats.some((c) => cats.includes(c))) return false;
       }
+      if (author && p.user_id !== author) return false;
+      if (year && String(new Date(p.published_at).getFullYear()) !== year) return false;
       if (q) {
-        const author = resolveAuthorName(nameMap, p.user_id, p.author_name).toLowerCase();
-        const hay = `${p.title} ${p.excerpt} ${author}`.toLowerCase();
+        const authorName = resolveAuthorName(nameMap, p.user_id, p.author_name).toLowerCase();
+        const hay = `${p.title} ${p.excerpt} ${authorName}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [posts, activeCats, query, nameMap]);
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      if (sort === "newest") return +new Date(b.published_at) - +new Date(a.published_at);
+      if (sort === "oldest") return +new Date(a.published_at) - +new Date(b.published_at);
+      if (sort === "az") return a.title.localeCompare(b.title);
+      return b.title.localeCompare(a.title);
+    });
+    return sorted;
+  }, [posts, activeCats, query, nameMap, author, year, sort]);
 
   const toggleCat = (c: string) =>
     setActiveCats((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
 
-  const hasFilters = activeCats.length > 0 || query.length > 0;
+  const hasFilters = activeCats.length > 0 || query.length > 0 || !!author || !!year || sort !== "newest";
 
   return (
     <div className="py-20">
