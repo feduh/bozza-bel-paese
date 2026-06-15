@@ -237,7 +237,7 @@ const DroneHero = () => {
             left: cursor.current.x,
             top: cursor.current.y,
             transform: `translate(-50%, -50%) rotate(${rocketRotation.toFixed(1)}deg)`,
-            transition: "transform 80ms linear",
+            willChange: "transform, left, top",
           }}
           aria-hidden
         >
