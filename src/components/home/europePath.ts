@@ -1,6 +1,6 @@
 import { geoMercator, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
-import topo from "world-atlas/countries-110m.json";
+import topo from "world-atlas/countries-50m.json";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 
 // Costruisce una path SVG dell'Europa partendo dai confini reali dei paesi.
