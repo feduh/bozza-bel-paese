@@ -10,7 +10,7 @@ import LogoPittogramma from "@/components/LogoPittogramma";
  * Nessun pin reale, nessuna query al database: è puro racconto visivo.
  */
 
-const { W: VB_W, H: VB_H } = ITALY_VB;
+const { W: VB_W, H: VB_H } = EUROPE_VB;
 
 const ROTATING_WORDS = [
   "realtà artistiche",
@@ -20,9 +20,9 @@ const ROTATING_WORDS = [
   "luoghi che resistono",
 ];
 
-// punto di partenza (Piemonte) e zoom della mappa
-const PIEMONTE = { x: 0.22, y: 0.14 }; // normalizzato nel viewBox dell'Italia
-const ZOOM = 2.6;
+// punto di partenza (Piemonte) e zoom della mappa — su Europa, Italia in primo piano
+const PIEMONTE = { x: 0.52, y: 0.80 }; // normalizzato nel viewBox Europa
+const ZOOM = 5.5;
 
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
