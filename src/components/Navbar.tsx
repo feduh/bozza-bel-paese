@@ -46,7 +46,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b-2 border-foreground"
+      className="sticky top-0 z-[1000] bg-background/95 backdrop-blur-md border-b-2 border-foreground"
       aria-label={t("nav.home")}
     >
       <div className="editorial-container flex items-center justify-between h-16">
