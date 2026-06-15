@@ -96,7 +96,7 @@ const ClusterLayer = ({ markers, cluster }: { markers: MarkerData[]; cluster: bo
 
     markers.forEach((m) => {
       const marker = L.marker([m.lat, m.lng], {
-        icon: buildIcon(m.color ?? "hsl(270 60% 58%)", !!m.outline),
+        icon: buildIcon(m.color ?? "#8B5CFF", !!m.outline),
       });
 
       // Build popup HTML from popupContent if it's a React element with simple content,
@@ -183,35 +183,53 @@ const LazyMap = ({
   maxZoom = 18,
   maxBounds = ITALY_BOUNDS,
   userLocation = null,
-}: LazyMapProps) => {
+  hudLabel = "Drone · IT · Live",
+}: LazyMapProps & { hudLabel?: string }) => {
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      minZoom={minZoom}
-      maxZoom={maxZoom}
-      maxBounds={maxBounds}
-      maxBoundsViscosity={1.0}
-      scrollWheelZoom={scrollWheelZoom}
-      zoomControl={false}
-      style={{ height, width: "100%" }}
-      className="ibp-map"
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
-        subdomains="abcd"
-        maxZoom={19}
-      />
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
-        subdomains="abcd"
-        maxZoom={19}
-      />
-      <ZoomControl position="bottomright" />
-      <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
-      <UserLocationLayer pos={userLocation} />
-    </MapContainer>
+    <div className="ibp-map-frame relative" style={{ height, width: "100%" }}>
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        maxBounds={maxBounds}
+        maxBoundsViscosity={1.0}
+        scrollWheelZoom={scrollWheelZoom}
+        zoomControl={false}
+        style={{ height: "100%", width: "100%" }}
+        className="ibp-map"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={19}
+        />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={19}
+        />
+        <ZoomControl position="bottomright" />
+        <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
+        <UserLocationLayer pos={userLocation} />
+      </MapContainer>
+
+      {/* HUD overlays — coerenti con la Hero */}
+      <div className="ibp-map-scanlines" aria-hidden />
+      <div className="ibp-map-vignette" aria-hidden />
+      <span className="ibp-map-corner ibp-map-corner--tl" aria-hidden />
+      <span className="ibp-map-corner ibp-map-corner--tr" aria-hidden />
+      <span className="ibp-map-corner ibp-map-corner--bl" aria-hidden />
+      <span className="ibp-map-corner ibp-map-corner--br" aria-hidden />
+      {hudLabel && (
+        <div className="ibp-map-hud" aria-hidden>
+          <span className="ibp-map-hud__dot" />
+          <span>{hudLabel}</span>
+        </div>
+      )}
+      <div className="ibp-map-hud ibp-map-hud--right" aria-hidden>MMXXVI</div>
+    </div>
   );
 };
 

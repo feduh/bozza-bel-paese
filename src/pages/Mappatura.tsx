@@ -454,7 +454,7 @@ const Mappatura = () => {
 
         {/* Map view */}
         {view === "map" && (
-          <div className="rounded-lg overflow-hidden border border-border h-[600px]">
+          <div className="overflow-hidden h-[600px]">
             <Suspense fallback={<MapFallback height="600px" />}>
               <LazyMap
                 center={[41.8719, 12.5674]}
