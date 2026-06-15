@@ -56,7 +56,7 @@ const Navbar = () => {
           style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.02em" }}
           aria-label="Il Bel Paese — home"
         >
-          <LogoPittogramma className="w-8 h-8 text-primary" />
+          <LogoPittogramma className="w-8 h-8 text-primary" flameClassName="text-orange-500" />
           ILBELPAESE
         </Link>
 
