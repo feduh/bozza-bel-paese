@@ -284,7 +284,7 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
         </p>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-body font-medium mb-2">Ruolo nella vita reale</label>
+            <label className="block text-sm font-body font-medium mb-2">Ruolo Lavorativo</label>
             <input
               value={roleRealLife}
               onChange={(e) => setRoleRealLife(e.target.value)}
