@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { ITALY_PATH, ITALY_VB } from "./italyPath";
+import { EUROPE_PATH, EUROPE_VB } from "./europePath";
 import LogoPittogramma from "@/components/LogoPittogramma";
 
 /**
- * DroneHero — hero editoriale con mappa vettoriale dell'Italia
+ * DroneHero — hero editoriale con mappa vettoriale dell'Europa
  * che reagisce in parallasse al movimento del cursore-razzo.
  * Nessun pin reale, nessuna query al database: è puro racconto visivo.
  */
 
-const { W: VB_W, H: VB_H } = ITALY_VB;
+const { W: VB_W, H: VB_H } = EUROPE_VB;
 
 const ROTATING_WORDS = [
   "realtà artistiche",
@@ -20,9 +20,9 @@ const ROTATING_WORDS = [
   "luoghi che resistono",
 ];
 
-// punto di partenza (Piemonte) e zoom della mappa
-const PIEMONTE = { x: 0.22, y: 0.14 }; // normalizzato nel viewBox dell'Italia
-const ZOOM = 2.6;
+// punto di partenza (Piemonte) e zoom della mappa — su Europa, Italia in primo piano
+const PIEMONTE = { x: 0.52, y: 0.80 }; // normalizzato nel viewBox Europa
+const ZOOM = 5.5;
 
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
@@ -83,12 +83,12 @@ const DroneHero = () => {
     const y = e.clientY - rect.top;
     cursor.current.x = x;
     cursor.current.y = y;
-    // mappa la posizione del mouse nel viewBox dell'Italia, con un piccolo padding:
-    // muovendo il cursore si naviga dal Piemonte alla Sicilia mantenendo il parallasse
+    // mappa la posizione del mouse nel viewBox dell'Europa, con un piccolo padding:
+    // muovendo il cursore si naviga dall'Italia al resto d'Europa mantenendo il parallasse
     const nx = Math.min(1, Math.max(0, x / rect.width));
     const ny = Math.min(1, Math.max(0, y / rect.height));
-    target.current.x = 0.08 + nx * 0.84;
-    target.current.y = 0.06 + ny * 0.9;
+    target.current.x = 0.40 + nx * 0.30;
+    target.current.y = 0.65 + ny * 0.25;
   };
 
   // ---- rotating word ----
@@ -146,16 +146,16 @@ const DroneHero = () => {
         <g transform={groupTransform}>
           {/* alone esterno tenue */}
           <path
-            d={ITALY_PATH}
+            d={EUROPE_PATH}
             fill="none"
             stroke="hsl(var(--secondary) / 0.18)"
             strokeWidth={5 / scale}
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
-          {/* Italia vettoriale */}
+          {/* Europa vettoriale */}
           <path
-            d={ITALY_PATH}
+            d={EUROPE_PATH}
             fill="none"
             stroke="hsl(var(--secondary))"
             strokeWidth={1.1 / scale}
