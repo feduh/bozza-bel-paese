@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { Calendar, User, Plus, ArrowRight, Reply, Search, X } from "lucide-react";
+import { Calendar, User, Plus, ArrowRight, Reply, Search, X, ArrowDownUp } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
@@ -24,12 +24,17 @@ type MagazinePost = {
   status: string;
 };
 
+type SortKey = "newest" | "oldest" | "az" | "za";
+
 const Magazine = () => {
   const [posts, setPosts] = useState<MagazinePost[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [activeCats, setActiveCats] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [author, setAuthor] = useState<string>("");
+  const [year, setYear] = useState<string>("");
+  const [sort, setSort] = useState<SortKey>("newest");
   const { user } = useAuth();
   const { t } = useTranslation();
 
@@ -59,26 +64,51 @@ const Magazine = () => {
     return ARTICLE_CATEGORIES.filter((c) => set.has(c));
   }, [posts]);
 
+  const availableAuthors = useMemo(() => {
+    const set = new Map<string, string>();
+    posts.forEach((p) => {
+      const name = resolveAuthorName(nameMap, p.user_id, p.author_name);
+      if (name) set.set(p.user_id, name);
+    });
+    return Array.from(set.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+  }, [posts, nameMap]);
+
+  const availableYears = useMemo(() => {
+    const set = new Set<number>();
+    posts.forEach((p) => set.add(new Date(p.published_at).getFullYear()));
+    return Array.from(set).sort((a, b) => b - a);
+  }, [posts]);
+
   const filteredPosts = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return posts.filter((p) => {
+    const list = posts.filter((p) => {
       if (activeCats.length > 0) {
         const cats = parseCategories(p.category);
         if (!activeCats.some((c) => cats.includes(c))) return false;
       }
+      if (author && p.user_id !== author) return false;
+      if (year && String(new Date(p.published_at).getFullYear()) !== year) return false;
       if (q) {
-        const author = resolveAuthorName(nameMap, p.user_id, p.author_name).toLowerCase();
-        const hay = `${p.title} ${p.excerpt} ${author}`.toLowerCase();
+        const authorName = resolveAuthorName(nameMap, p.user_id, p.author_name).toLowerCase();
+        const hay = `${p.title} ${p.excerpt} ${authorName}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [posts, activeCats, query, nameMap]);
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      if (sort === "newest") return +new Date(b.published_at) - +new Date(a.published_at);
+      if (sort === "oldest") return +new Date(a.published_at) - +new Date(b.published_at);
+      if (sort === "az") return a.title.localeCompare(b.title);
+      return b.title.localeCompare(a.title);
+    });
+    return sorted;
+  }, [posts, activeCats, query, nameMap, author, year, sort]);
 
   const toggleCat = (c: string) =>
     setActiveCats((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
 
-  const hasFilters = activeCats.length > 0 || query.length > 0;
+  const hasFilters = activeCats.length > 0 || query.length > 0 || !!author || !!year || sort !== "newest";
 
   return (
     <div className="py-20">
@@ -101,7 +131,7 @@ const Magazine = () => {
               to="/area-personale"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity shrink-0"
             >
-              <Plus size={16} /> Nuovo articolo
+              <Plus size={16} /> {t("magazine.newArticle")}
             </Link>
           )}
         </div>
@@ -116,21 +146,61 @@ const Magazine = () => {
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Cerca per titolo, autore…"
+                  placeholder={t("magazine.searchPlaceholder")}
                   className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
                 />
+              </div>
+              {availableAuthors.length > 0 && (
+                <select
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  aria-label={t("magazine.filterAuthor")}
+                >
+                  <option value="">{t("magazine.allAuthors")}</option>
+                  {availableAuthors.map(([id, name]) => (
+                    <option key={id} value={id}>{name}</option>
+                  ))}
+                </select>
+              )}
+              {availableYears.length > 0 && (
+                <select
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  aria-label={t("magazine.filterYear")}
+                >
+                  <option value="">{t("magazine.allYears")}</option>
+                  {availableYears.map((y) => (
+                    <option key={y} value={String(y)}>{y}</option>
+                  ))}
+                </select>
+              )}
+              <div className="relative">
+                <ArrowDownUp size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortKey)}
+                  className="pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  aria-label={t("magazine.sortBy")}
+                >
+                  <option value="newest">{t("magazine.sortNewest")}</option>
+                  <option value="oldest">{t("magazine.sortOldest")}</option>
+                  <option value="az">{t("magazine.sortAZ")}</option>
+                  <option value="za">{t("magazine.sortZA")}</option>
+                </select>
               </div>
               {hasFilters && (
                 <button
                   type="button"
-                  onClick={() => { setActiveCats([]); setQuery(""); }}
+                  onClick={() => { setActiveCats([]); setQuery(""); setAuthor(""); setYear(""); setSort("newest"); }}
                   className="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <X size={14} /> Azzera filtri
+                  <X size={14} /> {t("magazine.clearFilters")}
                 </button>
               )}
               <span className="ml-auto text-xs font-body text-muted-foreground">
-                {filteredPosts.length} {filteredPosts.length === 1 ? "articolo" : "articoli"}
+                {filteredPosts.length} {filteredPosts.length === 1 ? t("magazine.articleOne") : t("magazine.articleOther")}
               </span>
             </div>
             {availableCats.length > 0 && (
@@ -161,11 +231,11 @@ const Magazine = () => {
           <PostCardSkeletonGrid count={6} />
         ) : posts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground font-body">
-            Nessun articolo pubblicato ancora.
+            {t("magazine.emptyAll")}
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground font-body">
-            Nessun articolo trovato con questi filtri.
+            {t("magazine.emptyFiltered")}
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -179,7 +249,10 @@ const Magazine = () => {
   );
 };
 
-const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: string }) => (
+const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: string }) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith("en") ? "en-GB" : "it-IT";
+  return (
   <Link
     to={`/magazine/${post.slug}`}
     className="group block rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all overflow-hidden"
@@ -202,7 +275,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
         ))}
         {post.reply_to_id && (
           <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
-            <Reply size={10} /> Risposta
+            <Reply size={10} /> {t("magazine.replyTag")}
           </span>
         )}
       </div>
@@ -218,7 +291,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
         </span>
         <span className="flex items-center gap-1">
           <Calendar size={12} />
-          {new Date(post.published_at).toLocaleDateString("it-IT", {
+          {new Date(post.published_at).toLocaleDateString(locale, {
             day: "numeric",
             month: "short",
             year: "numeric",
@@ -226,10 +299,11 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
         </span>
       </div>
       <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
-        Leggi <ArrowRight size={14} />
+        {t("magazine.read")} <ArrowRight size={14} />
       </span>
     </div>
   </Link>
-);
+  );
+};
 
 export default Magazine;
