@@ -23,6 +23,12 @@ import PanelModerazione from "@/components/area/PanelModerazione";
 import PanelRealta from "@/components/area/PanelRealta";
 import PanelPreferiti from "@/components/area/PanelPreferiti";
 import InviteMemberForm from "@/components/InviteMemberForm";
+import AuditLogPanel from "@/components/admin/AuditLogPanel";
+import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
+import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
+import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
+import SystemStatusPanel from "@/components/admin/SystemStatusPanel";
+import AnalyticsDashboardPanel from "@/components/admin/AnalyticsDashboardPanel";
 import type {
   AreaProfile,
   AreaPost,
@@ -296,21 +302,13 @@ const AreaPersonale = () => {
             )}
 
             {isAdmin && (
-              <TabsContent value="admin" className="mt-0">
-                <section className="p-8 rounded-lg bg-card border border-border">
-                  <h2 className="font-display text-xl font-semibold mb-4 flex items-center gap-2">
-                    <ShieldCheck size={20} /> Strumenti admin
-                  </h2>
-                  <p className="font-body text-sm text-muted-foreground mb-6">
-                    Gestione utenti, realtà, segnalazioni, contatti e audit log sono nel pannello dedicato.
-                  </p>
-                  <Link
-                    to="/admin"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-secondary text-secondary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
-                  >
-                    <ShieldCheck size={14} /> Apri Pannello Admin
-                  </Link>
-                </section>
+              <TabsContent value="admin" className="mt-0 space-y-8">
+                <SystemStatusPanel />
+                <AnalyticsDashboardPanel />
+                <UsersManagementPanel />
+                <ContactMessagesPanel />
+                <RealityReportsPanel />
+                <AuditLogPanel />
               </TabsContent>
             )}
           </Tabs>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, LogOut, Shield, User as UserIcon } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
@@ -102,13 +102,6 @@ const Navbar = () => {
                     <UserIcon size={14} className="mr-2" /> Area personale
                   </Link>
                 </DropdownMenuItem>
-                {isAdmin && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin" className="cursor-pointer">
-                      <Shield size={14} className="mr-2" /> {t("nav.admin")}
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer text-destructive focus:text-destructive">
                   <LogOut size={14} className="mr-2" /> {t("nav.logout")}
@@ -172,15 +165,6 @@ const Navbar = () => {
               >
                 ◎ Area personale
               </Link>
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  onClick={() => setOpen(false)}
-                  className="block font-body text-sm font-medium text-primary uppercase"
-                >
-                  ⚙ {t("nav.admin")}
-                </Link>
-              )}
               <button
                 onClick={() => { signOut(); setOpen(false); }}
                 className="block w-full text-left font-body text-sm font-medium text-muted-foreground uppercase"
