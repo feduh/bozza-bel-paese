@@ -25,15 +25,44 @@
     "what": "What We Do",
     "map": "Map",
     "magazine": "Magazine",
+    "network": "Our Network",
+    "contacts": "Contact",
+    "report": "Report a reality",
     "admin": "Admin",
     "login": "Sign in",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "personalArea": "Personal area",
+    "userMenu": "User menu"
   },
   "footer": {
     "tagline": "Mapping Italy's artistic realities — nomadic, rooted and vanished.",
     "navigation": "Navigation",
     "contacts": "Contact",
-    "rights": "All rights reserved."
+    "legal": "Privacy & Policy",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookie Policy",
+    "terms": "Terms & Conditions"
+  },
+  "area": {
+    "title": "Your",
+    "titleAccent": "area",
+    "lead": "Personal dashboard: pick a section from the menu below.",
+    "loading": "Loading…",
+    "tabs": {
+      "profile": "Profile",
+      "calendar": "Calendar",
+      "articles": "Articles",
+      "favorites": "Bookmarks",
+      "realities": "Realities",
+      "members": "Members",
+      "moderation": "Moderation",
+      "admin": "Admin"
+    },
+    "inviteMember": "Invite new member",
+    "inviteAuthor": "Invite new author",
+    "inviteDescAdmin": "Create an account for a new author or collective coordinator.",
+    "inviteDescCoord": "Create an account for a new Magazine author. Only admins can invite coordinators."
   },
   "home": {
     "title": "Mapping Italy's",
@@ -164,6 +193,14 @@
     "search": "Search by name or city...",
     "filterRegion": "All regions",
     "filterMedia": "All artistic media",
+    "filterCategory": "All categories",
+    "year": "Year:",
+    "nearMe": "Near me",
+    "nearYou": "Near you",
+    "sortDefault": "Default order",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A",
+    "sortLatest": "Latest added",
     "clearFilters": "Clear filters",
     "results": "{{count}} realities found",
     "empty": "No realities match the selected filters.",

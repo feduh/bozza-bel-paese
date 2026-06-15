@@ -364,7 +364,7 @@ const Mappatura = () => {
             className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             aria-label="Filtra per categoria artistica"
           >
-            <option value="all">Tutte le categorie</option>
+            <option value="all">{t("map.filterCategory")}</option>
             {REALITY_CATEGORIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -374,16 +374,16 @@ const Mappatura = () => {
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
               className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              aria-label="Ordina risultati"
+              aria-label={t("magazine.sortBy")}
             >
-              <option value="default">Ordine predefinito</option>
-              <option value="az">A-Z</option>
-              <option value="za">Z-A</option>
-              <option value="latest">Ultimi aggiunti</option>
+              <option value="default">{t("map.sortDefault")}</option>
+              <option value="az">{t("map.sortAZ")}</option>
+              <option value="za">{t("map.sortZA")}</option>
+              <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
           <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
-            <span className="text-xs text-muted-foreground mr-1">Anno:</span>
+            <span className="text-xs text-muted-foreground mr-1">{t("map.year")}</span>
             <input
               type="number"
               value={yearMin}
@@ -420,7 +420,7 @@ const Mappatura = () => {
             ) : (
               <Navigation size={14} />
             )}
-            {userPos ? "Vicino a te" : "Vicino a me"}
+            {userPos ? t("map.nearYou") : t("map.nearMe")}
           </button>
           {hasFilters && (
             <button onClick={clearFilters} className="inline-flex items-center gap-1 px-4 py-2 text-xs font-body text-destructive hover:underline">

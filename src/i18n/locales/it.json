@@ -25,15 +25,44 @@
     "what": "Cosa Facciamo",
     "map": "Mappatura",
     "magazine": "Magazine",
+    "network": "La nostra rete",
+    "contacts": "Contatti",
+    "report": "Segnala una realtà",
     "admin": "Admin",
     "login": "Accedi",
-    "logout": "Esci"
+    "logout": "Esci",
+    "personalArea": "Area personale",
+    "userMenu": "Menu utente"
   },
   "footer": {
     "tagline": "Mappatura delle realtà artistiche italiane: nomadi, con sede e scomparse.",
     "navigation": "Navigazione",
     "contacts": "Contatti",
-    "rights": "Tutti i diritti riservati."
+    "legal": "Privacy & Policy",
+    "rights": "Tutti i diritti riservati.",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookie Policy",
+    "terms": "Termini e Condizioni"
+  },
+  "area": {
+    "title": "La",
+    "titleAccent": "tua area",
+    "lead": "Dashboard personale: scegli una sezione dal menù qui sotto.",
+    "loading": "Caricamento…",
+    "tabs": {
+      "profile": "Profilo",
+      "calendar": "Calendario",
+      "articles": "Articoli",
+      "favorites": "Preferiti",
+      "realities": "Realtà",
+      "members": "Membri",
+      "moderation": "Moderazione",
+      "admin": "Admin"
+    },
+    "inviteMember": "Invita nuovo membro",
+    "inviteAuthor": "Invita nuovo autore",
+    "inviteDescAdmin": "Crea un account per un nuovo autore o coordinatore del collettivo.",
+    "inviteDescCoord": "Crea un account per un nuovo autore del Magazine. Solo l'admin può invitare coordinatori."
   },
   "home": {
     "title": "Tracciamo le realtà",
@@ -164,6 +193,14 @@
     "search": "Cerca per nome o città...",
     "filterRegion": "Tutte le regioni",
     "filterMedia": "Tutti i media artistici",
+    "filterCategory": "Tutte le categorie",
+    "year": "Anno:",
+    "nearMe": "Vicino a me",
+    "nearYou": "Vicino a te",
+    "sortDefault": "Ordine predefinito",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A",
+    "sortLatest": "Ultimi aggiunti",
     "clearFilters": "Rimuovi filtri",
     "results": "{{count}} realtà trovate",
     "empty": "Nessuna realtà trovata con i filtri selezionati.",

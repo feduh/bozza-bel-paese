@@ -5,18 +5,18 @@ import LogoPittogramma from "@/components/LogoPittogramma";
 const Footer = () => {
   const { t } = useTranslation();
   const navLinks = [
-    { to: "/la-rete", label: "La nostra rete" },
+    { to: "/la-rete", label: t("nav.network") },
     { to: "/cosa-facciamo", label: t("nav.what") },
     { to: "/mappatura", label: t("nav.map") },
     { to: "/magazine", label: t("nav.magazine") },
-    { to: "/segnala-realta", label: "Segnala una realtà" },
-    { to: "/contatti", label: "Contatti" },
+    { to: "/segnala-realta", label: t("nav.report") },
+    { to: "/contatti", label: t("nav.contacts") },
   ];
 
   const legalLinks = [
-    { to: "/privacy", label: "Privacy Policy" },
-    { to: "/cookie-policy", label: "Cookie Policy" },
-    { to: "/termini", label: "Termini e Condizioni" },
+    { to: "/privacy", label: t("footer.privacy") },
+    { to: "/cookie-policy", label: t("footer.cookies") },
+    { to: "/termini", label: t("footer.terms") },
   ];
 
   return (
@@ -43,7 +43,7 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h4 className="font-display text-sm font-semibold mb-3">Privacy & Policy</h4>
+            <h4 className="font-display text-sm font-semibold mb-3">{t("footer.legal")}</h4>
             <div className="space-y-2">
               {legalLinks.map((l) => (
                 <Link key={l.to} to={l.to} className="block text-sm text-muted-foreground hover:text-primary transition-colors">
