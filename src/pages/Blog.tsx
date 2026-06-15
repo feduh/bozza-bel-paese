@@ -38,16 +38,23 @@ const Magazine = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
 
+  const isEn = (t as unknown as { i18n?: { language?: string } })?.i18n?.language?.startsWith("en") ?? false;
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, reply_to_id, published_at, status")
+        .select("id, slug, title, title_en, excerpt, excerpt_en, author_name, user_id, category, cover_image_url, reply_to_id, published_at, status")
         .eq("status", "published")
         .order("published_at", { ascending: false });
       if (cancelled) return;
-      const list = (data as MagazinePost[]) ?? [];
+      const raw = (data as (MagazinePost & { title_en?: string | null; excerpt_en?: string | null })[]) ?? [];
+      const list: MagazinePost[] = raw.map((p) => ({
+        ...p,
+        title: isEn && p.title_en ? p.title_en : p.title,
+        excerpt: isEn && p.excerpt_en ? p.excerpt_en : p.excerpt,
+      }));
       setPosts(list);
       const names = await fetchAuthorNames(list.map((p) => p.user_id));
       if (!cancelled) setNameMap(names);
@@ -56,7 +63,7 @@ const Magazine = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isEn]);
 
   const availableCats = useMemo(() => {
     const set = new Set<string>();
