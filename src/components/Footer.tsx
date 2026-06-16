@@ -25,8 +25,8 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <LogoPittogramma className="w-7 h-7 text-primary" />
-              <h3 className="font-display text-lg font-bold text-primary">Il Bel Paese</h3>
+              <LogoPittogramma className="w-7 h-7 text-foreground" flameClassName="text-foreground" />
+              <h3 className="font-display text-lg font-bold text-foreground tracking-tight uppercase">IL BEL PAESE</h3>
             </div>
             <p className="font-body text-sm text-muted-foreground leading-relaxed">
               {t("footer.tagline")}
