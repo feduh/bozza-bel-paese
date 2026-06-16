@@ -21,7 +21,7 @@ const LanguageSwitcher = () => {
         {current}
         <ChevronDown size={12} aria-hidden="true" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[80px]">
+      <DropdownMenuContent align="end" sideOffset={8} className="min-w-[70px] z-[1100]">
         {supportedLanguages.map((lang) => {
           const isActive = current === lang.code;
           return (
