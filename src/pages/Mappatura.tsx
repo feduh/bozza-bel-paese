@@ -305,11 +305,11 @@ const Mappatura = () => {
 
         {/* View toggle + Search */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex rounded-lg border border-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
+          <div className="flex w-full sm:w-auto rounded-lg border border-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -318,7 +318,7 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -327,7 +327,7 @@ const Mappatura = () => {
             <button
               onClick={() => setView("magazine")}
               aria-pressed={view === "magazine"}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
                 view === "magazine" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
