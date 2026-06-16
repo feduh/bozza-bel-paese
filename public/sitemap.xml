@@ -41,56 +41,92 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000005</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://il-bel-paese.lovable.app/realta/e66892c8-e457-466b-8761-aa18e8ff1956</loc>
     <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000001</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000002</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000004</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000005</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000007</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000008</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000003</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000006</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000003</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000004</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000002</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000001</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/prova-programmazione-hup1oy</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/meridiano-residenze-2026</loc>
     <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/prova-programmazione-n417wz</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/spazi-fragili-borghi</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/prova-1wo1xg</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/magazine/come-leggere-mappa</loc>
+    <lastmod>2026-05-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -107,50 +143,14 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/aurora-piazza-affari</loc>
-    <lastmod>2026-05-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://il-bel-paese.lovable.app/magazine/fondazione-luce-trent-anni</loc>
     <lastmod>2026-05-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/spazi-fragili-borghi</loc>
-    <lastmod>2026-05-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/come-leggere-mappa</loc>
-    <lastmod>2026-05-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/meridiano-residenze-2026</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/prova-1wo1xg</loc>
-    <lastmod>2026-05-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/prova-programmazione-hup1oy</loc>
-    <lastmod>2026-05-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/prova-programmazione-n417wz</loc>
-    <lastmod>2026-06-03</lastmod>
+    <loc>https://il-bel-paese.lovable.app/magazine/aurora-piazza-affari</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
