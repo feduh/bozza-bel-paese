@@ -1,38 +1,44 @@
 import { useTranslation } from "react-i18next";
+import { ChevronDown } from "lucide-react";
 import { supportedLanguages } from "@/i18n";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
   const current = i18n.language?.startsWith("en") ? "en" : "it";
 
   return (
-    <div className="flex items-center gap-0">
-      {supportedLanguages.map((lang, idx) => {
-        const isActive = current === lang.code;
-        return (
-          <div key={lang.code} className="flex items-center">
-            {idx > 0 && (
-              <span className="text-border select-none mx-1 text-[10px]">|</span>
-            )}
-            <button
-              type="button"
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label="Language"
+        className="inline-flex items-center gap-1 font-heading text-[13px] tracking-widest uppercase text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded-sm px-1"
+      >
+        {current}
+        <ChevronDown size={12} aria-hidden="true" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[80px]">
+        {supportedLanguages.map((lang) => {
+          const isActive = current === lang.code;
+          return (
+            <DropdownMenuItem
+              key={lang.code}
               onClick={() => i18n.changeLanguage(lang.code)}
-              className={`
-                font-heading text-[13px] tracking-widest uppercase transition-colors
-                ${isActive
-                  ? "text-primary font-semibold"
-                  : "text-muted-foreground hover:text-primary"
-                }
-              `}
-              aria-label={lang.label}
               aria-pressed={isActive}
+              className={`font-heading text-[13px] tracking-widest uppercase cursor-pointer justify-center ${
+                isActive ? "text-primary font-semibold" : "text-muted-foreground"
+              }`}
             >
               {lang.code}
-            </button>
-          </div>
-        );
-      })}
-    </div>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
