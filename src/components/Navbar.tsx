@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import ThemeToggle from "./ThemeToggle";
+
 import LanguageSwitcher from "./LanguageSwitcher";
 import NotificationsBell from "./NotificationsBell";
 import LogoPittogramma from "./LogoPittogramma";
@@ -81,7 +81,6 @@ const Navbar = () => {
 
           <div className="flex items-center gap-2 pl-2 border-l border-border">
             <LanguageSwitcher />
-            <ThemeToggle />
           </div>
 
           {user ? (
@@ -126,7 +125,6 @@ const Navbar = () => {
         {/* Mobile toggle */}
         <div className="md:hidden flex items-center gap-2">
           <LanguageSwitcher />
-          <ThemeToggle />
           <button
             onClick={() => setOpen(!open)}
             className="text-foreground"
