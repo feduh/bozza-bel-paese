@@ -101,7 +101,14 @@ export const inviteSchema = (t: TFunction) =>
     .object({
       displayName: z.string().trim().min(2, t("validation.nameMin")),
       email: z.string().trim().toLowerCase().email(t("validation.email")),
-      password: z.string().min(8, t("validation.passwordMin")),
+      password: z
+        .string()
+        .min(10, "La password deve contenere almeno 10 caratteri")
+        .max(72, "La password può contenere al massimo 72 caratteri")
+        .regex(/[A-Z]/, "La password deve contenere almeno una lettera maiuscola")
+        .regex(/[a-z]/, "La password deve contenere almeno una lettera minuscola")
+        .regex(/[0-9]/, "La password deve contenere almeno un numero")
+        .regex(/[^A-Za-z0-9]/, "La password deve contenere almeno un simbolo"),
       role: z.enum(["author", "coordinatore"]),
       authorType: z.enum(["reality", "external", "none"]).optional(),
       realityId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
