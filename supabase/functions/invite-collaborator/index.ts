@@ -190,21 +190,32 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create profile (reality_id and affiliation are mutually exclusive but both optional)
+    // Business rule: coordinators belong only to the "Il Bel Paese" editorial team,
+    // never to a mapped reality. Mapped realities only have authors.
+    const effectiveRealityId =
+      role === "author" ? reality_id ?? null : null;
+    const effectiveAffiliation =
+      role === "author" && !effectiveRealityId ? affiliation ?? null : null;
+
+    // Create profile
     const { error: profileError } = await adminClient.from("profiles").insert({
       user_id: newUser.user.id,
       display_name,
-      reality_id: role === "author" ? reality_id ?? null : null,
-      affiliation: role === "author" && !reality_id ? affiliation ?? null : null,
+      reality_id: effectiveRealityId,
+      affiliation: effectiveAffiliation,
       member_type: role === "coordinatore" ? member_type ?? null : "autore",
       figure_category: figure_category ?? null,
       role_real_life: role_real_life ?? null,
       role_collective: role === "coordinatore" ? role_collective ?? null : null,
     });
 
-
     if (profileError) {
       console.error("Profile creation error:", profileError);
+      await adminClient.auth.admin.deleteUser(newUser.user.id);
+      return new Response(
+        JSON.stringify({ error: `Errore creazione profilo: ${profileError.message}` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Assign role
@@ -215,6 +226,11 @@ Deno.serve(async (req) => {
 
     if (roleError) {
       console.error("Role assignment error:", roleError);
+      await adminClient.auth.admin.deleteUser(newUser.user.id);
+      return new Response(
+        JSON.stringify({ error: `Errore assegnazione ruolo: ${roleError.message}` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(

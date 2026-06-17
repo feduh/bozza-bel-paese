@@ -180,12 +180,13 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
                 if (v !== "author") {
                   setRealityId("");
                   setAffiliation("");
+                  setAuthorType("reality");
                 }
               }}
               className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="author">Autore (scrive sul Magazine)</option>
-              <option value="coordinatore">Coordinatore (collettivo)</option>
+              <option value="coordinatore">Coordinatore (redazione Il Bel Paese)</option>
             </select>
           ) : (
             <div className="w-full px-4 py-3 rounded-md border border-input bg-muted/40 font-body text-sm text-muted-foreground">
@@ -194,11 +195,17 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
           )}
           <p className="text-xs text-muted-foreground font-body mt-1">
             {role === "author"
-              ? "Può scrivere articoli (con moderazione) e gestire il proprio profilo."
-              : "Può proporre realtà sulla mappa, pubblicare direttamente sul Magazine e moderare i contenuti degli autori."}
+              ? "Può scrivere articoli (con moderazione) e gestire il proprio profilo. Può essere membro di una realtà mappata, ricercatore esterno o indipendente."
+              : "Membro della redazione Il Bel Paese: pubblica direttamente sul Magazine, propone realtà sulla mappa e modera. Non è legato a una realtà mappata."}
           </p>
         </div>
       </div>
+
+      {role === "coordinatore" && (
+        <div className="p-3 rounded-md bg-primary/5 border border-primary/20 text-xs font-body text-foreground/80">
+          I coordinatori appartengono esclusivamente alla redazione di <strong>Il Bel Paese</strong>. Per affiliare una persona a una realtà mappata, invitala come <em>Autore</em>.
+        </div>
+      )}
       {role === "author" && (
         <div className="space-y-4">
           <div>
