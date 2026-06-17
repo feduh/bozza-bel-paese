@@ -37,10 +37,12 @@ const inviteSchema = z.object({
     .max(255, "Email troppo lunga"),
   password: z
     .string()
-    .min(8, "La password deve avere almeno 8 caratteri")
+    .min(10, "La password deve avere almeno 10 caratteri")
     .max(72, "La password può avere al massimo 72 caratteri")
     .regex(/[A-Z]/, "La password deve contenere almeno una lettera maiuscola")
-    .regex(/[0-9]/, "La password deve contenere almeno un numero"),
+    .regex(/[a-z]/, "La password deve contenere almeno una lettera minuscola")
+    .regex(/[0-9]/, "La password deve contenere almeno un numero")
+    .regex(/[^A-Za-z0-9]/, "La password deve contenere almeno un simbolo"),
   display_name: z
     .string()
     .trim()
