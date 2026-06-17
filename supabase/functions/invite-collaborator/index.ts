@@ -145,8 +145,8 @@ Deno.serve(async (req) => {
     const parseResult = inviteSchema.safeParse(rawBody);
 
     if (!parseResult.success) {
-      const errors = parseResult.error.errors.map((e) => e.message).join(", ");
-      return new Response(JSON.stringify({ error: errors }), {
+      const errors = parseResult.error.errors.map((e) => e.message).join(" • ");
+      return new Response(JSON.stringify({ error: `Errore di validazione: ${errors}` }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

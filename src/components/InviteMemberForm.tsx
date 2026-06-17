@@ -153,9 +153,9 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minimo 8 caratteri"
+              placeholder="Min. 10 caratteri, maiuscola, minuscola, numero, simbolo"
               aria-invalid={!!errs.password}
-              aria-describedby={errs.password ? "err-password" : undefined}
+              aria-describedby={errs.password ? "err-password" : "pwd-hint"}
               className={`w-full px-4 py-3 pr-12 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.password ? "border-destructive" : "border-input"}`}
             />
             <button
@@ -168,6 +168,9 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
             </button>
           </div>
           <FieldError id="err-password" message={errs.password} />
+          <p id="pwd-hint" className="text-xs text-muted-foreground font-body mt-1">
+            Almeno 10 caratteri, una maiuscola, una minuscola, un numero e un simbolo.
+          </p>
         </div>
         <div>
           <label className="block text-sm font-body font-medium mb-2">Ruolo</label>
