@@ -206,10 +206,11 @@ Deno.serve(async (req) => {
       display_name,
       reality_id: effectiveRealityId,
       affiliation: effectiveAffiliation,
-      member_type: role === "coordinatore" ? member_type ?? null : "autore",
+      member_type: role === "coordinatore" ? (member_type ?? "coordinatore") : "autore",
       figure_category: figure_category ?? null,
       role_real_life: role_real_life ?? null,
       role_collective: role === "coordinatore" ? role_collective ?? null : null,
+      consent_public: true,
     });
 
     if (profileError) {
