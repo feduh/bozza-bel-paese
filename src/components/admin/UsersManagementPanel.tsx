@@ -51,22 +51,21 @@ const UsersManagementPanel = () => {
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke("manage-user", {
-      body: { op: "list_users" },
+    const { data, error } = await invokeFunction<{ users?: ManagedUser[] }>("manage-user", {
+      op: "list_users",
     });
     setLoading(false);
-    if (error) return setFeedback({ kind: "err", text: error.message });
-    if (data?.error) return setFeedback({ kind: "err", text: data.error });
+    if (error) return setFeedback({ kind: "err", text: error });
     setUsers(data?.users ?? []);
   };
 
   const call = async (body: Record<string, unknown>, successMsg: string) => {
     setBusyId((body.user_id as string) ?? "global");
     setFeedback(null);
-    const { data, error } = await supabase.functions.invoke("manage-user", { body });
+    const { error } = await invokeFunction("manage-user", body);
     setBusyId(null);
-    if (error || data?.error) {
-      setFeedback({ kind: "err", text: error?.message ?? data?.error });
+    if (error) {
+      setFeedback({ kind: "err", text: error });
       return false;
     }
     setFeedback({ kind: "ok", text: successMsg });
