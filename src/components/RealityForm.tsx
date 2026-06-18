@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/lib/invokeFunction";
 import { MapPin, Loader2, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { realitySchema, fieldErrors, type FieldErrors } from "@/lib/validation";
