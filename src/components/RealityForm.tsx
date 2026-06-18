@@ -63,11 +63,13 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
     setGeocoded(false);
     setError("");
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("geocode-address", {
-        body: { address, city, country },
+      const { data, error: fnError } = await invokeFunction<any>("geocode-address", {
+        address,
+        city,
+        country,
       });
-      if (fnError || data?.error) {
-        setError(data?.error || fnError?.message || "Geocodifica fallita");
+      if (fnError) {
+        setError(fnError);
         return;
       }
       if (data.zip_code) setZipCode(data.zip_code);
