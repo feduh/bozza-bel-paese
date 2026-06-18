@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/lib/invokeFunction";
 import { MapPin, Loader2, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { realitySchema, fieldErrors, type FieldErrors } from "@/lib/validation";
@@ -63,11 +64,13 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
     setGeocoded(false);
     setError("");
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("geocode-address", {
-        body: { address, city, country },
+      const { data, error: fnError } = await invokeFunction<any>("geocode-address", {
+        address,
+        city,
+        country,
       });
-      if (fnError || data?.error) {
-        setError(data?.error || fnError?.message || "Geocodifica fallita");
+      if (fnError) {
+        setError(fnError);
         return;
       }
       if (data.zip_code) setZipCode(data.zip_code);

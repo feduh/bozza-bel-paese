@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/lib/invokeFunction";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock, ShieldCheck, ShieldAlert, Eye } from "lucide-react";
@@ -281,21 +282,23 @@ const ArticoloEditor = () => {
       }
       setCopyrightChecking(true);
       try {
-        const { data: checkData, error: checkErr } = await supabase.functions.invoke("copyright-check", {
-          body: {
-            title: parsed.data.title,
-            excerpt: parsed.data.excerpt,
-            content: parsed.data.content,
-            coverImageUrl: parsed.data.coverImageUrl || null,
-            declaration: copyright,
-          },
+        const { data: checkData, error: checkErr } = await invokeFunction<{
+          status: "ok" | "blocked";
+          notes?: string;
+          error?: string;
+        }>("copyright-check", {
+          title: parsed.data.title,
+          excerpt: parsed.data.excerpt,
+          content: parsed.data.content,
+          coverImageUrl: parsed.data.coverImageUrl || null,
+          declaration: copyright,
         });
         setCopyrightChecking(false);
         if (checkErr) {
-          setGlobalError(`Verifica copyright non disponibile: ${checkErr.message}`);
+          setGlobalError(`Verifica copyright non disponibile: ${checkErr}`);
           return;
         }
-        const result = checkData as { status: "ok" | "blocked"; notes?: string; error?: string } | null;
+        const result = checkData;
         if (!result || result.status !== "ok") {
           setCopyrightResult({ status: "blocked", notes: result?.notes || result?.error || "Verifica non superata." });
           setGlobalError("Verifica copyright NON superata. Modifica il contenuto o la dichiarazione e riprova.");
