@@ -26,7 +26,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <LogoPittogramma className="w-7 h-7 text-foreground" flameClassName="text-foreground" />
-              <h3 className="font-display text-lg font-bold text-foreground tracking-tight uppercase">IL BEL PAESE</h3>
+              <h3 className="font-display text-lg font-bold text-foreground tracking-tight uppercase">ILBELPAESE</h3>
             </div>
             <p className="font-body text-sm text-muted-foreground leading-relaxed">
               {t("footer.tagline")}
