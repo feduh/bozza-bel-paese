@@ -70,41 +70,59 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
     }
 
     setSubmitting(true);
-    const { data, error: fnError } = await supabase.functions.invoke("invite-collaborator", {
-      body: {
-        email: parsed.data.email,
-        password: parsed.data.password,
-        display_name: parsed.data.displayName,
-        role: parsed.data.role,
-        reality_id: parsed.data.realityId ?? null,
-        affiliation: parsed.data.affiliation ?? null,
-        member_type: parsed.data.memberType ?? null,
-        figure_category: parsed.data.figureCategory ?? null,
-        role_real_life: parsed.data.roleRealLife ?? null,
-        role_collective: parsed.data.roleCollective ?? null,
-      },
-    });
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    if (fnError) {
-      setError(fnError.message);
-    } else if (data?.error) {
-      setError(data.error);
-    } else {
-      setMessage(`✅ ${data.message ?? "Account creato"}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`);
-      setEmail("");
-      setPassword("");
-      setDisplayName("");
-      setRole(allowedRoles[0] ?? "author");
-      setAuthorType("reality");
-      setRealityId("");
-      setAffiliation("");
-      setMemberType("");
-      setFigureCategory("");
-      setRoleRealLife("");
-      setRoleCollective("");
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-collaborator`;
+      const res = await fetch(fnUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({
+          email: parsed.data.email,
+          password: parsed.data.password,
+          display_name: parsed.data.displayName,
+          role: parsed.data.role,
+          reality_id: parsed.data.realityId ?? null,
+          affiliation: parsed.data.affiliation ?? null,
+          member_type: parsed.data.memberType ?? null,
+          figure_category: parsed.data.figureCategory ?? null,
+          role_real_life: parsed.data.roleRealLife ?? null,
+          role_collective: parsed.data.roleCollective ?? null,
+        }),
+      });
+
+      const payload = await res.json().catch(() => ({} as Record<string, unknown>));
+
+      if (!res.ok) {
+        setError(typeof payload.error === "string" ? payload.error : `Errore ${res.status}`);
+      } else if (payload.error) {
+        setError(String(payload.error));
+      } else {
+        setMessage(
+          `✅ ${(payload.message as string) ?? "Account creato"}. Credenziali: ${parsed.data.email} / ${parsed.data.password}`
+        );
+        setEmail("");
+        setPassword("");
+        setDisplayName("");
+        setRole(allowedRoles[0] ?? "author");
+        setAuthorType("reality");
+        setRealityId("");
+        setAffiliation("");
+        setMemberType("");
+        setFigureCategory("");
+        setRoleRealLife("");
+        setRoleCollective("");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Errore di rete");
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
   return (
