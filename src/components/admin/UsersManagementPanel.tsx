@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeFunction } from "@/lib/invokeFunction";
 import { Users, Shield, KeyRound, Ban, Trash2, RefreshCw, Search, Pencil } from "lucide-react";
 import { PASSWORD_RULES, passwordSchema, passwordStrength } from "@/lib/passwordPolicy";
 
