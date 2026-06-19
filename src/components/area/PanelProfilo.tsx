@@ -147,6 +147,7 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
               value={profile.role_collective ?? ""}
               onChange={(v) => setProfile({ ...profile, role_collective: v })}
               placeholder="es. coordinamento editoriale"
+              required
             />
           )}
         </div>
@@ -165,17 +166,21 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
         <div className="grid md:grid-cols-2 gap-4">
           <Field label="Ruolo Lavorativo" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
           <div>
-            <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
+            <label className="block text-sm font-body font-medium mb-2">Categoria figura *</label>
             <select
               value={profile.figure_category ?? ""}
               onChange={(e) => setProfile({ ...profile, figure_category: e.target.value })}
+              required
               className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="">— non specificata —</option>
+              <option value="">— seleziona —</option>
               {FIGURE_CATEGORIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
+            <p className="text-xs text-muted-foreground font-body mt-1">
+              Usata per i filtri di ricerca. Non viene mostrata sul tuo profilo pubblico.
+            </p>
           </div>
         </div>
 
@@ -191,7 +196,7 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
         )}
 
         <div className="grid md:grid-cols-2 gap-4">
-          <Field label="Email pubblica" value={profile.public_email ?? ""} onChange={(v) => setProfile({ ...profile, public_email: v })} placeholder="visibile sul profilo pubblico" />
+          <Field label="Email pubblica" value={profile.public_email ?? ""} onChange={(v) => setProfile({ ...profile, public_email: v })} placeholder="visibile sul profilo pubblico" required />
           <Field label="Sito web" value={profile.website ?? ""} onChange={(v) => setProfile({ ...profile, website: v })} placeholder="https://…" />
         </div>
 
