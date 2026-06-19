@@ -172,11 +172,21 @@ const UsersManagementPanel = () => {
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value as AppRole | "all")}
           className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+          aria-label="Filtra per ruolo"
         >
           <option value="all">Tutti i ruoli</option>
           {ALL_ROLES.map((r) => (
             <option key={r} value={r}>{ROLE_LABEL[r]}</option>
           ))}
+        </select>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as "alpha" | "recent")}
+          className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+          aria-label="Ordina per"
+        >
+          <option value="alpha">Ordine alfabetico</option>
+          <option value="recent">Più recenti</option>
         </select>
       </div>
 
