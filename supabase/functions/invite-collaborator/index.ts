@@ -158,10 +158,19 @@ Deno.serve(async (req) => {
       reality_id,
       affiliation,
       member_type,
+      public_email,
       figure_category,
       role_real_life,
       role_collective,
     } = parseResult.data;
+
+    // Coordinators must specify their role in the collective
+    if (role === "coordinatore" && !role_collective) {
+      return new Response(
+        JSON.stringify({ error: "Per i coordinatori il ruolo dentro il collettivo è obbligatorio" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Coordinators can only create authors — only admins can create coordinators
     if (!isAdmin && role !== "author") {
