@@ -76,11 +76,12 @@ const AuditLogPanel = () => {
             Ultime 100 azioni di admin, coordinatori e autori sul database.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="px-3 py-2 rounded-md border border-input bg-background font-body text-xs"
+            aria-label="Filtra per tabella"
           >
             <option value="all">Tutte le tabelle</option>
             <option value="realities">Realtà</option>
@@ -94,6 +95,16 @@ const AuditLogPanel = () => {
             aria-label="Ricarica registro"
           >
             <RefreshCcw size={12} /> Aggiorna
+          </button>
+          <button
+            type="button"
+            onClick={() => exportCsv(filtered)}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-input font-body text-xs hover:border-primary/40 transition-colors disabled:opacity-50"
+            aria-label="Esporta CSV"
+            title="Scarica CSV"
+          >
+            <Download size={12} /> Esporta CSV
           </button>
         </div>
       </div>
