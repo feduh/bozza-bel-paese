@@ -20,10 +20,10 @@ import SmartImage from "@/components/SmartImage";
 import type { AreaPost, AreaPostStatus } from "./types";
 
 const STATUS_LABEL: Record<AreaPostStatus, { label: string; tone: string; icon: typeof Clock }> = {
-  draft: { label: "Bozza", tone: "bg-muted text-muted-foreground", icon: FileText },
-  pending: { label: "In moderazione", tone: "bg-amber-500/15 text-amber-600 border-amber-500/30", icon: Clock },
-  scheduled: { label: "Programmato", tone: "bg-sky-500/15 text-sky-600 border-sky-500/30", icon: Clock },
-  published: { label: "Pubblicato", tone: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30", icon: CheckCircle2 },
+  draft: { label: "Bozza", tone: "bg-zinc-700 text-white", icon: FileText },
+  pending: { label: "In moderazione", tone: "bg-amber-500 text-white", icon: Clock },
+  scheduled: { label: "Programmato", tone: "bg-sky-600 text-white", icon: Clock },
+  published: { label: "Pubblicato", tone: "bg-emerald-600 text-white", icon: CheckCircle2 },
 };
 
 type SortKey = "recent" | "oldest" | "az" | "za";
