@@ -92,7 +92,8 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
           reality_id: parsed.data.realityId ?? null,
           affiliation: parsed.data.affiliation ?? null,
           member_type: parsed.data.memberType ?? null,
-          figure_category: parsed.data.figureCategory ?? null,
+          public_email: parsed.data.publicEmail,
+          figure_category: parsed.data.figureCategory,
           role_real_life: parsed.data.roleRealLife ?? null,
           role_collective: parsed.data.roleCollective ?? null,
         }),
@@ -117,6 +118,7 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
         setAffiliation("");
         setMemberType("");
         setFigureCategory("");
+        setPublicEmail("");
         setRoleRealLife("");
         setRoleCollective("");
       }
