@@ -127,9 +127,6 @@ const AutoreProfilo = () => {
           )}
           <div className="flex-1 min-w-0">
             <h1 className="font-display text-4xl font-bold mb-2">{profile.display_name}</h1>
-            {profile.figure_category && (
-              <p className="font-body text-primary text-sm mb-1">{profile.figure_category}</p>
-            )}
             {(profile.role_collective || profile.role_real_life) && (
               <p className="font-body text-muted-foreground text-sm mb-2">
                 {[profile.role_collective, profile.role_real_life].filter(Boolean).join(" · ")}
@@ -147,7 +144,7 @@ const AutoreProfilo = () => {
               </p>
             )}
             {profile.bio && (
-              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line">{profile.bio}</p>
+              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line prose-justify">{profile.bio}</p>
             )}
             <div className="mt-5 flex flex-wrap gap-3">
               {profile.public_email && (

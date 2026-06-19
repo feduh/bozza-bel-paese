@@ -1,81 +1,83 @@
-## Obiettivi
+# Piano correzioni — Il Bel Paese
 
-1. **Login → area personale** (già fatto in questa risposta).
-2. **Newsletter** estendibile (articoli, realtà, podcast futuri), a costo zero per 500-1000 iscritti.
+Prima di iniziare voglio condividere come ho prioritizzato le 12 richieste e procedere a blocchi, così puoi confermare/riordinare.
 
-## Provider scelto: Brevo (free)
+## Criteri di priorità
 
-- 0 €/mese, contatti illimitati, **300 email/giorno** sul piano gratuito.
-- Per liste >300 destinatari, l'invio viene **spezzato automaticamente in batch giornalieri** da una cron Supabase.
-- Connettore Brevo già supportato da Lovable → niente API key da gestire a mano una volta connesso.
-- Alternativa futura: passare a Brevo Lite (~7 €/mese, 20k email/mese) cambiando solo un parametro.
+1. **Bloccanti funzionali** (l'utente non riesce a fare cose oggi)
+2. **Sicurezza / dati** (validazioni, campi obbligatori)
+3. **UX visivo** (leggibilità, etichette, font)
+4. **Nice-to-have** (export logs, crediti)
 
-## Modello dati (nuove tabelle)
+---
 
-- `newsletter_subscribers`: `email`, `user_id` (nullable, FK profiles), `status` (`pending|confirmed|unsubscribed|bounced`), `confirmation_token`, `unsubscribe_token`, `confirmed_at`, `source` (`public_form|member_auto`), `locale`.
-- `newsletter_issues`: `title`, `subject`, `preheader`, `content_blocks` (jsonb — array di blocchi tipizzati: `editorial`, `articles_auto`, `realities_auto`, `podcast`, `custom_html`, ecc.), `status` (`draft|scheduled|sending|sent|failed`), `scheduled_for`, `sent_at`, `created_by`, `sent_count`, `failed_count`.
-- `newsletter_deliveries`: `issue_id`, `subscriber_id`, `status` (`queued|sent|failed|bounced`), `sent_at`, `error`. Tabella di tracking + supporto batch giornalieri.
+# DA SALTARE PER ORA: BLOCCO 1 — Bloccanti funzionali (prioritario)
 
-Il formato `content_blocks` (jsonb tipizzato) è la chiave della scalabilità: aggiungere podcast in futuro = aggiungere un nuovo tipo di blocco, niente migrazione.
+**1.1 Email automatica al nuovo membro invitato**
+Quando admin/coordinatore invita un membro, oggi viene creato l'utente con password ma non riceve nessuna mail con istruzioni di accesso. Soluzione: scaffold email transazionale Lovable + invio mail `member-welcome` con email, password temporanea, link login e invito a cambiarla. Richiede setup infrastruttura email (dominio + queue). Ti chiederò conferma del dominio mittente.
 
-RLS: subscribers solo admin/coordinatori in lettura; insert pubblico consentito al form; issues e deliveries solo admin/coordinatori.
+**1.2 Upload immagini rotto (avatar profilo + galleria realtà)**
+Da investigare: probabilmente policy storage o bucket. Verificherò bucket `avatars` e `reality-images`, RLS, e il codice di upload. Fix mirato.
 
-## Iscrizione
+**1.3 Modifica realtà esistenti da area personale (coord/admin)**
+Aggiungere nella tab "Realtà" la lista delle realtà che il coordinatore può modificare (le sue + quelle della propria reality region), con pulsante "Modifica" che apre RealityForm in modalità edit. Aggiungere filtri base (stato: pendente/confermato/storico; ricerca per nome).
 
-- **Form pubblico** nel Footer + sezione homepage: email → riga `pending` + email di conferma con link doppio opt-in.
-- **Membri registrati**: auto-iscritti come `confirmed` alla creazione del profilo (trigger DB). Toggle "ricevi newsletter" nell'area personale per disiscriversi.
-- Endpoint pubblico `unsubscribe` con token univoco (link in fondo a ogni email).
+---
 
-## Composizione & invio (area personale, solo admin/coordinatori)
+## BLOCCO 2 — Campi obbligatori & visibilità
 
-Nuova sezione `Newsletter` nell'area personale, stesso pattern degli articoli:
+**2.1 Campi obbligatori nelle bio**
+Rendere obbligatori in `PanelProfilo` e in `InviteMemberForm`:
 
-- Lista bozze/programmate/inviate.
-- Editor a blocchi: editoriale (markdown), selettore articoli del magazine, selettore realtà recenti, blocco podcast (placeholder per il futuro), HTML libero.
-- Anteprima desktop/mobile.
-- "Salva bozza" / "Programma" (slot 30 min come gli articoli) / "Invia ora".
-- Stato live durante l'invio (sent/failed counter).
+- `public_email`
+- `figure_category`
+- `role_collective` (solo per coordinatori)
+Validazione client (zod) + validazione edge function.
 
-## Pipeline di invio
+**2.2 Nascondere "categoria figura" dal profilo pubblico**
+In `AutoreProfilo.tsx` rimuovere il rendering di `figure_category`. Resta nel DB e nei filtri di ricerca de "La nostra rete".
 
-1. Edge function `newsletter-render` → genera HTML finale dai `content_blocks`.
-2. Edge function `newsletter-dispatch` (cron ogni 5 min): pesca issue `scheduled` con `scheduled_for <= now()`, crea righe `newsletter_deliveries` per ogni subscriber `confirmed`, marca issue `sending`.
-3. Edge function `newsletter-send-batch` (cron ogni 5 min): legge fino a N (default 250, sotto il limite Brevo) deliveries `queued`, invia via gateway Brevo (`POST /smtp/email`), aggiorna stato. Quando le `queued` finiscono → issue `sent`.
-4. Throttling automatico se Brevo restituisce 429.
+---
 
-## Edge functions da creare
+## BLOCCO 3 — UX / visuale
 
-- `newsletter-subscribe` (pubblico): valida email + zod, crea pending, invia mail di conferma.
-- `newsletter-confirm` (pubblico): valida token, marca `confirmed`.
-- `newsletter-unsubscribe` (pubblico): valida token, marca `unsubscribed`.
-- `newsletter-render`: ritorna HTML preview per editor.
-- `newsletter-dispatch` + `newsletter-send-batch`: cron.
+**3.1 Etichetta stato pubblicazione sopra cover articoli**
+In `PanelArticoli` sostituire il badge "liquid glass" con un badge a sfondo pieno semantico (es. verde=published, ambra=pending, blu=scheduled, grigio=draft), con buon contrasto sopra qualunque cover.
 
-## UI da creare/modificare
+**3.2 Font del corpo testi e degli input**
+Il font display attuale (Playfair-like complesso) viene usato anche nel body e negli input. Mantengo il display per H1-H3, e uso un sans-serif Google semplice (proposta: **Inter** o **DM Sans**) per body, H4-H6, label, input, textarea. Aggiorno `tailwind.config.ts`, `index.css` e l'import font in `index.html`.
 
-- `src/components/NewsletterSignup.tsx` (form footer + homepage).
-- `src/pages/NewsletterConfirm.tsx` (`/newsletter/conferma?token=…`).
-- `src/pages/NewsletterUnsubscribe.tsx` (`/newsletter/disiscriviti?token=…`).
-- `src/pages/area-personale/Newsletter.tsx` (lista issue).
-- `src/pages/area-personale/NewsletterEditor.tsx` (composizione blocchi).
-- Toggle "ricevi newsletter" nel profilo membro.
+**3.3 Giustifica i testi**
+Applicare `text-align: justify` + `hyphens: auto` + `text-wrap: pretty` ai blocchi di prosa lunghi (articoli, descrizioni realtà, sezioni "Cosa facciamo", "La nostra rete"). NON ai titoli, label, navigation, card brevi (lì peggiora). Aggiungo una utility `.prose-justify` e la applico ai punti giusti.
 
-## Costi totali stimati
+---
 
-- Brevo free: **0 €/mese** fino a 300 invii/giorno.
-- Connettore Brevo: gratuito.
-- Tutto il resto (DB, edge functions, cron): incluso in Lovable Cloud.
+## BLOCCO 4 — Admin
 
-## Setup richiesto
+**4.1 Gestione utenti: ordine alfabetico di default + filtro "Recenti"**
 
-Prima di scrivere codice ti chiederò di:
-1. Connettere il connettore Brevo (1 click).
-2. Verificare un dominio mittente su Brevo (DNS, ~5 min) — necessario per non finire in spam.
+- Default order: `display_name ASC`
+- Toggle ordinamento: "Alfabetico" / "Più recenti"
+- Rimuovere sezione "Ultimi membri" se presente
+- Per "Più recenti" uso `profiles.created_at` (verifico esista; se manca o è disallineato con `auth.users.created_at`, propongo migration per popolarlo da `auth.users`).
 
-## Step di implementazione
+**4.2 Export logs (admin audit log)**
+Pulsante "Scarica CSV" in `AuditLogPanel` che esporta `admin_audit_log` filtrato. Lato pratico è utile per audit/compliance — lo implemento.
 
-1. Migration: tabelle + RLS + trigger auto-subscribe membri.
-2. Edge functions subscribe/confirm/unsubscribe + pagine pubbliche + form footer.
-3. Editor newsletter nell'area personale + render preview.
-4. Cron dispatch + send-batch via Brevo.
-5. Toggle preferenza nel profilo + sezione admin "iscritti".
+---
+
+## BLOCCO 5 — Crediti
+
+**5.1 Crediti a Federica Gaglianone + Lovable**
+Aggiungo nel `Footer.tsx` una riga: "Sito realizzato da Federica Gaglianone con Lovable" (link a lovable.dev). Confermami se vuoi anche un link al profilo/sito di Federica.
+
+---
+
+## Domande di conferma prima di partire
+
+1. **Email mittente**: per le mail di benvenuto serve un dominio email verificato. Vuoi usare il dominio attuale del sito o un dominio dedicato? (Se non hai preferenze, configuro Lovable Emails con un sottodominio del tuo dominio pubblicato.)
+2. **Font body**: preferenza tra **Inter** (neutro, modernissimo) o **DM Sans** (più caldo, geometrico)?
+3. **Crediti Federica**: solo testo nel footer o anche link? Quale URL?
+4. **Ordine di esecuzione**: confermi BLOCCO 1 → 2 → 3 → 4 → 5, oppure vuoi anticipare qualcosa (es. font + giustificazione subito perché impatta tutto)?
+
+Appena confermi, parto dal BLOCCO 1.

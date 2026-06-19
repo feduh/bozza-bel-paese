@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ScrollText, RefreshCcw } from "lucide-react";
+import { ScrollText, RefreshCcw, Download } from "lucide-react";
 
 type AuditEntry = {
   id: string;
@@ -43,6 +43,35 @@ const describeRow = (entry: AuditEntry): string => {
   );
 };
 
+const csvEscape = (v: unknown): string => {
+  if (v === null || v === undefined) return "";
+  const s = typeof v === "string" ? v : JSON.stringify(v);
+  return `"${s.replace(/"/g, '""').replace(/\r?\n/g, " ")}"`;
+};
+
+const exportCsv = (rows: AuditEntry[]) => {
+  const header = ["created_at", "actor_email", "action", "table_name", "row_id", "summary"];
+  const body = rows.map((e) => [
+    e.created_at,
+    e.actor_email ?? "",
+    e.action,
+    e.table_name,
+    e.row_id ?? "",
+    describeRow(e),
+  ]);
+  const csv = [header, ...body].map((r) => r.map(csvEscape).join(",")).join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  a.href = url;
+  a.download = `audit-log-${stamp}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 const AuditLogPanel = () => {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,11 +105,12 @@ const AuditLogPanel = () => {
             Ultime 100 azioni di admin, coordinatori e autori sul database.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="px-3 py-2 rounded-md border border-input bg-background font-body text-xs"
+            aria-label="Filtra per tabella"
           >
             <option value="all">Tutte le tabelle</option>
             <option value="realities">Realtà</option>
@@ -94,6 +124,16 @@ const AuditLogPanel = () => {
             aria-label="Ricarica registro"
           >
             <RefreshCcw size={12} /> Aggiorna
+          </button>
+          <button
+            type="button"
+            onClick={() => exportCsv(filtered)}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-input font-body text-xs hover:border-primary/40 transition-colors disabled:opacity-50"
+            aria-label="Esporta CSV"
+            title="Scarica CSV"
+          >
+            <Download size={12} /> Esporta CSV
           </button>
         </div>
       </div>

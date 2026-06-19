@@ -15,8 +15,8 @@ export default {
     extend: {
       fontFamily: {
         display: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
-        body: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
-        mono: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['Inter', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         notch: ['Stack Sans Notch', 'Space Grotesk', 'system-ui', 'sans-serif'],
       },
       boxShadow: {

@@ -55,10 +55,10 @@
     --sidebar-border: 260 28% 6%;
     --sidebar-ring: 257 71% 51%;
 
-    /* Tipografia: Stack Sans Notch ovunque (variable font) */
+    /* Tipografia: display brutalist per H1–H3, Inter neutro per body / form / H4–H6 */
     --font-display: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
-    --font-body: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
-    --font-mono: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Inter', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     /* Brutalist shadow: offset duro, no blur */
     --shadow-brutalist: 4px 4px 0 0 hsl(var(--foreground));
@@ -109,13 +109,22 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    font-variation-settings: 'wght' 400;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  /* Solo gli headline maiuscoli usano il font display brutalist. H4–H6 usano Inter per leggibilità. */
+  h1, h2, h3 {
     font-family: var(--font-display);
     font-variation-settings: 'wght' 700;
     letter-spacing: -0.02em;
+  }
+  h4, h5, h6 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  /* Input, textarea, select, button ereditano Inter per consistenza form */
+  input, textarea, select, button {
+    font-family: var(--font-body);
   }
 
   /* Focus ring sempre netto, niente arrotondamenti */
@@ -156,8 +165,19 @@
 
   .editorial-body {
     font-family: var(--font-body);
-    font-variation-settings: 'wght' 400;
+    font-weight: 400;
     @apply text-lg md:text-xl leading-snug;
+    /* Giustificazione editoriale per blocchi di prosa ampi: hyphens + text-wrap evitano "fiumi". */
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    text-wrap: pretty;
+  }
+  .editorial-body p,
+  .editorial-body li {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
 
   /* Micro-UI: tag, label, metadati — sempre maiuscolo, tracking ampio */
@@ -203,6 +223,22 @@
     );
     background-repeat: no-repeat;
     padding-inline: 0.1em;
+  }
+
+  /* Testi giustificati per blocchi di prosa lunghi. Usa hyphens+text-wrap per evitare gap.
+     NON applicare a titoli, label, navigation o card brevi. */
+  .prose-justify {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    text-wrap: pretty;
+    word-spacing: 0.01em;
+  }
+  .prose-justify p,
+  .prose-justify li {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
 }
 

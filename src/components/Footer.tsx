@@ -57,8 +57,21 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground">info.ilbelpaese@gmail.com</p>
           </div>
         </div>
-        <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Il Bel Paese. {t("footer.rights")}
+        <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-1">
+          <p>© {new Date().getFullYear()} Il Bel Paese. {t("footer.rights")}</p>
+          <p>
+            Sito realizzato da{" "}
+            <span className="font-medium text-foreground">Federica Gaglianone</span> con{" "}
+            <a
+              href="https://lovable.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Lovable
+            </a>
+            .
+          </p>
         </div>
       </div>
     </footer>

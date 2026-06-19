@@ -52,23 +52,21 @@ const inviteSchema = z.object({
   reality_id: z.string().uuid().nullable().optional(),
   affiliation: z.string().trim().min(2).max(120).nullable().optional(),
   member_type: z.enum(["coordinatore", "autore"]).nullable().optional(),
-  figure_category: z
-    .enum([
-      "Istituzione",
-      "Università",
-      "Ricercatore indipendente",
-      "Curatore indipendente",
-      "Artista",
-      "Critico",
-      "Giornalista",
-      "Studente",
-      "Gallerista",
-      "Editore",
-      "Designer",
-      "Altro",
-    ])
-    .nullable()
-    .optional(),
+  public_email: z.string().trim().email("Email pubblica non valida").max(255),
+  figure_category: z.enum([
+    "Istituzione",
+    "Università",
+    "Ricercatore indipendente",
+    "Curatore indipendente",
+    "Artista",
+    "Critico",
+    "Giornalista",
+    "Studente",
+    "Gallerista",
+    "Editore",
+    "Designer",
+    "Altro",
+  ]),
   role_real_life: z.string().trim().max(120).nullable().optional(),
   role_collective: z.string().trim().max(120).nullable().optional(),
 });
@@ -160,10 +158,19 @@ Deno.serve(async (req) => {
       reality_id,
       affiliation,
       member_type,
+      public_email,
       figure_category,
       role_real_life,
       role_collective,
     } = parseResult.data;
+
+    // Coordinators must specify their role in the collective
+    if (role === "coordinatore" && !role_collective) {
+      return new Response(
+        JSON.stringify({ error: "Per i coordinatori il ruolo dentro il collettivo è obbligatorio" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Coordinators can only create authors — only admins can create coordinators
     if (!isAdmin && role !== "author") {
@@ -207,7 +214,8 @@ Deno.serve(async (req) => {
       reality_id: effectiveRealityId,
       affiliation: effectiveAffiliation,
       member_type: role === "coordinatore" ? (member_type ?? "coordinatore") : "autore",
-      figure_category: figure_category ?? null,
+      public_email,
+      figure_category,
       role_real_life: role_real_life ?? null,
       role_collective: role === "coordinatore" ? role_collective ?? null : null,
       consent_public: true,

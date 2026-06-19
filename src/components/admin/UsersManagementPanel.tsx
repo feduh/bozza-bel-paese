@@ -35,6 +35,7 @@ const UsersManagementPanel = () => {
   const [meId, setMeId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<AppRole | "all">("all");
+  const [sort, setSort] = useState<"alpha" | "recent">("alpha");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
@@ -75,7 +76,7 @@ const UsersManagementPanel = () => {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return users.filter((u) => {
+    const base = users.filter((u) => {
       if (roleFilter !== "all" && !u.roles.includes(roleFilter)) return false;
       if (!q) return true;
       return (
@@ -83,7 +84,16 @@ const UsersManagementPanel = () => {
         u.profile?.display_name?.toLowerCase().includes(q)
       );
     });
-  }, [users, search, roleFilter]);
+    const sorted = [...base].sort((a, b) => {
+      if (sort === "recent") {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      const an = (a.profile?.display_name || a.email || "").toLocaleLowerCase("it");
+      const bn = (b.profile?.display_name || b.email || "").toLocaleLowerCase("it");
+      return an.localeCompare(bn, "it");
+    });
+    return sorted;
+  }, [users, search, roleFilter, sort]);
 
   const isBanned = (u: ManagedUser) =>
     !!u.banned_until && new Date(u.banned_until).getTime() > Date.now();
@@ -162,11 +172,21 @@ const UsersManagementPanel = () => {
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value as AppRole | "all")}
           className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+          aria-label="Filtra per ruolo"
         >
           <option value="all">Tutti i ruoli</option>
           {ALL_ROLES.map((r) => (
             <option key={r} value={r}>{ROLE_LABEL[r]}</option>
           ))}
+        </select>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as "alpha" | "recent")}
+          className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+          aria-label="Ordina per"
+        >
+          <option value="alpha">Ordine alfabetico</option>
+          <option value="recent">Più recenti</option>
         </select>
       </div>
 
