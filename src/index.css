@@ -55,10 +55,10 @@
     --sidebar-border: 260 28% 6%;
     --sidebar-ring: 257 71% 51%;
 
-    /* Tipografia: Stack Sans Notch ovunque (variable font) */
+    /* Tipografia: display brutalist per H1–H3, Inter neutro per body / form / H4–H6 */
     --font-display: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
-    --font-body: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
-    --font-mono: 'Stack Sans Notch', 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Inter', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     /* Brutalist shadow: offset duro, no blur */
     --shadow-brutalist: 4px 4px 0 0 hsl(var(--foreground));
