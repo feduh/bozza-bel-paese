@@ -312,9 +312,41 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
 
       <div className="pt-2 border-t border-border/60">
         <p className="text-xs text-muted-foreground font-body mb-3">
-          Dati profilo (opzionali, modificabili poi dall'area personale).
+          Dati profilo. I campi contrassegnati con <strong>*</strong> sono obbligatori.
         </p>
         <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-body font-medium mb-2">Email pubblica *</label>
+            <input
+              type="email"
+              value={publicEmail}
+              onChange={(e) => setPublicEmail(e.target.value)}
+              placeholder="visibile sul profilo pubblico"
+              aria-invalid={!!errs.publicEmail}
+              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.publicEmail ? "border-destructive" : "border-input"}`}
+            />
+            <FieldError id="err-publicEmail" message={errs.publicEmail} />
+          </div>
+          <div>
+            <label className="block text-sm font-body font-medium mb-2">Categoria figura *</label>
+            <select
+              value={figureCategory}
+              onChange={(e) => setFigureCategory(e.target.value)}
+              aria-invalid={!!errs.figureCategory}
+              className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.figureCategory ? "border-destructive" : "border-input"}`}
+            >
+              <option value="">— seleziona —</option>
+              {FIGURE_CATEGORIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <FieldError id="err-figureCategory" message={errs.figureCategory} />
+            <p className="text-xs text-muted-foreground font-body mt-1">
+              Usata per i filtri di ricerca nella rete. Non viene mostrata sul profilo pubblico.
+            </p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4 mt-4">
           <div>
             <label className="block text-sm font-body font-medium mb-2">Ruolo Lavorativo</label>
             <input
@@ -324,19 +356,6 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
               maxLength={120}
               className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-body font-medium mb-2">Categoria figura</label>
-            <select
-              value={figureCategory}
-              onChange={(e) => setFigureCategory(e.target.value)}
-              className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="">— non specificata —</option>
-              {FIGURE_CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
           </div>
         </div>
         {role === "coordinatore" && (
@@ -355,14 +374,16 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-body font-medium mb-2">Ruolo dentro il collettivo</label>
+              <label className="block text-sm font-body font-medium mb-2">Ruolo dentro il collettivo *</label>
               <input
                 value={roleCollective}
                 onChange={(e) => setRoleCollective(e.target.value)}
                 placeholder="es. coordinamento editoriale"
                 maxLength={120}
-                className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-invalid={!!errs.roleCollective}
+                className={`w-full px-4 py-3 rounded-md border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring ${errs.roleCollective ? "border-destructive" : "border-input"}`}
               />
+              <FieldError id="err-roleCollective" message={errs.roleCollective} />
             </div>
           </div>
         )}
