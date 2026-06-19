@@ -76,7 +76,7 @@ const UsersManagementPanel = () => {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return users.filter((u) => {
+    const base = users.filter((u) => {
       if (roleFilter !== "all" && !u.roles.includes(roleFilter)) return false;
       if (!q) return true;
       return (
@@ -84,7 +84,16 @@ const UsersManagementPanel = () => {
         u.profile?.display_name?.toLowerCase().includes(q)
       );
     });
-  }, [users, search, roleFilter]);
+    const sorted = [...base].sort((a, b) => {
+      if (sort === "recent") {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      const an = (a.profile?.display_name || a.email || "").toLocaleLowerCase("it");
+      const bn = (b.profile?.display_name || b.email || "").toLocaleLowerCase("it");
+      return an.localeCompare(bn, "it");
+    });
+    return sorted;
+  }, [users, search, roleFilter, sort]);
 
   const isBanned = (u: ManagedUser) =>
     !!u.banned_until && new Date(u.banned_until).getTime() > Date.now();
