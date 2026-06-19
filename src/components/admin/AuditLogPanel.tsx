@@ -43,6 +43,35 @@ const describeRow = (entry: AuditEntry): string => {
   );
 };
 
+const csvEscape = (v: unknown): string => {
+  if (v === null || v === undefined) return "";
+  const s = typeof v === "string" ? v : JSON.stringify(v);
+  return `"${s.replace(/"/g, '""').replace(/\r?\n/g, " ")}"`;
+};
+
+const exportCsv = (rows: AuditEntry[]) => {
+  const header = ["created_at", "actor_email", "action", "table_name", "row_id", "summary"];
+  const body = rows.map((e) => [
+    e.created_at,
+    e.actor_email ?? "",
+    e.action,
+    e.table_name,
+    e.row_id ?? "",
+    describeRow(e),
+  ]);
+  const csv = [header, ...body].map((r) => r.map(csvEscape).join(",")).join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  a.href = url;
+  a.download = `audit-log-${stamp}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 const AuditLogPanel = () => {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
