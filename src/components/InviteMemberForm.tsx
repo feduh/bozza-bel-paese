@@ -60,7 +60,8 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
       realityId: role === "author" && authorType === "reality" ? realityId : undefined,
       affiliation: role === "author" && authorType === "external" ? affiliation : undefined,
       memberType: role === "coordinatore" ? (memberType || undefined) : undefined,
-      figureCategory: figureCategory || undefined,
+      publicEmail,
+      figureCategory,
       roleRealLife: roleRealLife || undefined,
       roleCollective: role === "coordinatore" ? (roleCollective || undefined) : undefined,
     });
