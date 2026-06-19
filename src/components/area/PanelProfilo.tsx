@@ -39,6 +39,25 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
     e.preventDefault();
     setSaving(true);
     setMsg("");
+
+    // Validazioni obbligatorie
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!profile.public_email || !emailRe.test(profile.public_email)) {
+      setMsg("⚠️ L'email pubblica è obbligatoria e deve essere valida.");
+      setSaving(false);
+      return;
+    }
+    if (!profile.figure_category) {
+      setMsg("⚠️ La categoria figura è obbligatoria.");
+      setSaving(false);
+      return;
+    }
+    if (isStaff && !(profile.role_collective ?? "").trim()) {
+      setMsg("⚠️ Il ruolo dentro il collettivo è obbligatorio per i coordinatori.");
+      setSaving(false);
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -50,12 +69,12 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
         social_twitter: profile.social_twitter || null,
         social_linkedin: profile.social_linkedin || null,
         affiliation: profile.reality_id ? null : (profile.affiliation || null),
-        public_email: profile.public_email || null,
+        public_email: profile.public_email,
         consent_public: !!profile.consent_public,
         member_type: isStaff ? (profile.member_type || null) : "autore",
-        role_collective: isStaff ? (profile.role_collective || null) : null,
+        role_collective: isStaff ? profile.role_collective : null,
         role_real_life: profile.role_real_life || null,
-        figure_category: profile.figure_category || null,
+        figure_category: profile.figure_category,
       })
       .eq("user_id", userId);
     setSaving(false);
