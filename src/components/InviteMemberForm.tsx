@@ -28,6 +28,7 @@ const InviteMemberForm = ({ allowedRoles }: Props) => {
   const [affiliation, setAffiliation] = useState("");
   const [memberType, setMemberType] = useState<"" | "coordinatore" | "autore">("");
   const [figureCategory, setFigureCategory] = useState("");
+  const [publicEmail, setPublicEmail] = useState("");
   const [roleRealLife, setRoleRealLife] = useState("");
   const [roleCollective, setRoleCollective] = useState("");
   const [showPassword, setShowPassword] = useState(false);
