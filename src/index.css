@@ -109,13 +109,22 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    font-variation-settings: 'wght' 400;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  /* Solo gli headline maiuscoli usano il font display brutalist. H4–H6 usano Inter per leggibilità. */
+  h1, h2, h3 {
     font-family: var(--font-display);
     font-variation-settings: 'wght' 700;
     letter-spacing: -0.02em;
+  }
+  h4, h5, h6 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  /* Input, textarea, select, button ereditano Inter per consistenza form */
+  input, textarea, select, button {
+    font-family: var(--font-body);
   }
 
   /* Focus ring sempre netto, niente arrotondamenti */
