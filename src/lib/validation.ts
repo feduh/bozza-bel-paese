@@ -120,14 +120,16 @@ export const inviteSchema = (t: TFunction) =>
         emptyToUndefined,
         z.enum(["coordinatore", "autore"]).optional(),
       ),
-      figureCategory: z.preprocess(
-        emptyToUndefined,
-        z.enum(FIGURE_CATEGORY_VALUES).optional(),
-      ),
+      // Email pubblica e categoria figura sono OBBLIGATORIE per tutte le bio
+      publicEmail: z.string().trim().toLowerCase().email(t("validation.email")),
+      figureCategory: z.enum(FIGURE_CATEGORY_VALUES, {
+        errorMap: () => ({ message: t("validation.required") }),
+      }),
       roleRealLife: z.preprocess(
         emptyToUndefined,
         z.string().trim().max(120).optional(),
       ),
+      // Per i coordinatori il ruolo dentro il collettivo è obbligatorio
       roleCollective: z.preprocess(
         emptyToUndefined,
         z.string().trim().max(120).optional(),
@@ -140,6 +142,10 @@ export const inviteSchema = (t: TFunction) =>
     .refine(
       (d) => d.role !== "author" || d.authorType !== "external" || !!d.affiliation,
       { path: ["affiliation"], message: t("validation.required") },
+    )
+    .refine(
+      (d) => d.role !== "coordinatore" || !!d.roleCollective,
+      { path: ["roleCollective"], message: t("validation.required") },
     );
 
 export type InviteInput = z.infer<ReturnType<typeof inviteSchema>>;
