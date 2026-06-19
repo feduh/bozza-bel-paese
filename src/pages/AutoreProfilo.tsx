@@ -144,7 +144,7 @@ const AutoreProfilo = () => {
               </p>
             )}
             {profile.bio && (
-              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line">{profile.bio}</p>
+              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line prose-justify">{profile.bio}</p>
             )}
             <div className="mt-5 flex flex-wrap gap-3">
               {profile.public_email && (
