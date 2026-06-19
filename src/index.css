@@ -165,8 +165,19 @@
 
   .editorial-body {
     font-family: var(--font-body);
-    font-variation-settings: 'wght' 400;
+    font-weight: 400;
     @apply text-lg md:text-xl leading-snug;
+    /* Giustificazione editoriale per blocchi di prosa ampi: hyphens + text-wrap evitano "fiumi". */
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    text-wrap: pretty;
+  }
+  .editorial-body p,
+  .editorial-body li {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
 
   /* Micro-UI: tag, label, metadati — sempre maiuscolo, tracking ampio */
