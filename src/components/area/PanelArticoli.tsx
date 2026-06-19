@@ -169,7 +169,7 @@ const PanelArticoli = ({ posts, isStaff, onChanged }: Props) => {
                     </div>
                   )}
                   <span
-                    className={`absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full border ${s.tone} bg-background/90 backdrop-blur`}
+                    className={`absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-sm shadow-md ${s.tone}`}
                   >
                     <Icon size={10} /> {s.label}
                   </span>
