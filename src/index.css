@@ -213,6 +213,22 @@
     background-repeat: no-repeat;
     padding-inline: 0.1em;
   }
+
+  /* Testi giustificati per blocchi di prosa lunghi. Usa hyphens+text-wrap per evitare gap.
+     NON applicare a titoli, label, navigation o card brevi. */
+  .prose-justify {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    text-wrap: pretty;
+    word-spacing: 0.01em;
+  }
+  .prose-justify p,
+  .prose-justify li {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
 }
 
 /* ============ Map styling (Il Bel Paese) — Drone HUD, allineato alla Hero ============ */
