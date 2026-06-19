@@ -35,6 +35,7 @@ const UsersManagementPanel = () => {
   const [meId, setMeId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<AppRole | "all">("all");
+  const [sort, setSort] = useState<"alpha" | "recent">("alpha");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
