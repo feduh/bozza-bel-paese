@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ScrollText, RefreshCcw } from "lucide-react";
+import { ScrollText, RefreshCcw, Download } from "lucide-react";
 
 type AuditEntry = {
   id: string;
