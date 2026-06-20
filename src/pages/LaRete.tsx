@@ -21,6 +21,7 @@ type Profile = {
   role_collective: string | null;
   role_real_life: string | null;
   figure_category: string | null;
+  display_priority: number | null;
 };
 
 type RealityRef = { id: string; name: string; city: string; region: string };
