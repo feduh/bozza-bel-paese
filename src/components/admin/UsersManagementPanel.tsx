@@ -46,6 +46,8 @@ const UsersManagementPanel = () => {
   const [pwd, setPwd] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editName, setEditName] = useState("");
+  const [editPriority, setEditPriority] = useState<string>("");
+  const [savingPriority, setSavingPriority] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null));
