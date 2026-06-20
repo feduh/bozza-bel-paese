@@ -312,6 +312,61 @@ const UsersManagementPanel = () => {
                       </div>
                     </div>
 
+                    {/* Ordine in evidenza (solo coordinatori) */}
+                    {u.profile?.member_type === "coordinatore" && (
+                      <div>
+                        <h3 className="text-xs font-body font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">
+                          <Users size={12} /> Ordine nella pagina “La nostra rete”
+                        </h3>
+                        <p className="text-[11px] font-body text-muted-foreground mb-2">
+                          Numero intero: i valori più bassi compaiono prima (es. 1 = Founder). Lascia vuoto per ordinare in coda in modo alfabetico.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                          <label className="block flex-1">
+                            <span className="text-[11px] font-body text-muted-foreground">Priorità</span>
+                            <input
+                              type="number"
+                              min={1}
+                              step={1}
+                              value={editPriority}
+                              onChange={(e) => setEditPriority(e.target.value)}
+                              placeholder="es. 1"
+                              className="mt-1 w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            disabled={savingPriority}
+                            onClick={async () => {
+                              setSavingPriority(true);
+                              setFeedback(null);
+                              const trimmed = editPriority.trim();
+                              const value = trimmed === "" ? null : Number(trimmed);
+                              if (value !== null && (!Number.isInteger(value) || value < 1)) {
+                                setSavingPriority(false);
+                                setFeedback({ kind: "err", text: "Inserisci un numero intero positivo (o lascia vuoto)." });
+                                return;
+                              }
+                              const { error } = await supabase
+                                .from("profiles")
+                                .update({ display_priority: value })
+                                .eq("user_id", u.id);
+                              setSavingPriority(false);
+                              if (error) {
+                                setFeedback({ kind: "err", text: error.message });
+                              } else {
+                                setFeedback({ kind: "ok", text: "Ordine aggiornato" });
+                              }
+                            }}
+                            className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-body text-sm hover:opacity-90 disabled:opacity-50"
+                          >
+                            Salva ordine
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+
                     {/* Ruoli */}
                     <div>
                       <h3 className="text-xs font-body font-semibold uppercase tracking-wider mb-2 flex items-center gap-1">
