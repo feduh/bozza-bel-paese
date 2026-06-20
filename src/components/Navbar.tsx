@@ -52,7 +52,7 @@ const Navbar = () => {
       <div className="editorial-container flex items-center justify-between h-16">
         <Link
           to="/"
-          className="flex items-center gap-2 text-xl tracking-tight text-foreground uppercase hover:text-primary transition-colors"
+          className="font-display flex items-center gap-2 text-xl tracking-tight text-foreground uppercase hover:text-primary transition-colors"
           style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.02em" }}
           aria-label="Il Bel Paese — home"
         >
