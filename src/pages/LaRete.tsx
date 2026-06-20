@@ -41,7 +41,7 @@ const LaRete = () => {
       const [{ data: profs }, { data: rels }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_linkedin, public_email, reality_id, member_type, role_collective, role_real_life, figure_category")
+          .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_linkedin, public_email, reality_id, member_type, role_collective, role_real_life, figure_category, display_priority")
           .eq("consent_public", true)
           .in("member_type", ["coordinatore", "autore"])
           .order("display_name", { ascending: true }),
