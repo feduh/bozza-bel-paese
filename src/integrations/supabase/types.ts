@@ -369,6 +369,7 @@ export type Database = {
           consent_public: boolean
           created_at: string
           display_name: string
+          display_priority: number | null
           figure_category: string | null
           id: string
           member_type: string | null
@@ -390,6 +391,7 @@ export type Database = {
           consent_public?: boolean
           created_at?: string
           display_name?: string
+          display_priority?: number | null
           figure_category?: string | null
           id?: string
           member_type?: string | null
@@ -411,6 +413,7 @@ export type Database = {
           consent_public?: boolean
           created_at?: string
           display_name?: string
+          display_priority?: number | null
           figure_category?: string | null
           id?: string
           member_type?: string | null

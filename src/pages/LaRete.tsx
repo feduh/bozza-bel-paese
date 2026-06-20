@@ -21,6 +21,7 @@ type Profile = {
   role_collective: string | null;
   role_real_life: string | null;
   figure_category: string | null;
+  display_priority: number | null;
 };
 
 type RealityRef = { id: string; name: string; city: string; region: string };
@@ -40,7 +41,7 @@ const LaRete = () => {
       const [{ data: profs }, { data: rels }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_linkedin, public_email, reality_id, member_type, role_collective, role_real_life, figure_category")
+          .select("user_id, display_name, bio, avatar_url, affiliation, website, social_instagram, social_linkedin, public_email, reality_id, member_type, role_collective, role_real_life, figure_category, display_priority")
           .eq("consent_public", true)
           .in("member_type", ["coordinatore", "autore"])
           .order("display_name", { ascending: true }),
@@ -60,7 +61,15 @@ const LaRete = () => {
   }, []);
 
   const coordinatori = useMemo(
-    () => profiles.filter((p) => p.member_type === "coordinatore"),
+    () =>
+      profiles
+        .filter((p) => p.member_type === "coordinatore")
+        .sort((a, b) => {
+          const ap = a.display_priority ?? Number.POSITIVE_INFINITY;
+          const bp = b.display_priority ?? Number.POSITIVE_INFINITY;
+          if (ap !== bp) return ap - bp;
+          return a.display_name.localeCompare(b.display_name, "it");
+        }),
     [profiles],
   );
   const autori = useMemo(
