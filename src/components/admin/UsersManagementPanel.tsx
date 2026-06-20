@@ -238,12 +238,23 @@ const UsersManagementPanel = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       const next = open ? null : u.id;
                       setOpenId(next);
                       setPwd("");
                       setEditEmail(u.email ?? "");
                       setEditName(u.profile?.display_name ?? "");
+                      setEditPriority("");
+                      if (next && u.profile?.member_type === "coordinatore") {
+                        const { data } = await supabase
+                          .from("profiles")
+                          .select("display_priority")
+                          .eq("user_id", u.id)
+                          .maybeSingle();
+                        setEditPriority(
+                          data?.display_priority != null ? String(data.display_priority) : "",
+                        );
+                      }
                     }}
                     className="text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
                   >
