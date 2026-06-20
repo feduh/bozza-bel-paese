@@ -61,7 +61,15 @@ const LaRete = () => {
   }, []);
 
   const coordinatori = useMemo(
-    () => profiles.filter((p) => p.member_type === "coordinatore"),
+    () =>
+      profiles
+        .filter((p) => p.member_type === "coordinatore")
+        .sort((a, b) => {
+          const ap = a.display_priority ?? Number.POSITIVE_INFINITY;
+          const bp = b.display_priority ?? Number.POSITIVE_INFINITY;
+          if (ap !== bp) return ap - bp;
+          return a.display_name.localeCompare(b.display_name, "it");
+        }),
     [profiles],
   );
   const autori = useMemo(
