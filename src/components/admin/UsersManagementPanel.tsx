@@ -25,6 +25,8 @@ type ManagedUser = {
     reality_id: string | null;
     affiliation: string | null;
     public_email: string | null;
+    role_collective: string | null;
+    display_priority: number | null;
   } | null;
   roles: AppRole[];
 };
