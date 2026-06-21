@@ -64,6 +64,49 @@ const RealityForm = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [errs, setErrs] = useState<FieldErrors>({});
+  const [loadingEdit, setLoadingEdit] = useState(isEditing);
+
+  useEffect(() => {
+    if (!editingId) return;
+    let alive = true;
+    (async () => {
+      setLoadingEdit(true);
+      const { data, error: e } = await supabase
+        .from("realities")
+        .select("*")
+        .eq("id", editingId)
+        .maybeSingle();
+      if (!alive) return;
+      if (e || !data) {
+        setError(e?.message || "Realtà non trovata");
+        setLoadingEdit(false);
+        return;
+      }
+      setName(data.name ?? "");
+      setType((data.type as RealityType) ?? "con-sede");
+      setCountry(data.country ?? "Italia");
+      setCity(data.city ?? "");
+      setAddress(data.address ?? "");
+      setZipCode(data.zip_code ?? "");
+      setRegion(data.region ?? "");
+      setLat(data.lat != null ? String(data.lat) : "");
+      setLng(data.lng != null ? String(data.lng) : "");
+      setYearFounded(data.year_founded != null ? String(data.year_founded) : "");
+      setYearClosed(data.year_closed != null ? String(data.year_closed) : "");
+      setWebsite(data.website ?? "");
+      setContactEmail(data.contact_email ?? "");
+      setDescription(data.description ?? "");
+      setHistory(data.history ?? "");
+      setIg(data.ig_link ?? "");
+      setFb(data.fb_link ?? "");
+      setLinkedin(data.linkedin_link ?? "");
+      setConfirmedStatus((data.confirmed_status as ConfirmedStatus) ?? "pendente");
+      setCategories(data.categories ?? (data.category ? [data.category] : []));
+      setGeocoded(!!(data.lat && data.lng));
+      setLoadingEdit(false);
+    })();
+    return () => { alive = false; };
+  }, [editingId]);
 
   const cls = (k: string) => `${inputCls} ${errs[k] ? inputErrCls : ""}`;
   const aria = (k: string) =>
