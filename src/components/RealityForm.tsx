@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { invokeFunction } from "@/lib/invokeFunction";
 import { MapPin, Loader2, Check } from "lucide-react";
@@ -16,9 +16,20 @@ const inputErrCls = "border-destructive focus:ring-destructive";
 
 type FormMode = "admin" | "coordinatore";
 
-const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mode?: FormMode }) => {
+const RealityForm = ({
+  onCreated,
+  mode = "admin",
+  editingId,
+  onCancel,
+}: {
+  onCreated?: () => void;
+  mode?: FormMode;
+  editingId?: string;
+  onCancel?: () => void;
+}) => {
   const { t } = useTranslation();
   const isCollaborator = mode === "coordinatore";
+  const isEditing = !!editingId;
 
   const [name, setName] = useState("");
   const [type, setType] = useState<RealityType>("con-sede");
@@ -53,6 +64,49 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [errs, setErrs] = useState<FieldErrors>({});
+  const [loadingEdit, setLoadingEdit] = useState(isEditing);
+
+  useEffect(() => {
+    if (!editingId) return;
+    let alive = true;
+    (async () => {
+      setLoadingEdit(true);
+      const { data, error: e } = await supabase
+        .from("realities")
+        .select("*")
+        .eq("id", editingId)
+        .maybeSingle();
+      if (!alive) return;
+      if (e || !data) {
+        setError(e?.message || "Realtà non trovata");
+        setLoadingEdit(false);
+        return;
+      }
+      setName(data.name ?? "");
+      setType((data.type as RealityType) ?? "con-sede");
+      setCountry(data.country ?? "Italia");
+      setCity(data.city ?? "");
+      setAddress(data.address ?? "");
+      setZipCode(data.zip_code ?? "");
+      setRegion(data.region ?? "");
+      setLat(data.lat != null ? String(data.lat) : "");
+      setLng(data.lng != null ? String(data.lng) : "");
+      setYearFounded(data.year_founded != null ? String(data.year_founded) : "");
+      setYearClosed(data.year_closed != null ? String(data.year_closed) : "");
+      setWebsite(data.website ?? "");
+      setContactEmail(data.contact_email ?? "");
+      setDescription(data.description ?? "");
+      setHistory(data.history ?? "");
+      setIg(data.ig_link ?? "");
+      setFb(data.fb_link ?? "");
+      setLinkedin(data.linkedin_link ?? "");
+      setConfirmedStatus((data.confirmed_status as ConfirmedStatus) ?? "pendente");
+      setCategories(data.categories ?? (data.category ? [data.category] : []));
+      setGeocoded(!!(data.lat && data.lng));
+      setLoadingEdit(false);
+    })();
+    return () => { alive = false; };
+  }, [editingId]);
 
   const cls = (k: string) => `${inputCls} ${errs[k] ? inputErrCls : ""}`;
   const aria = (k: string) =>
@@ -107,10 +161,8 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
     const v = parsed.data;
     const { data: { user } } = await supabase.auth.getUser();
     const effectiveStatus = isCollaborator ? "pendente" : v.confirmedStatus;
-    const autoConfirmAt = isCollaborator
-      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      : null;
-    const { error: insertError } = await supabase.from("realities").insert({
+
+    const payload = {
       name: v.name,
       type: v.type,
       country: v.country,
@@ -131,24 +183,47 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
       linkedin_link: v.linkedin ?? null,
       confirmed_status: effectiveStatus,
       status: effectiveStatus === "storico" ? "archiviato" : "attivo",
-      created_by: user?.id ?? null,
-      auto_confirm_at: autoConfirmAt,
       categories,
       category: categories[0] ?? null,
-    } as any);
+    };
 
-    if (insertError) {
-      setError(insertError.message);
+    let opError: { message: string } | null = null;
+    if (isEditing) {
+      const { error: updError } = await supabase
+        .from("realities")
+        .update(payload as any)
+        .eq("id", editingId!);
+      opError = updError;
     } else {
-      setSuccess(`✅ Realtà "${v.name}" salvata.`);
-      setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
-      setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
-      setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
+      const autoConfirmAt = isCollaborator
+        ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        : null;
+      const { error: insertError } = await supabase.from("realities").insert({
+        ...payload,
+        created_by: user?.id ?? null,
+        auto_confirm_at: autoConfirmAt,
+      } as any);
+      opError = insertError;
+    }
+
+    if (opError) {
+      setError(opError.message);
+    } else {
+      setSuccess(isEditing ? `✅ Realtà "${v.name}" aggiornata.` : `✅ Realtà "${v.name}" salvata.`);
+      if (!isEditing) {
+        setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
+        setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
+        setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
+        setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
+      }
       onCreated?.();
     }
     setSubmitting(false);
   };
+
+  if (loadingEdit) {
+    return <div className="py-10 text-center text-sm text-muted-foreground font-body">Caricamento realtà…</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
@@ -322,15 +397,22 @@ const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mo
         </div>
       )}
 
-      {isCollaborator && (
+      {isCollaborator && !isEditing && (
         <div className="p-4 rounded-md bg-amber-500/10 border border-amber-500/30 text-sm font-body">
           ⏳ La realtà che proponi resterà <strong>in verifica per 24 ore</strong>: in questa finestra puoi correggerla o eliminarla. Trascorso il tempo verrà <strong>pubblicata automaticamente</strong> sulla mappa. Ricontrolla bene tutti i contatti prima di salvare.
         </div>
       )}
 
-      <button type="submit" disabled={submitting} className="px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:opacity-90 disabled:opacity-50">
-        {submitting ? "Salvataggio..." : isCollaborator ? "Proponi realtà" : "Salva realtà"}
-      </button>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button type="submit" disabled={submitting} className="px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:opacity-90 disabled:opacity-50">
+          {submitting ? "Salvataggio..." : isEditing ? "Aggiorna realtà" : isCollaborator ? "Proponi realtà" : "Salva realtà"}
+        </button>
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="px-4 py-3 rounded-md border border-border font-body text-sm hover:bg-muted/50">
+            Annulla
+          </button>
+        )}
+      </div>
     </form>
   );
 };
