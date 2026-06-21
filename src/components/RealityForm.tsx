@@ -14,6 +14,30 @@ const inputCls =
   "w-full px-4 py-2.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 const inputErrCls = "border-destructive focus:ring-destructive";
 
+// Capitalizza la prima lettera di ogni parola, mantenendo minuscole le particelle italiane (di, del, ecc.)
+const TITLE_LOWER = new Set([
+  "di","del","della","dello","dei","degli","delle",
+  "da","dal","dalla","dallo","dai","dagli","dalle",
+  "de","e","la","lo","il","i","gli","le",
+  "in","su","a","ai","alle","alla","allo","con","per",
+]);
+const toTitleCase = (s: string): string => {
+  if (!s) return s;
+  const tokens = s.toLowerCase().split(/(\s+)/);
+  let wordIdx = 0;
+  return tokens
+    .map((tok) => {
+      if (/^\s+$/.test(tok) || tok === "") return tok;
+      const isFirst = wordIdx === 0;
+      wordIdx++;
+      if (!isFirst && TITLE_LOWER.has(tok)) return tok;
+      // Maiuscola dopo apostrofi (d'angelo -> D'Angelo) e a inizio parola
+      return tok
+        .replace(/(^|[-'’])([\p{L}])/gu, (_m, sep, ch) => sep + ch.toUpperCase());
+    })
+    .join("");
+};
+
 type FormMode = "admin" | "coordinatore";
 
 const RealityForm = ({
