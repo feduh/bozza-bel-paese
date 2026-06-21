@@ -397,15 +397,22 @@ const RealityForm = ({
         </div>
       )}
 
-      {isCollaborator && (
+      {isCollaborator && !isEditing && (
         <div className="p-4 rounded-md bg-amber-500/10 border border-amber-500/30 text-sm font-body">
           ⏳ La realtà che proponi resterà <strong>in verifica per 24 ore</strong>: in questa finestra puoi correggerla o eliminarla. Trascorso il tempo verrà <strong>pubblicata automaticamente</strong> sulla mappa. Ricontrolla bene tutti i contatti prima di salvare.
         </div>
       )}
 
-      <button type="submit" disabled={submitting} className="px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:opacity-90 disabled:opacity-50">
-        {submitting ? "Salvataggio..." : isCollaborator ? "Proponi realtà" : "Salva realtà"}
-      </button>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button type="submit" disabled={submitting} className="px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:opacity-90 disabled:opacity-50">
+          {submitting ? "Salvataggio..." : isEditing ? "Aggiorna realtà" : isCollaborator ? "Proponi realtà" : "Salva realtà"}
+        </button>
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="px-4 py-3 rounded-md border border-border font-body text-sm hover:bg-muted/50">
+            Annulla
+          </button>
+        )}
+      </div>
     </form>
   );
 };
