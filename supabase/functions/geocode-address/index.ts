@@ -30,37 +30,53 @@ Deno.serve(async (req) => {
       );
     }
 
-    const q = `${address}, ${city}, ${country || "Italia"}`;
-    const url = new URL("https://nominatim.openstreetmap.org/search");
-    url.searchParams.set("q", q);
-    url.searchParams.set("format", "json");
-    url.searchParams.set("addressdetails", "1");
-    url.searchParams.set("limit", "1");
-    url.searchParams.set("countrycodes", "it");
+    const search = async (q: string) => {
+      const url = new URL("https://nominatim.openstreetmap.org/search");
+      url.searchParams.set("q", q);
+      url.searchParams.set("format", "json");
+      url.searchParams.set("addressdetails", "1");
+      url.searchParams.set("limit", "1");
+      url.searchParams.set("countrycodes", "it");
+      const r = await fetch(url, {
+        headers: {
+          "User-Agent": "IlBelPaese/1.0 (lovable.app)",
+          "Accept-Language": "it",
+        },
+      });
+      if (!r.ok) throw new Error(`Nominatim ${r.status}`);
+      return (await r.json()) as NominatimResult[];
+    };
 
-    const r = await fetch(url, {
-      headers: {
-        "User-Agent": "IlBelPaese/1.0 (lovable.app)",
-        "Accept-Language": "it",
-      },
-    });
+    const co = country || "Italia";
+    // 1) full address  2) address + city  3) city + country (approximate)
+    const attempts = [
+      `${address}, ${city}, ${co}`,
+      `${address}, ${city}`,
+      `${city}, ${co}`,
+    ];
 
-    if (!r.ok) {
-      return new Response(
-        JSON.stringify({ error: `Nominatim ${r.status}` }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    let hit: NominatimResult | null = null;
+    let approximate = false;
+    for (let i = 0; i < attempts.length; i++) {
+      try {
+        const data = await search(attempts[i]);
+        if (data.length) {
+          hit = data[0];
+          approximate = i === attempts.length - 1;
+          break;
+        }
+      } catch (_) {
+        // try next
+      }
     }
 
-    const data = (await r.json()) as NominatimResult[];
-    if (!data.length) {
+    if (!hit) {
       return new Response(
-        JSON.stringify({ error: "Indirizzo non trovato" }),
+        JSON.stringify({ error: "Indirizzo non trovato. Verifica via, città e CAP, oppure inserisci manualmente lat/lng." }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const hit = data[0];
     return new Response(
       JSON.stringify({
         lat: parseFloat(hit.lat),
@@ -68,6 +84,7 @@ Deno.serve(async (req) => {
         zip_code: hit.address?.postcode ?? "",
         region: hit.address?.state ?? hit.address?.region ?? hit.address?.county ?? "",
         display_name: hit.display_name,
+        approximate,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

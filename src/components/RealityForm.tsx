@@ -132,6 +132,9 @@ const RealityForm = ({
       setLat(String(data.lat));
       setLng(String(data.lng));
       setGeocoded(true);
+      if (data.approximate) {
+        setError("⚠️ Indirizzo esatto non trovato: ho usato il centro città. Controlla e correggi lat/lng manualmente se serve.");
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
