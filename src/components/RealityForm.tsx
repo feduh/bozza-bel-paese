@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { invokeFunction } from "@/lib/invokeFunction";
 import { MapPin, Loader2, Check } from "lucide-react";
@@ -16,9 +16,20 @@ const inputErrCls = "border-destructive focus:ring-destructive";
 
 type FormMode = "admin" | "coordinatore";
 
-const RealityForm = ({ onCreated, mode = "admin" }: { onCreated?: () => void; mode?: FormMode }) => {
+const RealityForm = ({
+  onCreated,
+  mode = "admin",
+  editingId,
+  onCancel,
+}: {
+  onCreated?: () => void;
+  mode?: FormMode;
+  editingId?: string;
+  onCancel?: () => void;
+}) => {
   const { t } = useTranslation();
   const isCollaborator = mode === "coordinatore";
+  const isEditing = !!editingId;
 
   const [name, setName] = useState("");
   const [type, setType] = useState<RealityType>("con-sede");
