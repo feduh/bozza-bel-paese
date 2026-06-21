@@ -315,12 +315,25 @@ const RealityForm = ({
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Città *</label>
-          <input value={city} onChange={(e) => setCity(e.target.value)} onBlur={runGeocode} className={cls("city")} {...aria("city")} />
+          <input
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            onBlur={(e) => { const v = toTitleCase(e.target.value); setCity(v); if (v && address) runGeocode(); }}
+            className={cls("city")}
+            {...aria("city")}
+          />
           <FieldError id="err-city" message={errs.city} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Indirizzo *</label>
-          <input value={address} onChange={(e) => setAddress(e.target.value)} onBlur={runGeocode} className={cls("address")} {...aria("address")} />
+          <input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            onBlur={(e) => { const v = toTitleCase(e.target.value); setAddress(v); if (v && city) runGeocode(); }}
+            placeholder="es. Via Torino 40"
+            className={cls("address")}
+            {...aria("address")}
+          />
           <FieldError id="err-address" message={errs.address} />
         </div>
       </div>
