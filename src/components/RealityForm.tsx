@@ -161,10 +161,8 @@ const RealityForm = ({
     const v = parsed.data;
     const { data: { user } } = await supabase.auth.getUser();
     const effectiveStatus = isCollaborator ? "pendente" : v.confirmedStatus;
-    const autoConfirmAt = isCollaborator
-      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      : null;
-    const { error: insertError } = await supabase.from("realities").insert({
+
+    const payload = {
       name: v.name,
       type: v.type,
       country: v.country,
@@ -185,24 +183,47 @@ const RealityForm = ({
       linkedin_link: v.linkedin ?? null,
       confirmed_status: effectiveStatus,
       status: effectiveStatus === "storico" ? "archiviato" : "attivo",
-      created_by: user?.id ?? null,
-      auto_confirm_at: autoConfirmAt,
       categories,
       category: categories[0] ?? null,
-    } as any);
+    };
 
-    if (insertError) {
-      setError(insertError.message);
+    let opError: { message: string } | null = null;
+    if (isEditing) {
+      const { error: updError } = await supabase
+        .from("realities")
+        .update(payload as any)
+        .eq("id", editingId!);
+      opError = updError;
     } else {
-      setSuccess(`✅ Realtà "${v.name}" salvata.`);
-      setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
-      setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
-      setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-      setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
+      const autoConfirmAt = isCollaborator
+        ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        : null;
+      const { error: insertError } = await supabase.from("realities").insert({
+        ...payload,
+        created_by: user?.id ?? null,
+        auto_confirm_at: autoConfirmAt,
+      } as any);
+      opError = insertError;
+    }
+
+    if (opError) {
+      setError(opError.message);
+    } else {
+      setSuccess(isEditing ? `✅ Realtà "${v.name}" aggiornata.` : `✅ Realtà "${v.name}" salvata.`);
+      if (!isEditing) {
+        setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
+        setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
+        setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
+        setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
+      }
       onCreated?.();
     }
     setSubmitting(false);
   };
+
+  if (loadingEdit) {
+    return <div className="py-10 text-center text-sm text-muted-foreground font-body">Caricamento realtà…</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
