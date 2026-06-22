@@ -393,16 +393,44 @@ const RealityForm = ({
           />
           <FieldError id="err-city" message={errs.city} />
         </div>
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium mb-2">Indirizzo *</label>
           <input
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            onBlur={(e) => { const v = toTitleCase(e.target.value); setAddress(v); if (v && city) runGeocode(); }}
+            onFocus={() => { if (addrSuggestions.length) setAddrOpen(true); }}
+            onBlur={(e) => {
+              // chiudo il dropdown con un piccolo delay per permettere il click su una voce
+              setTimeout(() => setAddrOpen(false), 150);
+              const v = toTitleCase(e.target.value);
+              if (v !== address) setAddress(v);
+            }}
             placeholder="es. Via Torino 40"
+            autoComplete="off"
             className={cls("address")}
             {...aria("address")}
           />
+          {addrOpen && (addrLoading || addrSuggestions.length > 0) && (
+            <ul className="absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-md text-sm font-body">
+              {addrLoading && (
+                <li className="px-3 py-2 text-muted-foreground flex items-center gap-2">
+                  <Loader2 size={12} className="animate-spin" /> Ricerca…
+                </li>
+              )}
+              {!addrLoading && addrSuggestions.map((f, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onMouseDown={(ev) => ev.preventDefault()}
+                    onClick={() => pickSuggestion(f)}
+                    className="w-full text-left px-3 py-2 hover:bg-muted/60"
+                  >
+                    {formatSuggestion(f)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <FieldError id="err-address" message={errs.address} />
         </div>
       </div>
