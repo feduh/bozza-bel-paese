@@ -54,7 +54,7 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.contacts")}</h4>
-            <p className="text-sm text-muted-foreground">info.ilbelpaese@gmail.com</p>
+            <p className="text-sm text-muted-foreground">info@ilbelpaese.it</p>
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-1">
