@@ -126,59 +126,46 @@
   "what": {
     "title": "What We",
     "titleAccent": "Do",
-    "intro": "Our work rests on three pillars — mapping, promotion and research — designed to legitimise the independent scene and connect it with the institutional system.",
-    "intro_html": "Our work rests on three pillars — <strong>mapping</strong>, <strong>promotion</strong> and <strong>research</strong> — designed to legitimise the independent scene and connect it with the institutional system.",
-    "seoDesc": "Mapping, promotion and research: the three pillars through which Il Bel Paese legitimises the Italian independent art scene.",
+    "intro_html": "<strong>Il Bel Paese</strong> is the first mapping, promotion and research platform that brings together and tells the story of Italy's independent scene.",
+    "intro_html2": "Through a <strong>dynamic showcase</strong> and a <strong>historical archive</strong>, the project systematises these experiences to foster networks and <strong>narrow the gap between the independent scene and the institutional system</strong>.",
+    "seoDesc": "Mapping, promotion and research: the three pillars through which Il Bel Paese tells the story of Italy's independent art scene.",
     "pillars": {
       "mapping": {
         "title": "Mapping",
-        "desc": "We identify and categorise Italy's independent artistic realities into three families: Spaces (with a physical venue), Spaces without a space (itinerant, digital, nomadic) and Spaces that were (historical archive of concluded experiences)."
+        "desc_html": "We identify and categorise Italy's independent artistic realities into three families: <strong>Spaces</strong> (with a physical venue), <strong>Spaces without a space</strong> (itinerant, digital, nomadic) and <strong>Spaces that were</strong> (historical archive of concluded experiences)."
       },
       "promotion": {
         "title": "Promotion",
-        "desc": "We give visibility to mapped realities through a dynamic showcase, an editorial magazine and an open replies space where different voices debate the issues shaping the independent scene."
+        "desc": "We give visibility to mapped realities through a dynamic showcase, an academically-minded editorial line and oral interviews produced in collaboration with equally independent radio stations and podcast platforms."
       },
       "research": {
         "title": "Research",
-        "desc": "We conduct research, gather data and produce content to interpret and document the transformations of Italy's art scene."
+        "desc": "We carry out research, gather data and produce content for a counter-narrative to the mainstream framing that so often shapes the independent scene."
       }
     },
-    "methodTitle": "How we do it",
-    "methodSteps": {
-      "listen": "We listen",
-      "map": "We map",
-      "tell": "We tell",
-      "update": "We update"
-    },
-    "methodDescs": {
-      "listen": "We surface realities through tip-offs, field research and direct dialogue with the scene.",
-      "map": "We verify, geolocate and categorise every experience using shared criteria.",
-      "tell": "We publish profiles, articles and debates to provide context and visibility.",
-      "update": "An annual review of mapped realities to keep the data current."
-    },
     "whyTitle": "Why",
-    "whyText": "Because independent realities often fall under the radar of institutions, official databases and funding routes. Documenting them, telling their stories and connecting them means restoring the legitimacy they deserve and enriching the country's cultural heritage.",
+    "whyBullets": [
+      "For a critical counter-narrative of the independent scene.",
+      "To spark new connections and unexpected collaborations.",
+      "For the legitimacy that is still missing."
+    ],
     "ctaTitle": "Want to contribute?",
-    "ctaText": "If you represent an independent artistic reality, are a researcher or an institutional partner, write to us to join the map or the magazine.",
+    "ctaText": "If you represent an independent artistic reality, are a researcher or an institutional partner, you can write to us here.",
     "ctaButton": "Write to us",
     "howIntro": "How",
     "howSuffix": "we do it",
     "how": {
-      "showcase": {
-        "title": "Dynamic showcase",
-        "desc": "Up-to-date profiles with filters by region, medium and type, plus community-sourced submissions."
-      },
-      "archive": {
-        "title": "Historical archive",
-        "desc": "The memory of past realities, recovered through testimonies and documents."
-      },
-      "magazine": {
-        "title": "Editorial magazine",
-        "desc": "Articles, interviews and the replies-between-authors format with with editors-in-chief providing editorial oversight."
-      },
       "update": {
-        "title": "Let's update",
-        "desc": "An annual review of mapped realities to keep the data current."
+        "title": "Always-fresh data",
+        "desc": "Regular review of mapped realities to keep the data alive and reliable."
+      },
+      "personalized": {
+        "title": "Personalised browsing",
+        "desc": "Filters, views and suggestions to explore the map the way you prefer."
+      },
+      "milestones": {
+        "title": "Sharing milestones",
+        "desc": "We give back to the network: data collected, new voices, collaborations started."
       }
     }
   },
