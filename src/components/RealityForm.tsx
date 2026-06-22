@@ -90,6 +90,75 @@ const RealityForm = ({
   const [errs, setErrs] = useState<FieldErrors>({});
   const [loadingEdit, setLoadingEdit] = useState(isEditing);
 
+  // --- Photon autocomplete (indirizzo) ---
+  type PhotonFeature = {
+    properties: {
+      name?: string; street?: string; housenumber?: string;
+      city?: string; postcode?: string; state?: string;
+      country?: string; countrycode?: string; type?: string;
+    };
+    geometry: { coordinates: [number, number] };
+  };
+  const [addrSuggestions, setAddrSuggestions] = useState<PhotonFeature[]>([]);
+  const [addrOpen, setAddrOpen] = useState(false);
+  const [addrLoading, setAddrLoading] = useState(false);
+  const addrDebounce = useRef<number | null>(null);
+  const addrSkipFetch = useRef(false);
+
+  useEffect(() => {
+    if (addrSkipFetch.current) { addrSkipFetch.current = false; return; }
+    if (addrDebounce.current) window.clearTimeout(addrDebounce.current);
+    const q = address.trim();
+    if (q.length < 3) { setAddrSuggestions([]); setAddrOpen(false); return; }
+    addrDebounce.current = window.setTimeout(async () => {
+      try {
+        setAddrLoading(true);
+        const url = new URL("https://photon.komoot.io/api/");
+        const fullQ = city ? `${q}, ${city}` : q;
+        url.searchParams.set("q", fullQ);
+        url.searchParams.set("lang", "it");
+        url.searchParams.set("limit", "6");
+        const r = await fetch(url.toString());
+        if (!r.ok) return;
+        const j = await r.json();
+        const feats = (j.features as PhotonFeature[] | undefined) ?? [];
+        // Preferisci risultati italiani e con via/civico
+        const filtered = feats.filter(
+          (f) => (f.properties.countrycode ?? "").toLowerCase() === "it" || !f.properties.countrycode,
+        );
+        setAddrSuggestions(filtered.length ? filtered : feats);
+        setAddrOpen(true);
+      } finally {
+        setAddrLoading(false);
+      }
+    }, 300);
+    return () => { if (addrDebounce.current) window.clearTimeout(addrDebounce.current); };
+  }, [address, city]);
+
+  const formatSuggestion = (f: PhotonFeature) => {
+    const p = f.properties;
+    const street = [p.street ?? p.name, p.housenumber].filter(Boolean).join(" ");
+    const loc = [p.postcode, p.city, p.state].filter(Boolean).join(" ");
+    return [street, loc].filter(Boolean).join(" — ");
+  };
+
+  const pickSuggestion = (f: PhotonFeature) => {
+    const p = f.properties;
+    const street = toTitleCase([p.street ?? p.name ?? "", p.housenumber ?? ""].filter(Boolean).join(" "));
+    addrSkipFetch.current = true;
+    setAddress(street);
+    if (p.city) setCity(toTitleCase(p.city));
+    if (p.postcode) setZipCode(p.postcode);
+    if (p.state) setRegion(p.state);
+    if (p.country) setCountry(p.country);
+    const [lon, latN] = f.geometry.coordinates;
+    setLat(String(latN));
+    setLng(String(lon));
+    setGeocoded(true);
+    setAddrOpen(false);
+    setAddrSuggestions([]);
+  };
+
   useEffect(() => {
     if (!editingId) return;
     let alive = true;
