@@ -190,7 +190,7 @@ const LaRete = () => {
               Tutti i <span className="italic text-primary">membri</span>
             </h2>
             <p className="font-body text-muted-foreground mt-2 max-w-2xl">
-              Autori, contributor e ricercatori che animano la rete. Una mappa è prima di tutto una comunità.
+              Chi crede e anima la rete. Puoi farne parte anche tu, se vuoi.
             </p>
           </div>
 
