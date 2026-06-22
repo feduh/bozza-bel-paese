@@ -112,29 +112,18 @@ const LaRete = () => {
         canonicalPath="/la-rete"
       />
       <div className="editorial-container max-w-6xl">
-        {/* Header + integrazione Chi siamo */}
-        <div className="max-w-3xl mb-12">
+        {/* Header */}
+        <div className="max-w-3xl mb-16">
           <h1 className="editorial-heading mb-4">
             La nostra <span className="italic text-primary">rete</span>
           </h1>
           <div className="space-y-4 editorial-body text-muted-foreground">
             <p>
-              <Trans i18nKey="about.p1_html" components={{ strong: <strong className="text-foreground" /> }} />
+              <em>Il Bel Paese</em> vive perché la rete lo nutre, e viceversa.
             </p>
             <p>
-              <Trans i18nKey="about.p2_html" components={{ strong: <strong className="text-foreground" /> }} />
+              Aiutaci a costruire un racconto che rispetti le condizioni di chi alimenta da dentro questo sistema.
             </p>
-          </div>
-        </div>
-
-        <div className="mb-16 grid md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-lg bg-card border border-border">
-            <h3 className="font-display text-lg font-semibold mb-2">{t("about.missionTitle")}</h3>
-            <p className="font-body text-sm text-muted-foreground">{t("about.missionDesc")}</p>
-          </div>
-          <div className="p-6 rounded-lg bg-card border border-border">
-            <h3 className="font-display text-lg font-semibold mb-2">{t("about.visionTitle")}</h3>
-            <p className="font-body text-sm text-muted-foreground">{t("about.visionDesc")}</p>
           </div>
         </div>
 
