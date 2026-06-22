@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { Users, MapPin, Globe, Instagram, Linkedin, Mail, Search, X } from "lucide-react";
