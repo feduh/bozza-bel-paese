@@ -130,12 +130,11 @@ const LaRete = () => {
         {/* Sezione coordinatori in evidenza */}
         <section className="mb-20">
           <div className="mb-6">
-            <span className="text-xs font-body uppercase tracking-widest text-primary">In evidenza</span>
-            <h2 className="editorial-subheading mt-1">
+            <h2 className="editorial-subheading">
               I <span className="italic text-primary">coordinatori</span>
             </h2>
             <p className="font-body text-muted-foreground mt-2 max-w-2xl">
-              Le cinque persone che guidano e coordinano il progetto <em>Il Bel Paese</em>.
+              Chi c'è dietro il progetto.
             </p>
           </div>
           {loading ? (
