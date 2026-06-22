@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Trans, useTranslation } from "react-i18next";
+
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { Users, MapPin, Globe, Instagram, Linkedin, Mail, Search, X } from "lucide-react";
@@ -27,7 +27,7 @@ type Profile = {
 type RealityRef = { id: string; name: string; city: string; region: string };
 
 const LaRete = () => {
-  const { t } = useTranslation();
+  
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [realitiesById, setRealitiesById] = useState<Record<string, RealityRef>>({});
   const [loading, setLoading] = useState(true);
@@ -112,41 +112,29 @@ const LaRete = () => {
         canonicalPath="/la-rete"
       />
       <div className="editorial-container max-w-6xl">
-        {/* Header + integrazione Chi siamo */}
-        <div className="max-w-3xl mb-12">
+        {/* Header */}
+        <div className="max-w-3xl mb-16">
           <h1 className="editorial-heading mb-4">
             La nostra <span className="italic text-primary">rete</span>
           </h1>
           <div className="space-y-4 editorial-body text-muted-foreground">
             <p>
-              <Trans i18nKey="about.p1_html" components={{ strong: <strong className="text-foreground" /> }} />
+              <em>Il Bel Paese</em> vive perché la rete lo nutre, e viceversa.
             </p>
             <p>
-              <Trans i18nKey="about.p2_html" components={{ strong: <strong className="text-foreground" /> }} />
+              Aiutaci a costruire un racconto che rispetti le condizioni di chi alimenta da dentro questo sistema.
             </p>
-          </div>
-        </div>
-
-        <div className="mb-16 grid md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-lg bg-card border border-border">
-            <h3 className="font-display text-lg font-semibold mb-2">{t("about.missionTitle")}</h3>
-            <p className="font-body text-sm text-muted-foreground">{t("about.missionDesc")}</p>
-          </div>
-          <div className="p-6 rounded-lg bg-card border border-border">
-            <h3 className="font-display text-lg font-semibold mb-2">{t("about.visionTitle")}</h3>
-            <p className="font-body text-sm text-muted-foreground">{t("about.visionDesc")}</p>
           </div>
         </div>
 
         {/* Sezione coordinatori in evidenza */}
         <section className="mb-20">
           <div className="mb-6">
-            <span className="text-xs font-body uppercase tracking-widest text-primary">In evidenza</span>
-            <h2 className="editorial-subheading mt-1">
+            <h2 className="editorial-subheading">
               I <span className="italic text-primary">coordinatori</span>
             </h2>
             <p className="font-body text-muted-foreground mt-2 max-w-2xl">
-              Le cinque persone che guidano e coordinano il progetto <em>Il Bel Paese</em>.
+              Chi c'è dietro il progetto.
             </p>
           </div>
           {loading ? (
@@ -202,7 +190,7 @@ const LaRete = () => {
               Tutti i <span className="italic text-primary">membri</span>
             </h2>
             <p className="font-body text-muted-foreground mt-2 max-w-2xl">
-              Autori, contributor e ricercatori che animano la rete. Una mappa è prima di tutto una comunità.
+              Chi crede e anima la rete. Puoi farne parte anche tu, se vuoi.
             </p>
           </div>
 

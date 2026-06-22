@@ -50,31 +50,26 @@ const Contatti = () => {
       <div className="editorial-container">
         <div className="max-w-3xl mb-12">
           <h1 className="editorial-heading mb-6">
-            <span className="italic text-primary">Scrivici</span> due righe
+            <span className="italic text-primary">Scrivici</span>
+            <br />
+            due righe
           </h1>
           <p className="editorial-body text-muted-foreground">
-            Per collaborazioni, proposte editoriali, segnalazioni o semplicemente per dirci che esistete:
-            ci fa piacere ricevere ogni messaggio.
+            Per collaborazioni, proposte editoriali, segnalazioni o semplicemente per scambiare due parole:
+            accogliamo ogni tipo di messaggio.
           </p>
         </div>
 
         <div className="grid md:grid-cols-[1fr_2fr] gap-12">
           {/* Info colonna sx */}
           <aside className="space-y-8">
-            <div>
-              <h2 className="font-display text-lg font-semibold mb-3 text-primary">In due parole</h2>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed">
-                Per partecipare attivamente al progetto serve un invito da un membro del collettivo.
-                Per tutto il resto, basta una mail.
-              </p>
-            </div>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <Mail size={18} className="text-primary mt-0.5" aria-hidden="true" />
                 <div>
                   <p className="font-body text-sm font-semibold">Email</p>
-                  <a href="mailto:info.ilbelpaese@gmail.com" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">
-                    info.ilbelpaese@gmail.com
+                  <a href="mailto:info@ilbelpaese.it" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">
+                    info@ilbelpaese.it
                   </a>
                 </div>
               </div>

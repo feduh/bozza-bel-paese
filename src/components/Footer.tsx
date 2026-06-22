@@ -5,11 +5,11 @@ import LogoPittogramma from "@/components/LogoPittogramma";
 const Footer = () => {
   const { t } = useTranslation();
   const navLinks = [
-    { to: "/la-rete", label: t("nav.network") },
     { to: "/cosa-facciamo", label: t("nav.what") },
+    { to: "/la-rete", label: t("nav.network") },
     { to: "/mappatura", label: t("nav.map") },
     { to: "/magazine", label: t("nav.magazine") },
-    { to: "/segnala-realta", label: t("nav.report") },
+    { to: "/la-vostra-voce", label: t("nav.voice") },
     { to: "/contatti", label: t("nav.contacts") },
   ];
 
@@ -54,7 +54,7 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.contacts")}</h4>
-            <p className="text-sm text-muted-foreground">info.ilbelpaese@gmail.com</p>
+            <p className="text-sm text-muted-foreground">info@ilbelpaese.it</p>
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-1">

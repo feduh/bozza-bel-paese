@@ -24,12 +24,13 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
-  // Link primari nella navbar (cuore pulsante del progetto)
+  // Link primari nella navbar (ordine richiesto)
   const primaryLinks = [
-    { to: "/mappatura", label: t("nav.map") },
-    { to: "/la-rete", label: t("nav.network") },
-    { to: "/magazine", label: t("nav.magazine") },
     { to: "/cosa-facciamo", label: t("nav.what") },
+    { to: "/la-rete", label: t("nav.network") },
+    { to: "/mappatura", label: t("nav.map") },
+    { to: "/magazine", label: t("nav.magazine") },
+    { to: "/la-vostra-voce", label: t("nav.voice") },
     { to: "/contatti", label: t("nav.contacts") },
   ];
 

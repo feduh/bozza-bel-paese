@@ -25,6 +25,7 @@
     "what": "Cosa Facciamo",
     "map": "Mappatura",
     "magazine": "Magazine",
+    "voice": "La vostra voce",
     "network": "La nostra rete",
     "contacts": "Contatti",
     "report": "Segnala una realtà",
@@ -125,66 +126,53 @@
   "what": {
     "title": "Cosa",
     "titleAccent": "Facciamo",
-    "intro": "Il nostro impegno si articola attraverso tre pilastri — mappatura, promozione e ricerca — pensati per legittimare la scena indipendente e metterla in dialogo con il sistema istituzionale.",
-    "intro_html": "Il nostro impegno si articola attraverso tre pilastri — <strong>mappatura</strong>, <strong>promozione</strong> e <strong>ricerca</strong> — pensati per legittimare la scena indipendente e metterla in dialogo con il sistema istituzionale.",
-    "seoDesc": "Mappatura, promozione e ricerca: i tre pilastri con cui Il Bel Paese legittima la scena artistica indipendente italiana.",
+    "intro_html": "<strong>Il Bel Paese</strong> è la prima piattaforma di mappatura, promozione e ricerca che mette a sistema e racconta la scena indipendente italiana.",
+    "intro_html2": "Attraverso una <strong>vetrina dinamica</strong> e un <strong>archivio storico</strong>, il progetto mette a sistema queste esperienze per favorire la creazione di reti e <strong>ridurre la distanza tra la scena indipendente e il sistema istituzionale</strong>.",
+    "seoDesc": "Mappatura, promozione e ricerca: i tre pilastri con cui Il Bel Paese racconta la scena artistica indipendente italiana.",
     "pillars": {
       "mapping": {
         "title": "Mappatura",
-        "desc": "Identifichiamo e categorizziamo le realtà artistiche indipendenti italiane in tre famiglie: Spazi (con sede fisica), Spazi senza spazi (itineranti, digitali, nomadi) e Spazi che furono (archivio storico delle esperienze concluse)."
+        "desc_html": "Identifichiamo e categorizziamo le realtà artistiche indipendenti italiane in tre famiglie: <strong>Spazi</strong> (con sede fisica), <strong>Spazi senza spazi</strong> (itineranti, digitali, nomadi) e <strong>Spazi che furono</strong> (archivio storico delle esperienze concluse)."
       },
       "promotion": {
         "title": "Promozione",
-        "desc": "Diamo visibilità alle realtà mappate attraverso una vetrina dinamica, un magazine editoriale e uno spazio di risposte aperte dove voci diverse si confrontano sui temi della scena indipendente."
+        "desc": "Diamo visibilità alle realtà mappate attraverso una vetrina dinamica, un editoriale di impronta accademica e interviste orali realizzate in collaborazione con radio e piattaforme podcast altrettanto indipendenti."
       },
       "research": {
         "title": "Ricerca",
-        "desc": "Conduciamo ricerche, raccogliamo dati e produciamo contenuti per leggere e raccontare le trasformazioni della scena artistica italiana."
+        "desc": "Conduciamo ricerche, raccogliamo dati e produciamo contenuti per un racconto contro il mainstream che spesso caratterizza la scena indipendente."
       }
     },
-    "methodTitle": "Come lo facciamo",
-    "methodSteps": {
-      "listen": "Ascoltiamo",
-      "map": "Mappiamo",
-      "tell": "Raccontiamo",
-      "update": "Aggiorniamoci"
-    },
-    "methodDescs": {
-      "listen": "Identifichiamo realtà attraverso segnalazioni, ricerca sul campo e dialogo diretto con la scena.",
-      "map": "Verifichiamo, geolocalizziamo e categorizziamo ogni esperienza secondo criteri condivisi.",
-      "tell": "Pubblichiamo schede, articoli e dibattiti per dare contesto e visibilità.",
-      "update": "Verifica annuale dello stato delle realtà mappate per mantenere il dato vivo."
-    },
     "whyTitle": "Perché",
-    "whyText": "Perché le realtà indipendenti spesso restano fuori dai radar istituzionali, dalle banche dati ufficiali e dai percorsi di finanziamento. Documentarle, raccontarle e metterle in rete significa restituire loro la legittimazione che meritano e arricchire il patrimonio culturale del paese.",
+    "whyBullets": [
+      "Per una contro-narrazione critica della scena indipendente.",
+      "Per attivare connessioni e collaborazioni inedite.",
+      "Per una legittimazione che ancora non c'è."
+    ],
     "ctaTitle": "Vuoi contribuire?",
-    "ctaText": "Se rappresenti una realtà artistica indipendente, sei un ricercatore o un partner istituzionale, scrivici per entrare nella mappa o nel magazine.",
+    "ctaText": "Se rappresenti una realtà artistica indipendente, sei un ricercatore o un partner istituzionale, puoi scriverci qui.",
     "ctaButton": "Scrivici",
     "howIntro": "Come",
     "howSuffix": "lo facciamo",
     "how": {
-      "showcase": {
-        "title": "Vetrina dinamica",
-        "desc": "Schede aggiornate, filtri per regione, media e tipologia, segnalazioni dal basso."
-      },
-      "archive": {
-        "title": "Archivio storico",
-        "desc": "Memoria delle realtà concluse, recuperata attraverso testimonianze e documenti."
-      },
-      "magazine": {
-        "title": "Magazine editoriale",
-        "desc": "Articoli, interviste e il format delle risposte tra autori, con editor in chief come garanzia scientifica."
-      },
       "update": {
-        "title": "Aggiorniamoci",
-        "desc": "Verifica annuale dello stato delle realtà mappate per mantenere il dato vivo."
+        "title": "Dati sempre aggiornati",
+        "desc": "Verifica periodica delle realtà mappate per mantenere il dato vivo e affidabile."
+      },
+      "personalized": {
+        "title": "Fruizione personalizzata",
+        "desc": "Filtri, modalità di visualizzazione e suggerimenti per esplorare la mappa nel modo che preferisci."
+      },
+      "milestones": {
+        "title": "Condivisione dei traguardi",
+        "desc": "Restituiamo alla rete le tappe del progetto: dati raccolti, nuove voci, collaborazioni avviate."
       }
     }
   },
   "map": {
     "title": "Mappatura",
     "titleSuffix": "delle realtà",
-    "lead": "Esplora la scena indipendente italiana. Filtra per sezione, regione o media artistico.",
+    "lead": "Esplora la scena indipendente italiana nel modo che più ti piace.",
     "section": "Sezione",
     "view": {
       "map": "Mappa",
@@ -213,7 +201,7 @@
   "magazine": {
     "title": "Il",
     "titleAccent": "Magazine",
-    "lead": "Articoli, interviste, inchieste e dibattiti sulla scena artistica indipendente italiana.",
+    "lead": "Interviste, saggi e dibattiti sulla scena artistica indipendente italiana – e non solo.",
     "back": "Torna al magazine",
     "notFound": "Articolo non trovato.",
     "readReply": "Leggi la replica",

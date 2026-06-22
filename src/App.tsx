@@ -30,6 +30,7 @@ const LaRete = lazy(() => import("./pages/LaRete"));
 const AutoreProfilo = lazy(() => import("./pages/AutoreProfilo"));
 const SegnalaRealta = lazy(() => import("./pages/SegnalaRealta"));
 const Contatti = lazy(() => import("./pages/Contatti"));
+const LaVostraVoce = lazy(() => import("./pages/LaVostraVoce"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Termini = lazy(() => import("./pages/Termini"));
@@ -68,6 +69,7 @@ const App = () => (
                   <Route path="/autori/:userId" element={<AutoreProfilo />} />
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />
                   <Route path="/contatti" element={<Contatti />} />
+                  <Route path="/la-vostra-voce" element={<LaVostraVoce />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/cookie-policy" element={<CookiePolicy />} />
                   <Route path="/termini" element={<Termini />} />
