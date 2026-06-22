@@ -116,7 +116,6 @@ const RealityForm = ({
         const url = new URL("https://photon.komoot.io/api/");
         const fullQ = city ? `${q}, ${city}` : q;
         url.searchParams.set("q", fullQ);
-        url.searchParams.set("lang", "it");
         url.searchParams.set("limit", "6");
         const r = await fetch(url.toString());
         if (!r.ok) return;
