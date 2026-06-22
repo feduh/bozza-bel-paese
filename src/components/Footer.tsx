@@ -5,11 +5,11 @@ import LogoPittogramma from "@/components/LogoPittogramma";
 const Footer = () => {
   const { t } = useTranslation();
   const navLinks = [
-    { to: "/la-rete", label: t("nav.network") },
     { to: "/cosa-facciamo", label: t("nav.what") },
+    { to: "/la-rete", label: t("nav.network") },
     { to: "/mappatura", label: t("nav.map") },
     { to: "/magazine", label: t("nav.magazine") },
-    { to: "/segnala-realta", label: t("nav.report") },
+    { to: "/la-vostra-voce", label: t("nav.voice") },
     { to: "/contatti", label: t("nav.contacts") },
   ];
 
