@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { invokeFunction } from "@/lib/invokeFunction";
 import { MapPin, Loader2, Check } from "lucide-react";
@@ -89,6 +89,75 @@ const RealityForm = ({
   const [success, setSuccess] = useState("");
   const [errs, setErrs] = useState<FieldErrors>({});
   const [loadingEdit, setLoadingEdit] = useState(isEditing);
+
+  // --- Photon autocomplete (indirizzo) ---
+  type PhotonFeature = {
+    properties: {
+      name?: string; street?: string; housenumber?: string;
+      city?: string; postcode?: string; state?: string;
+      country?: string; countrycode?: string; type?: string;
+    };
+    geometry: { coordinates: [number, number] };
+  };
+  const [addrSuggestions, setAddrSuggestions] = useState<PhotonFeature[]>([]);
+  const [addrOpen, setAddrOpen] = useState(false);
+  const [addrLoading, setAddrLoading] = useState(false);
+  const addrDebounce = useRef<number | null>(null);
+  const addrSkipFetch = useRef(false);
+
+  useEffect(() => {
+    if (addrSkipFetch.current) { addrSkipFetch.current = false; return; }
+    if (addrDebounce.current) window.clearTimeout(addrDebounce.current);
+    const q = address.trim();
+    if (q.length < 3) { setAddrSuggestions([]); setAddrOpen(false); return; }
+    addrDebounce.current = window.setTimeout(async () => {
+      try {
+        setAddrLoading(true);
+        const url = new URL("https://photon.komoot.io/api/");
+        const fullQ = city ? `${q}, ${city}` : q;
+        url.searchParams.set("q", fullQ);
+        url.searchParams.set("lang", "it");
+        url.searchParams.set("limit", "6");
+        const r = await fetch(url.toString());
+        if (!r.ok) return;
+        const j = await r.json();
+        const feats = (j.features as PhotonFeature[] | undefined) ?? [];
+        // Preferisci risultati italiani e con via/civico
+        const filtered = feats.filter(
+          (f) => (f.properties.countrycode ?? "").toLowerCase() === "it" || !f.properties.countrycode,
+        );
+        setAddrSuggestions(filtered.length ? filtered : feats);
+        setAddrOpen(true);
+      } finally {
+        setAddrLoading(false);
+      }
+    }, 300);
+    return () => { if (addrDebounce.current) window.clearTimeout(addrDebounce.current); };
+  }, [address, city]);
+
+  const formatSuggestion = (f: PhotonFeature) => {
+    const p = f.properties;
+    const street = [p.street ?? p.name, p.housenumber].filter(Boolean).join(" ");
+    const loc = [p.postcode, p.city, p.state].filter(Boolean).join(" ");
+    return [street, loc].filter(Boolean).join(" — ");
+  };
+
+  const pickSuggestion = (f: PhotonFeature) => {
+    const p = f.properties;
+    const street = toTitleCase([p.street ?? p.name ?? "", p.housenumber ?? ""].filter(Boolean).join(" "));
+    addrSkipFetch.current = true;
+    setAddress(street);
+    if (p.city) setCity(toTitleCase(p.city));
+    if (p.postcode) setZipCode(p.postcode);
+    if (p.state) setRegion(p.state);
+    if (p.country) setCountry(p.country);
+    const [lon, latN] = f.geometry.coordinates;
+    setLat(String(latN));
+    setLng(String(lon));
+    setGeocoded(true);
+    setAddrOpen(false);
+    setAddrSuggestions([]);
+  };
 
   useEffect(() => {
     if (!editingId) return;
@@ -324,16 +393,44 @@ const RealityForm = ({
           />
           <FieldError id="err-city" message={errs.city} />
         </div>
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium mb-2">Indirizzo *</label>
           <input
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            onBlur={(e) => { const v = toTitleCase(e.target.value); setAddress(v); if (v && city) runGeocode(); }}
+            onFocus={() => { if (addrSuggestions.length) setAddrOpen(true); }}
+            onBlur={(e) => {
+              // chiudo il dropdown con un piccolo delay per permettere il click su una voce
+              setTimeout(() => setAddrOpen(false), 150);
+              const v = toTitleCase(e.target.value);
+              if (v !== address) setAddress(v);
+            }}
             placeholder="es. Via Torino 40"
+            autoComplete="off"
             className={cls("address")}
             {...aria("address")}
           />
+          {addrOpen && (addrLoading || addrSuggestions.length > 0) && (
+            <ul className="absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-md border border-border bg-popover shadow-md text-sm font-body">
+              {addrLoading && (
+                <li className="px-3 py-2 text-muted-foreground flex items-center gap-2">
+                  <Loader2 size={12} className="animate-spin" /> Ricerca…
+                </li>
+              )}
+              {!addrLoading && addrSuggestions.map((f, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onMouseDown={(ev) => ev.preventDefault()}
+                    onClick={() => pickSuggestion(f)}
+                    className="w-full text-left px-3 py-2 hover:bg-muted/60"
+                  >
+                    {formatSuggestion(f)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <FieldError id="err-address" message={errs.address} />
         </div>
       </div>
