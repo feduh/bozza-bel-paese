@@ -27,7 +27,7 @@ type Profile = {
 type RealityRef = { id: string; name: string; city: string; region: string };
 
 const LaRete = () => {
-  const { t } = useTranslation();
+  useTranslation();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [realitiesById, setRealitiesById] = useState<Record<string, RealityRef>>({});
   const [loading, setLoading] = useState(true);
