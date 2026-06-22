@@ -69,6 +69,7 @@ const App = () => (
                   <Route path="/autori/:userId" element={<AutoreProfilo />} />
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />
                   <Route path="/contatti" element={<Contatti />} />
+                  <Route path="/la-vostra-voce" element={<LaVostraVoce />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/cookie-policy" element={<CookiePolicy />} />
                   <Route path="/termini" element={<Termini />} />
