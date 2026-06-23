@@ -117,7 +117,6 @@ const LaRete = () => {
       <div className="editorial-container max-w-6xl space-y-16 md:space-y-20">
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
-          <div className="micro-label text-primary mb-4">§ La nostra rete</div>
           <h1 className="editorial-heading mb-6">
             La nostra <span className="text-primary">rete</span>
           </h1>
@@ -134,7 +133,6 @@ const LaRete = () => {
               <h2 className="editorial-subheading">I <span className="text-primary">coordinatori</span></h2>
               <p className="text-sm text-foreground/70 mt-2 max-w-2xl">Chi c'è dietro il progetto.</p>
             </div>
-            <span className="micro-label hidden md:block">§ 01 / Coordinatori</span>
           </div>
 
           {loading ? (
@@ -192,7 +190,6 @@ const LaRete = () => {
               <h2 className="editorial-subheading">Tutti i <span className="text-primary">membri</span></h2>
               <p className="text-sm text-foreground/70 mt-2 max-w-2xl">Chi crede e anima la rete. Puoi farne parte anche tu, se vuoi.</p>
             </div>
-            <span className="micro-label hidden md:block">§ 02 / Membri</span>
           </div>
 
           {/* Filtri */}

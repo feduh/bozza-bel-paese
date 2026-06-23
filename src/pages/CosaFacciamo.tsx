@@ -30,7 +30,6 @@ const CosaFacciamo = () => {
       <div className="editorial-container space-y-16 md:space-y-20">
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
-          <div className="micro-label text-primary mb-4">§ 01 / Cosa facciamo</div>
           <h1 className="editorial-heading mb-6">
             {t("what.title")} <span className="text-primary">{t("what.titleAccent")}</span>
           </h1>
@@ -48,7 +47,6 @@ const CosaFacciamo = () => {
         <section>
           <div className="flex items-end justify-between mb-8 border-b-2 border-foreground pb-4">
             <h2 className="editorial-subheading">I <span className="text-primary">pilastri</span></h2>
-            <span className="micro-label hidden md:block">§ 02 / Pilastri</span>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {pillars.map((p, i) => (
@@ -80,7 +78,6 @@ const CosaFacciamo = () => {
             <h2 className="editorial-subheading">
               <span className="text-primary">{t("what.howIntro")}</span> {t("what.howSuffix")}
             </h2>
-            <span className="micro-label hidden md:block">§ 03 / Metodo</span>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {how.map((h, i) => {
@@ -105,7 +102,6 @@ const CosaFacciamo = () => {
             <h2 className="editorial-subheading">
               <span className="text-primary">{t("what.whyTitle")}</span>
             </h2>
-            <span className="micro-label hidden md:block">§ 04 / Perché</span>
           </div>
           <div className="brutalist-card p-8 bg-primary text-primary-foreground">
             <ul className="space-y-4">
@@ -121,7 +117,6 @@ const CosaFacciamo = () => {
 
         {/* CTA */}
         <section className="brutalist-card p-10 md:p-14 text-center">
-          <div className="micro-label text-primary mb-4">§ 05 / Unisciti</div>
           <h3 className="editorial-subheading mb-4">{t("what.ctaTitle")}</h3>
           <p className="text-base md:text-lg text-foreground/80 max-w-xl mx-auto mb-8">{t("what.ctaText")}</p>
           <Link to="/contatti" className="btn-brutalist">
