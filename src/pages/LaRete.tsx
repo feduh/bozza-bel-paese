@@ -157,7 +157,7 @@ const LaRete = () => {
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg uppercase leading-tight tracking-tight" style={{ fontVariationSettings: "'wght' 700" }}>
+                      <h3 className="text-lg leading-tight tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
                         {c.display_name}
                       </h3>
                       {c.role_collective && (
@@ -268,7 +268,7 @@ const LaRete = () => {
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-base uppercase leading-tight tracking-tight group-hover:text-primary transition-colors truncate" style={{ fontVariationSettings: "'wght' 700" }}>
+                        <h3 className="text-base leading-tight tracking-tight group-hover:text-primary transition-colors truncate" style={{ fontVariationSettings: "'wght' 600" }}>
                           {p.display_name}
                         </h3>
                         {p.figure_category && (
