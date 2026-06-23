@@ -18,7 +18,6 @@ const Contatti = () => {
       return;
     }
     if (!antiSpam.passes()) {
-      // Silent reject for bots; show generic feedback so we don't tip them off.
       setSent(true);
       setForm({ name: "", email: "", subject: "", message: "" });
       return;
@@ -40,116 +39,122 @@ const Contatti = () => {
     toast({ title: "Messaggio inviato", description: "Ti risponderemo al più presto." });
   };
 
+  const inputClass =
+    "w-full px-4 py-3 brutalist-border bg-background text-sm focus:outline-none focus:ring-0 focus:border-primary";
+
   return (
-    <div className="py-20">
+    <div className="bg-background py-16 md:py-20">
       <SEO
         title="Contatti — Il Bel Paese"
         description="Scrivi al collettivo Il Bel Paese: collaborazioni, segnalazioni, stampa e proposte editoriali."
         canonicalPath="/contatti"
       />
-      <div className="editorial-container">
-        <div className="max-w-3xl mb-12">
+      <div className="editorial-container space-y-12 md:space-y-16">
+        {/* Header */}
+        <header className="border-b-2 border-foreground pb-10">
+          <div className="micro-label text-primary mb-4">§ Contatti</div>
           <h1 className="editorial-heading mb-6">
-            <span className="italic text-primary">Scrivici</span>
+            <span className="text-primary">Scrivici</span>
             <br />
             due righe
           </h1>
-          <p className="editorial-body text-muted-foreground">
+          <p className="editorial-body text-foreground/80 max-w-3xl">
             Per collaborazioni, proposte editoriali, segnalazioni o semplicemente per scambiare due parole:
             accogliamo ogni tipo di messaggio.
           </p>
-        </div>
+        </header>
 
-        <div className="grid md:grid-cols-[1fr_2fr] gap-12">
+        <div className="grid md:grid-cols-[1fr_2fr] gap-8 md:gap-12">
           {/* Info colonna sx */}
-          <aside className="space-y-8">
-            <div className="space-y-3">
+          <aside className="brutalist-card p-8 self-start">
+            <div className="micro-label text-primary mb-6">§ Dove trovarci</div>
+            <div className="space-y-6">
               <div className="flex items-start gap-3">
-                <Mail size={18} className="text-primary mt-0.5" aria-hidden="true" />
+                <Mail size={18} className="text-foreground mt-0.5" aria-hidden="true" />
                 <div>
-                  <p className="font-body text-sm font-semibold">Email</p>
-                  <a href="mailto:info@ilbelpaese.it" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <p className="micro-label mb-1">Email</p>
+                  <a href="mailto:info@ilbelpaese.it" className="text-sm hover:text-primary transition-colors">
                     info@ilbelpaese.it
                   </a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Instagram size={18} className="text-primary mt-0.5" aria-hidden="true" />
+                <Instagram size={18} className="text-foreground mt-0.5" aria-hidden="true" />
                 <div>
-                  <p className="font-body text-sm font-semibold">Instagram</p>
-                  <a href="https://instagram.com/ilbelpaese" target="_blank" rel="noreferrer" className="font-body text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <p className="micro-label mb-1">Instagram</p>
+                  <a href="https://instagram.com/ilbelpaese" target="_blank" rel="noreferrer" className="text-sm hover:text-primary transition-colors">
                     @ilbelpaese
                   </a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <MapPin size={18} className="text-primary mt-0.5" aria-hidden="true" />
+                <MapPin size={18} className="text-foreground mt-0.5" aria-hidden="true" />
                 <div>
-                  <p className="font-body text-sm font-semibold">Dove siamo</p>
-                  <p className="font-body text-sm text-muted-foreground">Italia, ovunque ci sia una realtà da mappare.</p>
+                  <p className="micro-label mb-1">Dove siamo</p>
+                  <p className="text-sm text-foreground/80">Italia, ovunque ci sia una realtà da mappare.</p>
                 </div>
               </div>
             </div>
           </aside>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5 bg-card border border-border rounded-lg p-8">
+          <form onSubmit={handleSubmit} className="brutalist-card p-8 space-y-5">
+            <div className="micro-label text-primary">§ Scrivici un messaggio</div>
             {sent && (
-              <div role="status" className="rounded-lg border border-secondary/40 bg-secondary/10 p-4 text-sm font-body text-secondary-foreground">
+              <div role="status" className="brutalist-border bg-secondary/20 p-4 text-sm">
                 Grazie! Abbiamo ricevuto il tuo messaggio. Ti scriviamo presto.
               </div>
             )}
-            {/* honeypot anti-spam */}
             <input {...antiSpam.honeypotProps} />
             <div className="grid sm:grid-cols-2 gap-5">
               <label className="block">
-                <span className="font-body text-sm font-medium mb-1.5 block">Nome *</span>
+                <span className="micro-label mb-2 block">Nome *</span>
                 <input
                   type="text"
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className={inputClass}
                 />
               </label>
               <label className="block">
-                <span className="font-body text-sm font-medium mb-1.5 block">Email *</span>
+                <span className="micro-label mb-2 block">Email *</span>
                 <input
                   type="email"
                   required
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className={inputClass}
                 />
               </label>
             </div>
             <label className="block">
-              <span className="font-body text-sm font-medium mb-1.5 block">Oggetto</span>
+              <span className="micro-label mb-2 block">Oggetto</span>
               <input
                 type="text"
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
                 placeholder="Collaborazione, segnalazione, stampa…"
-                className="w-full px-4 py-2.5 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className={inputClass}
               />
             </label>
             <label className="block">
-              <span className="font-body text-sm font-medium mb-1.5 block">Messaggio *</span>
+              <span className="micro-label mb-2 block">Messaggio *</span>
               <textarea
                 required
                 rows={7}
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+                className={`${inputClass} resize-y`}
               />
             </label>
-            <p className="text-xs text-muted-foreground font-body">
+            <p className="text-xs text-foreground/70">
               Inviando il messaggio accetti la nostra <a href="/privacy" className="text-primary hover:underline">privacy policy</a>.
             </p>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-body font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
+              className="btn-brutalist disabled:opacity-60"
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               {submitting ? "Invio in corso…" : "Invia messaggio"}
