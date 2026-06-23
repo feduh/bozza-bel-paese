@@ -117,7 +117,6 @@ const LaRete = () => {
       <div className="editorial-container max-w-6xl space-y-16 md:space-y-20">
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
-          <div className="micro-label text-primary mb-4">§ La nostra rete</div>
           <h1 className="editorial-heading mb-6">
             La nostra <span className="text-primary">rete</span>
           </h1>
@@ -134,7 +133,6 @@ const LaRete = () => {
               <h2 className="editorial-subheading">I <span className="text-primary">coordinatori</span></h2>
               <p className="text-sm text-foreground/70 mt-2 max-w-2xl">Chi c'è dietro il progetto.</p>
             </div>
-            <span className="micro-label hidden md:block">§ 01 / Coordinatori</span>
           </div>
 
           {loading ? (
@@ -159,7 +157,7 @@ const LaRete = () => {
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg uppercase leading-tight tracking-tight" style={{ fontVariationSettings: "'wght' 700" }}>
+                      <h3 className="text-lg leading-tight tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
                         {c.display_name}
                       </h3>
                       {c.role_collective && (
@@ -192,7 +190,6 @@ const LaRete = () => {
               <h2 className="editorial-subheading">Tutti i <span className="text-primary">membri</span></h2>
               <p className="text-sm text-foreground/70 mt-2 max-w-2xl">Chi crede e anima la rete. Puoi farne parte anche tu, se vuoi.</p>
             </div>
-            <span className="micro-label hidden md:block">§ 02 / Membri</span>
           </div>
 
           {/* Filtri */}
@@ -271,7 +268,7 @@ const LaRete = () => {
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-base uppercase leading-tight tracking-tight group-hover:text-primary transition-colors truncate" style={{ fontVariationSettings: "'wght' 700" }}>
+                        <h3 className="text-base leading-tight tracking-tight group-hover:text-primary transition-colors truncate" style={{ fontVariationSettings: "'wght' 600" }}>
                           {p.display_name}
                         </h3>
                         {p.figure_category && (

@@ -52,7 +52,6 @@ const Contatti = () => {
       <div className="editorial-container space-y-12 md:space-y-16">
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
-          <div className="micro-label text-primary mb-4">§ Contatti</div>
           <h1 className="editorial-heading mb-6">
             <span className="text-primary">Scrivici</span>
             <br />
@@ -67,7 +66,6 @@ const Contatti = () => {
         <div className="grid md:grid-cols-[1fr_2fr] gap-8 md:gap-12">
           {/* Info colonna sx */}
           <aside className="brutalist-card p-8 self-start">
-            <div className="micro-label text-primary mb-6">§ Dove trovarci</div>
             <div className="space-y-6">
               <div className="flex items-start gap-3">
                 <Mail size={18} className="text-foreground mt-0.5" aria-hidden="true" />
@@ -99,7 +97,6 @@ const Contatti = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="brutalist-card p-8 space-y-5">
-            <div className="micro-label text-primary">§ Scrivici un messaggio</div>
             {sent && (
               <div role="status" className="brutalist-border bg-secondary/20 p-4 text-sm">
                 Grazie! Abbiamo ricevuto il tuo messaggio. Ti scriviamo presto.

@@ -103,7 +103,6 @@ const Index = () => {
               {t("home.sectionTitle")}{" "}
               <span className="text-primary">{t("home.sectionTitleAccent")}</span>
             </h2>
-            <span className="micro-label hidden md:block">§ 02 / Sezioni</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

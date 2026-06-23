@@ -12,7 +12,6 @@ const LaVostraVoce = () => {
       />
       <div className="editorial-container max-w-4xl space-y-12 md:space-y-16">
         <header className="border-b-2 border-foreground pb-10">
-          <div className="micro-label text-primary mb-4">§ La vostra voce</div>
           <h1 className="editorial-heading mb-6">
             La <span className="text-primary">vostra</span> voce
           </h1>
@@ -25,7 +24,6 @@ const LaVostraVoce = () => {
           <div className="flex items-start gap-5">
             <Radio className="text-foreground shrink-0 mt-1" size={32} aria-hidden="true" />
             <div>
-              <div className="micro-label text-primary mb-2">§ In cerca di alleati</div>
               <h2 className="text-2xl md:text-3xl uppercase leading-tight tracking-tight mb-4" style={{ fontVariationSettings: "'wght' 700" }}>
                 Stiamo cercando alleati
               </h2>
@@ -42,7 +40,6 @@ const LaVostraVoce = () => {
 
         <section className="brutalist-card p-10 md:p-14 bg-primary text-primary-foreground text-center">
           <Mic className="mx-auto mb-4" size={28} aria-hidden="true" />
-          <div className="micro-label text-secondary mb-3">§ Collabora</div>
           <h3 className="editorial-subheading mb-4">Sei interessato?</h3>
           <p className="text-base md:text-lg max-w-xl mx-auto mb-8 text-primary-foreground/90">
             Scrivici qui e raccontaci come potremmo collaborare.
