@@ -20,6 +20,7 @@ import {
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
@@ -35,15 +36,30 @@ const Navbar = () => {
   ];
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
+    if (!user) { setIsAdmin(false); setAvatarUrl(null); return; }
     const check = async () => {
-      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-      setIsAdmin(!!data);
+      const [{ data: roleData }, { data: profile }] = await Promise.all([
+        supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }),
+        supabase.from("profiles").select("avatar_url").eq("user_id", user.id).maybeSingle(),
+      ]);
+      setIsAdmin(!!roleData);
+      setAvatarUrl(profile?.avatar_url ?? null);
     };
     check();
+
+    const channel = supabase
+      .channel(`profile-avatar-${user.id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const next = (payload.new as { avatar_url?: string | null })?.avatar_url ?? null;
+          setAvatarUrl(next);
+        })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [user]);
 
   const userInitial = user?.email?.[0]?.toUpperCase() ?? "?";
+
 
   return (
     <nav
