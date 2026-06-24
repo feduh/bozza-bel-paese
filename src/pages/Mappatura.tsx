@@ -352,7 +352,7 @@ const Mappatura = () => {
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
@@ -362,7 +362,7 @@ const Mappatura = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             aria-label="Filtra per categoria artistica"
           >
             <option value="all">{t("map.filterCategory")}</option>
@@ -374,7 +374,7 @@ const Mappatura = () => {
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
               aria-label={t("magazine.sortBy")}
             >
               <option value="default">{t("map.sortDefault")}</option>
@@ -383,8 +383,8 @@ const Mappatura = () => {
               <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
-          <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
-            <span className="text-xs text-muted-foreground mr-1">{t("map.year")}</span>
+          <div className="inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
+            <span className="micro-label mr-1">{t("map.year")}</span>
             <input
               type="number"
               value={yearMin}
@@ -395,7 +395,7 @@ const Mappatura = () => {
               className="w-20 bg-transparent focus:outline-none text-sm"
               aria-label="Anno fondazione minimo"
             />
-            <span className="text-muted-foreground">–</span>
+            <span className="text-foreground/60">–</span>
             <input
               type="number"
               value={yearMax}
@@ -410,10 +410,10 @@ const Mappatura = () => {
           <button
             onClick={requestGeo}
             disabled={geoStatus === "loading"}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-body text-sm transition-colors ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
               userPos
-                ? "border-secondary bg-secondary/15 text-secondary"
-                : "border-input bg-background hover:border-primary/40"
+                ? "bg-secondary text-foreground"
+                : "bg-background hover:bg-foreground hover:text-background"
             } disabled:opacity-50`}
           >
             {geoStatus === "loading" ? (
@@ -424,7 +424,7 @@ const Mappatura = () => {
             {userPos ? t("map.nearYou") : t("map.nearMe")}
           </button>
           {hasFilters && (
-            <button onClick={clearFilters} className="inline-flex items-center gap-1 px-4 py-2 text-xs font-body text-destructive hover:underline">
+            <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
