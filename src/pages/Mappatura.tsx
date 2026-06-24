@@ -441,27 +441,26 @@ const Mappatura = () => {
         )}
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground" aria-label="Legenda categorie">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 micro-label text-foreground/70" aria-label="Legenda categorie">
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-primary border-2 border-foreground" /> {t("map.buckets.spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-secondary border-2 border-foreground" /> {t("map.buckets.spazi-senza-spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-foreground" />
             {t("map.buckets.spazi-che-furono")}
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-6 font-body" aria-live="polite" aria-atomic="true">
+        <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>
 
         {/* Map view */}
         {view === "map" && (
-          <div className="overflow-hidden h-[600px]">
+          <div className="brutalist-border shadow-brutalist overflow-hidden h-[600px]">
             <Suspense fallback={<MapFallback height="600px" />}>
               <LazyMap
                 center={[41.8719, 12.5674]}
