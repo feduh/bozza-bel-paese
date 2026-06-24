@@ -262,37 +262,39 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
   return (
   <Link
     to={`/magazine/${post.slug}`}
-    className="group block rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all overflow-hidden"
+    className="group brutalist-card block overflow-hidden"
   >
     {post.cover_image_url && (
-      <SmartImage
-        src={post.cover_image_url}
-        alt={post.title}
-        aspect="16/9"
-        wrapperClassName="w-full"
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-      />
+      <div className="border-b-2 border-foreground">
+        <SmartImage
+          src={post.cover_image_url}
+          alt={post.title}
+          aspect="16/9"
+          wrapperClassName="w-full"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      </div>
     )}
     <div className="p-6">
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         {parseCategories(post.category).map((c) => (
-          <span key={c} className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <span key={c} className="inline-block micro-label px-2.5 py-1 brutalist-border bg-secondary">
             {c}
           </span>
         ))}
         {post.reply_to_id && (
-          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
+          <span className="inline-flex items-center gap-1 micro-label px-2 py-1 brutalist-border bg-primary text-primary-foreground">
             <Reply size={10} /> {t("magazine.replyTag")}
           </span>
         )}
       </div>
-      <h3 className="font-display text-lg font-semibold mb-3 group-hover:text-primary transition-colors line-clamp-2">
+      <h3 className="text-xl uppercase leading-tight tracking-tight mb-3 group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
         {post.title}
       </h3>
-      <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+      <p className="text-sm text-foreground/70 leading-relaxed mb-4 line-clamp-3">
         {post.excerpt}
       </p>
-      <div className="flex items-center gap-4 text-xs text-muted-foreground font-body">
+      <div className="flex items-center gap-4 text-xs text-foreground/60">
         <span className="flex items-center gap-1">
           <User size={12} /> {authorName}
         </span>
@@ -305,7 +307,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
           })}
         </span>
       </div>
-      <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+      <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
         {t("magazine.read")} <ArrowRight size={14} />
       </span>
     </div>
