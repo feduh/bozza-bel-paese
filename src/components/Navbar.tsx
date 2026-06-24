@@ -106,10 +106,15 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label={t("nav.userMenu")}
-                className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-sm font-body font-semibold hover:bg-primary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                className="inline-flex items-center justify-center w-9 h-9 rounded-full overflow-hidden bg-primary/10 text-primary text-sm font-body font-semibold hover:bg-primary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                {userInitial}
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  userInitial
+                )}
               </DropdownMenuTrigger>
+
               <DropdownMenuContent align="end" className="min-w-[200px]">
                 <DropdownMenuLabel className="font-body text-xs text-muted-foreground truncate">
                   {user.email}
