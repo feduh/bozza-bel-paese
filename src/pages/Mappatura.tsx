@@ -255,34 +255,34 @@ const Mappatura = () => {
   }
 
   return (
-    <div className="py-20">
+    <div className="bg-background py-16 md:py-20">
       <SEO
         title="Mappatura — realtà artistiche italiane"
         description="Esplora la scena indipendente italiana: spazi con sede, nomadi e archivio storico. Filtra per regione, media artistico e stato."
         canonicalPath="/mappatura"
       />
       <div className="editorial-container">
-        <div className="max-w-3xl mb-10">
+        <header className="border-b-2 border-foreground pb-10 mb-10 max-w-3xl">
           <h1 className="editorial-heading mb-6">
-            <span className="italic text-primary">{t("map.title")}</span> {t("map.titleSuffix")}
+            <span className="text-primary">{t("map.title")}</span> {t("map.titleSuffix")}
           </h1>
-          <p className="editorial-body text-muted-foreground">
+          <p className="editorial-body text-foreground/80">
             {t("map.lead")}
           </p>
-        </div>
+        </header>
 
         <div className="mb-6 relative inline-block">
           <button
             onClick={() => setBucketMenuOpen((o) => !o)}
             aria-haspopup="menu"
             aria-expanded={bucketMenuOpen}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card font-body text-sm font-medium hover:border-primary/40 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-3 brutalist-border bg-background micro-label hover:bg-foreground hover:text-background transition-colors"
           >
             {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
             <ChevronDown size={14} aria-hidden="true" />
           </button>
           {bucketMenuOpen && (
-            <div role="menu" className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+            <div role="menu" className="absolute z-20 mt-2 w-64 brutalist-border bg-background shadow-brutalist overflow-hidden">
               {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
                 <button
                   key={val}
@@ -292,8 +292,8 @@ const Mappatura = () => {
                     setBucketFilter(val as "all" | Bucket);
                     setBucketMenuOpen(false);
                   }}
-                  className={`block w-full text-left px-4 py-2 text-sm font-body hover:bg-muted ${
-                    bucketFilter === val ? "bg-muted text-primary font-medium" : ""
+                  className={`block w-full text-left px-4 py-2.5 text-sm border-b-2 border-foreground/10 last:border-b-0 hover:bg-secondary/30 ${
+                    bucketFilter === val ? "bg-primary text-primary-foreground" : ""
                   }`}
                 >
                   {val === "all" ? t("common.all") : t(`map.buckets.${val}`)}
@@ -305,12 +305,12 @@ const Mappatura = () => {
 
         {/* View toggle + Search */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex w-full sm:w-auto rounded-lg border border-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
+          <div className="flex w-full sm:w-auto brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
-                view === "map" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
+                view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <Map size={16} aria-hidden="true" /> {t("map.view.map")}
@@ -318,8 +318,8 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
-                view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
+                view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <List size={16} aria-hidden="true" /> {t("map.view.list")}
@@ -327,8 +327,8 @@ const Mappatura = () => {
             <button
               onClick={() => setView("magazine")}
               aria-pressed={view === "magazine"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
-                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
+                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <LayoutGrid size={16} aria-hidden="true" /> Magazine
@@ -341,17 +341,18 @@ const Mappatura = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("map.search")}
-              className="w-full px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-4 py-3 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             />
           </label>
         </div>
+
 
         {/* Region + Discipline + Year + Geo filters */}
         <div className="flex flex-wrap gap-3 mb-6 items-center">
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
@@ -361,7 +362,7 @@ const Mappatura = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             aria-label="Filtra per categoria artistica"
           >
             <option value="all">{t("map.filterCategory")}</option>
@@ -373,7 +374,7 @@ const Mappatura = () => {
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className="px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
               aria-label={t("magazine.sortBy")}
             >
               <option value="default">{t("map.sortDefault")}</option>
@@ -382,8 +383,8 @@ const Mappatura = () => {
               <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
-          <div className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-input bg-background font-body text-sm">
-            <span className="text-xs text-muted-foreground mr-1">{t("map.year")}</span>
+          <div className="inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
+            <span className="micro-label mr-1">{t("map.year")}</span>
             <input
               type="number"
               value={yearMin}
@@ -394,7 +395,7 @@ const Mappatura = () => {
               className="w-20 bg-transparent focus:outline-none text-sm"
               aria-label="Anno fondazione minimo"
             />
-            <span className="text-muted-foreground">–</span>
+            <span className="text-foreground/60">–</span>
             <input
               type="number"
               value={yearMax}
@@ -409,10 +410,10 @@ const Mappatura = () => {
           <button
             onClick={requestGeo}
             disabled={geoStatus === "loading"}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-body text-sm transition-colors ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
               userPos
-                ? "border-secondary bg-secondary/15 text-secondary"
-                : "border-input bg-background hover:border-primary/40"
+                ? "bg-secondary text-foreground"
+                : "bg-background hover:bg-foreground hover:text-background"
             } disabled:opacity-50`}
           >
             {geoStatus === "loading" ? (
@@ -423,7 +424,7 @@ const Mappatura = () => {
             {userPos ? t("map.nearYou") : t("map.nearMe")}
           </button>
           {hasFilters && (
-            <button onClick={clearFilters} className="inline-flex items-center gap-1 px-4 py-2 text-xs font-body text-destructive hover:underline">
+            <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
@@ -440,27 +441,26 @@ const Mappatura = () => {
         )}
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 text-xs font-body text-muted-foreground" aria-label="Legenda categorie">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 micro-label text-foreground/70" aria-label="Legenda categorie">
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-primary border-2 border-primary" /> {t("map.buckets.spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-primary border-2 border-foreground" /> {t("map.buckets.spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-secondary border-2 border-secondary" /> {t("map.buckets.spazi-senza-spazi")}
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-secondary border-2 border-foreground" /> {t("map.buckets.spazi-senza-spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-primary" />
-            <span aria-hidden="true" className="inline-block w-3 h-3 rounded-full bg-background border-2 border-secondary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-foreground" />
             {t("map.buckets.spazi-che-furono")}
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-6 font-body" aria-live="polite" aria-atomic="true">
+        <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>
 
         {/* Map view */}
         {view === "map" && (
-          <div className="overflow-hidden h-[600px]">
+          <div className="brutalist-border shadow-brutalist overflow-hidden h-[600px]">
             <Suspense fallback={<MapFallback height="600px" />}>
               <LazyMap
                 center={[41.8719, 12.5674]}
@@ -485,39 +485,39 @@ const Mappatura = () => {
                 <Link
                   to={`/realta/${r.id}`}
                   key={r.id}
-                  className="group p-6 rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all"
+                  className="group brutalist-card p-6 block"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${cfg.badgeClass}`}>
+                    <span className="inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
                       <Icon size={12} /> {cfg.label}
                     </span>
-                    <span className="text-xs text-muted-foreground font-body">
+                    <span className="text-xs text-foreground/60">
                       {r.year_founded}{r.year_closed ? ` – ${r.year_closed}` : r.status === "attivo" ? " – oggi" : ""}
                     </span>
                   </div>
-                  <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
+                  <h3 className="text-xl uppercase leading-tight tracking-tight mb-2 group-hover:text-primary transition-colors" style={{ fontVariationSettings: "'wght' 700" }}>{r.name}</h3>
                   {((r.categories && r.categories.length > 0) || r.category) && (
-                    <p className="text-[11px] uppercase tracking-wider text-primary font-body font-semibold mb-2">
+                    <p className="micro-label text-primary mb-2">
                       {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
+                  <p className="text-sm text-foreground/80 flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
                     {userPos && (
-                      <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-medium">
+                      <span className="ml-auto text-[10px] uppercase tracking-[0.15em] font-bold px-2 py-0.5 brutalist-border bg-secondary">
                         {Math.round(distanceKm(userPos, { lat: r.lat, lng: r.lng }))} km
                       </span>
                     )}
                   </p>
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{r.description}</p>
-                  <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                  <p className="text-sm text-foreground/70 leading-relaxed line-clamp-2">{r.description}</p>
+                  <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
                     {t("home.discover")} <ArrowRight size={14} />
                   </span>
                 </Link>
               );
             })}
             {filtered.length === 0 && (
-              <div className="col-span-full text-center py-16 text-muted-foreground font-body">
+              <div className="col-span-full text-center py-16 text-foreground/60">
                 {t("map.empty")}
               </div>
             )}
@@ -535,9 +535,9 @@ const Mappatura = () => {
                 <Link
                   to={`/realta/${r.id}`}
                   key={r.id}
-                  className="group flex flex-col rounded-lg overflow-hidden bg-card border border-border hover:border-primary/40 hover:shadow-lg transition-all"
+                  className="group brutalist-card flex flex-col overflow-hidden"
                 >
-                  <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                  <div className="relative aspect-[4/3] bg-muted overflow-hidden border-b-2 border-foreground">
                     {r.image_url ? (
                       <img
                         src={r.image_url}
@@ -546,11 +546,11 @@ const Mappatura = () => {
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted via-muted to-muted-foreground/10">
-                        <ImageOff size={32} className="text-muted-foreground/40" aria-hidden="true" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                        <ImageOff size={32} className="text-foreground/30" aria-hidden="true" />
                       </div>
                     )}
-                    <span className={`absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${cfg.badgeClass}`}>
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
                       <Icon size={11} /> {cfg.label}
                     </span>
                     <div
@@ -562,23 +562,23 @@ const Mappatura = () => {
                   </div>
                   <div className="flex-1 flex flex-col p-5">
                     {((r.categories && r.categories.length > 0) || r.category) && (
-                      <p className="text-[10px] uppercase tracking-wider text-primary font-body font-semibold mb-2">
+                      <p className="micro-label text-primary mb-2">
                         {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
                       </p>
                     )}
-                    <h3 className="font-display text-lg font-semibold mb-2 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    <h3 className="text-lg uppercase mb-2 leading-tight tracking-tight group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
                       {r.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground font-body flex items-center gap-1 mb-3">
+                    <p className="text-xs text-foreground/70 flex items-center gap-1 mb-3">
                       <MapPin size={11} /> {r.city}, {r.region}
                       <span className="ml-auto">
                         {r.year_founded}{r.year_closed ? `–${r.year_closed}` : ""}
                       </span>
                     </p>
-                    <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+                    <p className="text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
                       {r.description}
                     </p>
-                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
                       {t("home.discover")} <ArrowRight size={14} />
                     </span>
                   </div>
@@ -586,7 +586,7 @@ const Mappatura = () => {
               );
             })}
             {filtered.length === 0 && (
-              <div className="col-span-full text-center py-16 text-muted-foreground font-body">
+              <div className="col-span-full text-center py-16 text-foreground/60">
                 {t("map.empty")}
               </div>
             )}
