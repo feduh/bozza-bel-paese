@@ -485,39 +485,39 @@ const Mappatura = () => {
                 <Link
                   to={`/realta/${r.id}`}
                   key={r.id}
-                  className="group p-6 rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-md transition-all"
+                  className="group brutalist-card p-6 block"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${cfg.badgeClass}`}>
+                    <span className="inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
                       <Icon size={12} /> {cfg.label}
                     </span>
-                    <span className="text-xs text-muted-foreground font-body">
+                    <span className="text-xs text-foreground/60">
                       {r.year_founded}{r.year_closed ? ` – ${r.year_closed}` : r.status === "attivo" ? " – oggi" : ""}
                     </span>
                   </div>
-                  <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
+                  <h3 className="text-xl uppercase leading-tight tracking-tight mb-2 group-hover:text-primary transition-colors" style={{ fontVariationSettings: "'wght' 700" }}>{r.name}</h3>
                   {((r.categories && r.categories.length > 0) || r.category) && (
-                    <p className="text-[11px] uppercase tracking-wider text-primary font-body font-semibold mb-2">
+                    <p className="micro-label text-primary mb-2">
                       {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground font-body flex items-center gap-1 mb-3">
+                  <p className="text-sm text-foreground/80 flex items-center gap-1 mb-3">
                     <MapPin size={13} /> {r.city}, {r.region}
                     {userPos && (
-                      <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-medium">
+                      <span className="ml-auto text-[10px] uppercase tracking-[0.15em] font-bold px-2 py-0.5 brutalist-border bg-secondary">
                         {Math.round(distanceKm(userPos, { lat: r.lat, lng: r.lng }))} km
                       </span>
                     )}
                   </p>
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{r.description}</p>
-                  <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                  <p className="text-sm text-foreground/70 leading-relaxed line-clamp-2">{r.description}</p>
+                  <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
                     {t("home.discover")} <ArrowRight size={14} />
                   </span>
                 </Link>
               );
             })}
             {filtered.length === 0 && (
-              <div className="col-span-full text-center py-16 text-muted-foreground font-body">
+              <div className="col-span-full text-center py-16 text-foreground/60">
                 {t("map.empty")}
               </div>
             )}
@@ -535,9 +535,9 @@ const Mappatura = () => {
                 <Link
                   to={`/realta/${r.id}`}
                   key={r.id}
-                  className="group flex flex-col rounded-lg overflow-hidden bg-card border border-border hover:border-primary/40 hover:shadow-lg transition-all"
+                  className="group brutalist-card flex flex-col overflow-hidden"
                 >
-                  <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                  <div className="relative aspect-[4/3] bg-muted overflow-hidden border-b-2 border-foreground">
                     {r.image_url ? (
                       <img
                         src={r.image_url}
@@ -546,11 +546,11 @@ const Mappatura = () => {
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted via-muted to-muted-foreground/10">
-                        <ImageOff size={32} className="text-muted-foreground/40" aria-hidden="true" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                        <ImageOff size={32} className="text-foreground/30" aria-hidden="true" />
                       </div>
                     )}
-                    <span className={`absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${cfg.badgeClass}`}>
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
                       <Icon size={11} /> {cfg.label}
                     </span>
                     <div
@@ -562,23 +562,23 @@ const Mappatura = () => {
                   </div>
                   <div className="flex-1 flex flex-col p-5">
                     {((r.categories && r.categories.length > 0) || r.category) && (
-                      <p className="text-[10px] uppercase tracking-wider text-primary font-body font-semibold mb-2">
+                      <p className="micro-label text-primary mb-2">
                         {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
                       </p>
                     )}
-                    <h3 className="font-display text-lg font-semibold mb-2 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    <h3 className="text-lg uppercase mb-2 leading-tight tracking-tight group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
                       {r.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground font-body flex items-center gap-1 mb-3">
+                    <p className="text-xs text-foreground/70 flex items-center gap-1 mb-3">
                       <MapPin size={11} /> {r.city}, {r.region}
                       <span className="ml-auto">
                         {r.year_founded}{r.year_closed ? `–${r.year_closed}` : ""}
                       </span>
                     </p>
-                    <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+                    <p className="text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
                       {r.description}
                     </p>
-                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
                       {t("home.discover")} <ArrowRight size={14} />
                     </span>
                   </div>
@@ -586,7 +586,7 @@ const Mappatura = () => {
               );
             })}
             {filtered.length === 0 && (
-              <div className="col-span-full text-center py-16 text-muted-foreground font-body">
+              <div className="col-span-full text-center py-16 text-foreground/60">
                 {t("map.empty")}
               </div>
             )}
