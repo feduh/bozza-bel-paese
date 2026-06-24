@@ -276,13 +276,13 @@ const Mappatura = () => {
             onClick={() => setBucketMenuOpen((o) => !o)}
             aria-haspopup="menu"
             aria-expanded={bucketMenuOpen}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card font-body text-sm font-medium hover:border-primary/40 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-3 brutalist-border bg-background micro-label hover:bg-foreground hover:text-background transition-colors"
           >
             {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
             <ChevronDown size={14} aria-hidden="true" />
           </button>
           {bucketMenuOpen && (
-            <div role="menu" className="absolute z-20 mt-2 w-64 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+            <div role="menu" className="absolute z-20 mt-2 w-64 brutalist-border bg-background shadow-brutalist overflow-hidden">
               {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
                 <button
                   key={val}
@@ -292,8 +292,8 @@ const Mappatura = () => {
                     setBucketFilter(val as "all" | Bucket);
                     setBucketMenuOpen(false);
                   }}
-                  className={`block w-full text-left px-4 py-2 text-sm font-body hover:bg-muted ${
-                    bucketFilter === val ? "bg-muted text-primary font-medium" : ""
+                  className={`block w-full text-left px-4 py-2.5 text-sm border-b-2 border-foreground/10 last:border-b-0 hover:bg-secondary/30 ${
+                    bucketFilter === val ? "bg-primary text-primary-foreground" : ""
                   }`}
                 >
                   {val === "all" ? t("common.all") : t(`map.buckets.${val}`)}
@@ -305,12 +305,12 @@ const Mappatura = () => {
 
         {/* View toggle + Search */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex w-full sm:w-auto rounded-lg border border-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
+          <div className="flex w-full sm:w-auto brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors ${
-                view === "map" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
+                view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <Map size={16} aria-hidden="true" /> {t("map.view.map")}
@@ -318,8 +318,8 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
-                view === "list" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
+                view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <List size={16} aria-hidden="true" /> {t("map.view.list")}
@@ -327,8 +327,8 @@ const Mappatura = () => {
             <button
               onClick={() => setView("magazine")}
               aria-pressed={view === "magazine"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-sm font-body font-medium transition-colors border-l border-border ${
-                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
+                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <LayoutGrid size={16} aria-hidden="true" /> Magazine
@@ -341,10 +341,11 @@ const Mappatura = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("map.search")}
-              className="w-full px-4 py-2 rounded-lg border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-4 py-3 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             />
           </label>
         </div>
+
 
         {/* Region + Discipline + Year + Geo filters */}
         <div className="flex flex-wrap gap-3 mb-6 items-center">
