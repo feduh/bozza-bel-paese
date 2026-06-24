@@ -255,21 +255,21 @@ const Mappatura = () => {
   }
 
   return (
-    <div className="py-20">
+    <div className="bg-background py-16 md:py-20">
       <SEO
         title="Mappatura — realtà artistiche italiane"
         description="Esplora la scena indipendente italiana: spazi con sede, nomadi e archivio storico. Filtra per regione, media artistico e stato."
         canonicalPath="/mappatura"
       />
       <div className="editorial-container">
-        <div className="max-w-3xl mb-10">
+        <header className="border-b-2 border-foreground pb-10 mb-10 max-w-3xl">
           <h1 className="editorial-heading mb-6">
-            <span className="italic text-primary">{t("map.title")}</span> {t("map.titleSuffix")}
+            <span className="text-primary">{t("map.title")}</span> {t("map.titleSuffix")}
           </h1>
-          <p className="editorial-body text-muted-foreground">
+          <p className="editorial-body text-foreground/80">
             {t("map.lead")}
           </p>
-        </div>
+        </header>
 
         <div className="mb-6 relative inline-block">
           <button
