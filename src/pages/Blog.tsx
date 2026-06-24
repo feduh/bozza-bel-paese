@@ -118,50 +118,50 @@ const Magazine = () => {
   const hasFilters = activeCats.length > 0 || query.length > 0 || !!author || !!year || sort !== "newest";
 
   return (
-    <div className="py-20">
+    <div className="bg-background py-16 md:py-20">
       <SEO
         title={t("magazine.title") + " " + t("magazine.titleAccent")}
         description={t("magazine.lead")}
         canonicalPath="/magazine"
       />
       <div className="editorial-container">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <header className="border-b-2 border-foreground pb-10 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="max-w-3xl">
             <h1 className="editorial-heading mb-4">
               {t("magazine.title")}{" "}
-              <span className="italic text-primary">{t("magazine.titleAccent")}</span>
+              <span className="text-primary">{t("magazine.titleAccent")}</span>
             </h1>
-            <p className="editorial-body text-muted-foreground">{t("magazine.lead")}</p>
+            <p className="editorial-body text-foreground/80">{t("magazine.lead")}</p>
           </div>
           {user && (
             <Link
               to="/area-personale"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-body font-medium hover:opacity-90 transition-opacity shrink-0"
+              className="btn-brutalist shrink-0"
             >
               <Plus size={16} /> {t("magazine.newArticle")}
             </Link>
           )}
-        </div>
+        </header>
 
         {/* Filtri */}
         {!loading && posts.length > 0 && (
           <div className="mb-10 space-y-4">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[220px] max-w-sm">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60" />
                 <input
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t("magazine.searchPlaceholder")}
-                  className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  className="w-full pl-9 pr-3 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
                 />
               </div>
               {availableAuthors.length > 0 && (
                 <select
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
-                  className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  className="px-3 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
                   aria-label={t("magazine.filterAuthor")}
                 >
                   <option value="">{t("magazine.allAuthors")}</option>
@@ -174,7 +174,7 @@ const Magazine = () => {
                 <select
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="px-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  className="px-3 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
                   aria-label={t("magazine.filterYear")}
                 >
                   <option value="">{t("magazine.allYears")}</option>
@@ -184,11 +184,11 @@ const Magazine = () => {
                 </select>
               )}
               <div className="relative">
-                <ArrowDownUp size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <ArrowDownUp size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 pointer-events-none" />
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value as SortKey)}
-                  className="pl-9 pr-3 py-2 rounded-md border border-input bg-background font-body text-sm"
+                  className="pl-9 pr-3 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
                   aria-label={t("magazine.sortBy")}
                 >
                   <option value="newest">{t("magazine.sortNewest")}</option>
@@ -201,12 +201,12 @@ const Magazine = () => {
                 <button
                   type="button"
                   onClick={() => { setActiveCats([]); setQuery(""); setAuthor(""); setYear(""); setSort("newest"); }}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline"
                 >
                   <X size={14} /> {t("magazine.clearFilters")}
                 </button>
               )}
-              <span className="ml-auto text-xs font-body text-muted-foreground">
+              <span className="ml-auto micro-label text-foreground/70">
                 {filteredPosts.length} {filteredPosts.length === 1 ? t("magazine.articleOne") : t("magazine.articleOther")}
               </span>
             </div>
@@ -219,10 +219,10 @@ const Magazine = () => {
                       key={c}
                       type="button"
                       onClick={() => toggleCat(c)}
-                      className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                      className={`text-xs uppercase tracking-[0.15em] font-bold px-3 py-1.5 brutalist-border transition-colors ${
                         active
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background hover:bg-foreground hover:text-background"
                       }`}
                     >
                       {c}
@@ -237,11 +237,11 @@ const Magazine = () => {
         {loading ? (
           <PostCardSkeletonGrid count={6} />
         ) : posts.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground font-body">
+          <div className="text-center py-16 text-foreground/60">
             {t("magazine.emptyAll")}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground font-body">
+          <div className="text-center py-16 text-foreground/60">
             {t("magazine.emptyFiltered")}
           </div>
         ) : (
