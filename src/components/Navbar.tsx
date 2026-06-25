@@ -77,8 +77,9 @@ const Navbar = () => {
           ILBELPAESE
         </Link>
 
-        {/* Desktop */}
-        <div className="hidden md:flex items-center gap-6">
+        {/* Desktop (≥1024px) */}
+        <div className="hidden lg:flex items-center gap-x-7 ml-8">
+
 
           {primaryLinks.map((link) => {
             const active = location.pathname === link.to;
