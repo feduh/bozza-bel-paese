@@ -186,10 +186,11 @@ const MagazinePost = () => {
           </span>
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
-            {new Date(post.published_at).toLocaleDateString(
-              i18n.language === "en" ? "en-GB" : "it-IT",
-              { day: "numeric", month: "long", year: "numeric" }
-            )}
+            {new Date(post.published_at).toLocaleDateString("it-IT", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
           </span>
           <span className="flex items-center gap-1.5">
             <Clock size={14} /> {readingTime} min di lettura
