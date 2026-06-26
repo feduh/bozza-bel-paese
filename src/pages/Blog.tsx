@@ -38,23 +38,16 @@ const Magazine = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  const isEn = (t as unknown as { i18n?: { language?: string } })?.i18n?.language?.startsWith("en") ?? false;
-
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, title_en, excerpt, excerpt_en, author_name, user_id, category, cover_image_url, reply_to_id, published_at, status")
+        .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, reply_to_id, published_at, status")
         .eq("status", "published")
         .order("published_at", { ascending: false });
       if (cancelled) return;
-      const raw = (data as (MagazinePost & { title_en?: string | null; excerpt_en?: string | null })[]) ?? [];
-      const list: MagazinePost[] = raw.map((p) => ({
-        ...p,
-        title: isEn && p.title_en ? p.title_en : p.title,
-        excerpt: isEn && p.excerpt_en ? p.excerpt_en : p.excerpt,
-      }));
+      const list = (data as MagazinePost[]) ?? [];
       setPosts(list);
       const names = await fetchAuthorNames(list.map((p) => p.user_id));
       if (!cancelled) setNameMap(names);
@@ -63,7 +56,7 @@ const Magazine = () => {
     return () => {
       cancelled = true;
     };
-  }, [isEn]);
+  }, []);
 
   const availableCats = useMemo(() => {
     const set = new Set<string>();
@@ -257,8 +250,8 @@ const Magazine = () => {
 };
 
 const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: string }) => {
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language?.startsWith("en") ? "en-GB" : "it-IT";
+  const { t } = useTranslation();
+  const locale = "it-IT";
   return (
   <Link
     to={`/magazine/${post.slug}`}
@@ -288,7 +281,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
           </span>
         )}
       </div>
-      <h3 className="text-xl uppercase leading-tight tracking-tight mb-3 group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
+      <h3 className="text-xl leading-tight tracking-tight mb-3 group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
         {post.title}
       </h3>
       <p className="text-sm text-foreground/70 leading-relaxed mb-4 line-clamp-3">

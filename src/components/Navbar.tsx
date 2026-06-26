@@ -5,7 +5,7 @@ import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 
-import LanguageSwitcher from "./LanguageSwitcher";
+
 import NotificationsBell from "./NotificationsBell";
 import LogoPittogramma from "./LogoPittogramma";
 import {
@@ -97,9 +97,6 @@ const Navbar = () => {
             );
           })}
 
-          <div className="flex items-center gap-2 pl-2 border-l border-border">
-            <LanguageSwitcher />
-          </div>
 
           {user ? (
             <>
@@ -147,7 +144,6 @@ const Navbar = () => {
 
         {/* Mobile + Tablet (<1024px) toggle */}
         <div className="lg:hidden flex items-center gap-3">
-          <LanguageSwitcher />
           <button
             onClick={() => setOpen(!open)}
             className="text-foreground"
