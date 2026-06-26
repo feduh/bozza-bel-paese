@@ -38,7 +38,7 @@ type ReplyMeta = {
 };
 
 const MagazinePost = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
