@@ -53,7 +53,7 @@ const CosaFacciamo = () => {
               <div key={p.key} className="brutalist-card p-8 flex flex-col gap-4">
                 <div className="micro-label text-primary">0{i + 1} // {p.key}</div>
                 <p.icon className="text-foreground" size={28} aria-hidden="true" />
-                <h3 className="text-2xl uppercase leading-none tracking-tight" style={{ fontVariationSettings: "'wght' 700" }}>
+                <h3 className="text-2xl leading-none tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
                   {t(`what.pillars.${p.key}.title`)}
                 </h3>
                 <div className="h-[2px] w-12 bg-foreground" />
@@ -86,7 +86,7 @@ const CosaFacciamo = () => {
                 <div key={h} className="brutalist-card p-6 flex flex-col gap-3">
                   <div className="micro-label text-primary">0{i + 1}</div>
                   <Icon className="text-foreground" size={22} aria-hidden="true" />
-                  <h4 className="text-lg uppercase tracking-tight" style={{ fontVariationSettings: "'wght' 700" }}>
+                  <h4 className="text-lg tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
                     {t(`what.how.${h}.title`)}
                   </h4>
                   <p className="text-sm text-foreground/80 leading-relaxed">{t(`what.how.${h}.desc`)}</p>
