@@ -242,92 +242,64 @@
   }
 }
 
-/* ============ Map styling (Il Bel Paese) — Drone HUD, allineato alla Hero ============ */
+/* ============ Map styling (Il Bel Paese) — editorial light, allineato a "La Nostra Rete" ============ */
 .ibp-map-frame {
   position: relative;
-  background: #0a0a12;
+  background: hsl(var(--background));
   overflow: hidden;
-  border: 1px solid rgba(139, 92, 255, 0.25);
-  box-shadow:
-    inset 0 0 0 1px rgba(139, 92, 255, 0.08),
-    0 18px 60px -30px rgba(139, 92, 255, 0.55);
 }
 .ibp-map {
-  background: #0a0a12;
+  background: hsl(var(--background));
 }
 .ibp-map .leaflet-tile-pane {
-  filter: saturate(1.05) contrast(1.05) brightness(0.95) hue-rotate(-8deg);
+  /* nessun filtro: leggibilità massima delle etichette */
+  filter: none;
 }
-/* Scanlines + vignettatura per dare la stessa "lettura drone" della Hero */
-.ibp-map-scanlines {
-  position: absolute; inset: 0; pointer-events: none; z-index: 400;
-  opacity: 0.18; mix-blend-mode: overlay;
-  background-image: repeating-linear-gradient(
-    0deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 3px
-  );
-}
-.ibp-map-vignette {
-  position: absolute; inset: 0; pointer-events: none; z-index: 401;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(8, 6, 18, 0.85) 100%);
-}
-/* Bracket-corner come mirino HUD */
-.ibp-map-corner {
-  position: absolute; width: 18px; height: 18px; pointer-events: none; z-index: 500;
-  border: 1.5px solid #8B5CFF;
-  filter: drop-shadow(0 0 6px rgba(139, 92, 255, 0.55));
-}
-.ibp-map-corner--tl { top: 10px;    left: 10px;    border-right: none; border-bottom: none; }
-.ibp-map-corner--tr { top: 10px;    right: 10px;   border-left:  none; border-bottom: none; }
-.ibp-map-corner--bl { bottom: 10px; left: 10px;    border-right: none; border-top:    none; }
-.ibp-map-corner--br { bottom: 10px; right: 10px;   border-left:  none; border-top:    none; }
-/* HUD label (top-left) e tag (top-right) */
+/* HUD label minimal, niente glow */
 .ibp-map-hud {
-  position: absolute; top: 14px; left: 32px; z-index: 500; pointer-events: none;
+  position: absolute; top: 10px; left: 14px; z-index: 500; pointer-events: none;
   display: inline-flex; align-items: center; gap: 8px;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: #8B5CFF;
-  text-shadow: 0 0 12px rgba(139, 92, 255, 0.45);
+  color: hsl(var(--foreground) / 0.65);
+  background: hsl(var(--background) / 0.85);
+  padding: 4px 8px;
+  border: 1.5px solid hsl(var(--foreground));
 }
-.ibp-map-hud--right { left: auto; right: 32px; color: rgba(139, 92, 255, 0.7); }
 .ibp-map-hud__dot {
-  width: 6px; height: 6px; border-radius: 9999px; background: #8B5CFF;
-  box-shadow: 0 0 8px rgba(139, 92, 255, 0.9);
+  width: 6px; height: 6px; border-radius: 9999px; background: hsl(var(--primary));
   animation: ibp-pulse-dot 1.6s ease-in-out infinite;
 }
 @keyframes ibp-pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.35} }
 
-/* Zoom control coerente con la palette HUD */
+/* Zoom control — brutalist neutro */
 .ibp-map .leaflet-control-zoom a {
-  background: rgba(10, 10, 18, 0.85);
-  color: #8B5CFF;
-  border: 1px solid rgba(139, 92, 255, 0.5) !important;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border: 1.5px solid hsl(var(--foreground)) !important;
   border-radius: 0 !important;
   margin-bottom: 4px;
-  box-shadow: 0 0 12px rgba(139, 92, 255, 0.25);
   font-family: var(--font-mono);
   font-weight: 700;
-  backdrop-filter: blur(4px);
 }
 .ibp-map .leaflet-control-zoom a:hover {
-  background: rgba(139, 92, 255, 0.18);
-  color: #ffffff;
-  border-color: #8B5CFF !important;
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
 }
 .ibp-map .leaflet-control-attribution {
-  background: rgba(10, 10, 18, 0.7);
-  color: rgba(139, 92, 255, 0.7);
+  background: hsl(var(--background) / 0.9);
+  color: hsl(var(--foreground) / 0.7);
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   padding: 3px 8px;
-  border: 1px solid rgba(139, 92, 255, 0.3);
+  border: 1px solid hsl(var(--foreground) / 0.2);
   border-radius: 0;
 }
-.ibp-map .leaflet-control-attribution a { color: #8B5CFF; }
+.ibp-map .leaflet-control-attribution a { color: hsl(var(--primary)); }
 
-/* Markers */
+/* Markers — nitidi, senza glow/blur che sfoca le etichette */
 .ibp-marker-wrap { background: transparent !important; border: none !important; }
 .ibp-marker {
   position: relative;
@@ -340,29 +312,28 @@
   inset: 8px;
   border-radius: 9999px;
   background: var(--mc);
-  border: 2px solid #0a0a12;
-  box-shadow: 0 0 10px var(--mc), 0 0 2px rgba(0, 0, 0, 0.6);
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 0 0 1.5px hsl(var(--foreground)), 0 2px 6px rgba(0,0,0,0.15);
 }
 .ibp-marker--solid .ibp-marker__halo {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
   background: var(--mc);
-  opacity: 0.35;
+  opacity: 0.25;
   animation: ibp-pulse 2.4s ease-out infinite;
-  filter: blur(0.5px);
 }
 .ibp-marker--ghost .ibp-marker__core {
-  background: #0a0a12;
+  background: hsl(var(--background));
   border: 2px solid var(--mc);
-  box-shadow: 0 0 8px var(--mc);
+  box-shadow: 0 0 0 1.5px hsl(var(--foreground));
 }
 .ibp-marker--ghost .ibp-marker__ring {
   position: absolute;
   inset: 2px;
   border-radius: 9999px;
   border: 1.5px dashed var(--mc);
-  opacity: 0.8;
+  opacity: 0.85;
 }
 .ibp-marker:hover .ibp-marker__core {
   transform: scale(1.18);
@@ -370,23 +341,22 @@
 }
 
 @keyframes ibp-pulse {
-  0%   { transform: scale(0.7); opacity: 0.55; }
+  0%   { transform: scale(0.7); opacity: 0.45; }
   70%  { transform: scale(1.7); opacity: 0;    }
   100% { transform: scale(1.7); opacity: 0;    }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ibp-marker--solid .ibp-marker__halo { animation: none; opacity: 0.35; }
+  .ibp-marker--solid .ibp-marker__halo { animation: none; opacity: 0.25; }
   .ibp-map-hud__dot { animation: none; }
 }
 
-/* Popup — vetro scuro con bordo viola */
+/* Popup — bianco editoriale con bordo brutalist */
 .ibp-map .leaflet-popup-content-wrapper {
-  background: rgba(10, 10, 18, 0.92);
-  color: #f5f3ff;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   border-radius: 0;
-  box-shadow: 0 0 0 1px rgba(139, 92, 255, 0.5), 0 14px 40px -16px rgba(139, 92, 255, 0.6);
-  border: 1px solid rgba(139, 92, 255, 0.6);
-  backdrop-filter: blur(6px);
+  box-shadow: 4px 4px 0 0 hsl(var(--foreground));
+  border: 1.5px solid hsl(var(--foreground));
 }
 .ibp-map .leaflet-popup-content {
   margin: 12px 14px;
@@ -394,26 +364,25 @@
   line-height: 1.5;
 }
 .ibp-map .leaflet-popup-tip {
-  background: rgba(10, 10, 18, 0.92);
-  border: 1px solid rgba(139, 92, 255, 0.6);
+  background: hsl(var(--background));
+  border: 1.5px solid hsl(var(--foreground));
 }
-.ibp-map .leaflet-popup-close-button { color: #8B5CFF !important; }
+.ibp-map .leaflet-popup-close-button { color: hsl(var(--foreground)) !important; }
 
-/* Cluster bubbles */
+/* Cluster bubbles — neutri, leggibili sul basemap chiaro */
 .ibp-cluster-wrap { background: transparent !important; border: none !important; }
 .ibp-cluster {
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: rgba(139, 92, 255, 0.15);
-  border: 1.5px solid #8B5CFF;
-  color: #f5f3ff;
+  background: hsl(var(--background));
+  border: 1.5px solid hsl(var(--foreground));
+  color: hsl(var(--foreground));
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 0 14px rgba(139, 92, 255, 0.5), inset 0 0 12px rgba(139, 92, 255, 0.25);
-  backdrop-filter: blur(2px);
+  box-shadow: 2px 2px 0 0 hsl(var(--foreground));
   transition: transform 0.18s ease;
 }
 .ibp-cluster:hover { transform: scale(1.08); }

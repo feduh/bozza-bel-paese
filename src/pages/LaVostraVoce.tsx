@@ -24,7 +24,7 @@ const LaVostraVoce = () => {
           <div className="flex items-start gap-5">
             <Radio className="text-foreground shrink-0 mt-1" size={32} aria-hidden="true" />
             <div>
-              <h2 className="text-2xl md:text-3xl uppercase leading-tight tracking-tight mb-4" style={{ fontVariationSettings: "'wght' 700" }}>
+              <h2 className="text-2xl md:text-3xl leading-tight tracking-tight mb-4" style={{ fontVariationSettings: "'wght' 600" }}>
                 Stiamo cercando alleati
               </h2>
               <div className="h-[2px] w-12 bg-foreground mb-4" />

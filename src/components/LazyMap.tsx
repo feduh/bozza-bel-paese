@@ -201,12 +201,7 @@ const LazyMap = ({
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-          subdomains="abcd"
-          maxZoom={19}
-        />
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
           maxZoom={19}
         />
@@ -214,21 +209,12 @@ const LazyMap = ({
         <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
         <UserLocationLayer pos={userLocation} />
       </MapContainer>
-
-      {/* HUD overlays — coerenti con la Hero */}
-      <div className="ibp-map-scanlines" aria-hidden />
-      <div className="ibp-map-vignette" aria-hidden />
-      <span className="ibp-map-corner ibp-map-corner--tl" aria-hidden />
-      <span className="ibp-map-corner ibp-map-corner--tr" aria-hidden />
-      <span className="ibp-map-corner ibp-map-corner--bl" aria-hidden />
-      <span className="ibp-map-corner ibp-map-corner--br" aria-hidden />
       {hudLabel && (
         <div className="ibp-map-hud" aria-hidden>
           <span className="ibp-map-hud__dot" />
           <span>{hudLabel}</span>
         </div>
       )}
-      <div className="ibp-map-hud ibp-map-hud--right" aria-hidden>MMXXVI</div>
     </div>
   );
 };

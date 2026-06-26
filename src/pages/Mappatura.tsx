@@ -43,8 +43,7 @@ type ViewMode = "list" | "map" | "magazine";
 type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
-  const { t, i18n } = useTranslation();
-  const isEn = i18n.language?.startsWith("en") ?? false;
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [realities, setRealities] = useState<Reality[]>([]);
@@ -77,8 +76,6 @@ const Mappatura = () => {
           const rr = r as any;
           return {
             ...rr,
-            name: isEn && rr.name_en ? rr.name_en : rr.name,
-            description: isEn && rr.description_en ? rr.description_en : rr.description,
             type: rr.type as DbRealityType,
             status: (rr.status ?? "attivo") as RealityStatus,
             tags: tagsData?.filter((t) => t.reality_id === rr.id).map((t) => t.tag) ?? [],
@@ -89,7 +86,7 @@ const Mappatura = () => {
       setLoading(false);
     };
     fetchRealities();
-  }, [isEn]);
+  }, []);
 
   // Sync state → URL (debounced for search)
   useEffect(() => {
@@ -449,7 +446,8 @@ const Mappatura = () => {
             <span aria-hidden="true" className="inline-block w-3 h-3 bg-secondary border-2 border-foreground" /> {t("map.buckets.spazi-senza-spazi")}
           </span>
           <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-foreground" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-primary" />
+            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-secondary -ml-1" />
             {t("map.buckets.spazi-che-furono")}
           </span>
         </div>
@@ -495,7 +493,7 @@ const Mappatura = () => {
                       {r.year_founded}{r.year_closed ? ` – ${r.year_closed}` : r.status === "attivo" ? " – oggi" : ""}
                     </span>
                   </div>
-                  <h3 className="text-xl uppercase leading-tight tracking-tight mb-2 group-hover:text-primary transition-colors" style={{ fontVariationSettings: "'wght' 700" }}>{r.name}</h3>
+                  <h3 className="text-xl leading-tight tracking-tight mb-2 group-hover:text-primary transition-colors" style={{ fontVariationSettings: "'wght' 600" }}>{r.name}</h3>
                   {((r.categories && r.categories.length > 0) || r.category) && (
                     <p className="micro-label text-primary mb-2">
                       {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
@@ -566,7 +564,7 @@ const Mappatura = () => {
                         {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
                       </p>
                     )}
-                    <h3 className="text-lg uppercase mb-2 leading-tight tracking-tight group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
+                    <h3 className="text-lg mb-2 leading-tight tracking-tight group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 600" }}>
                       {r.name}
                     </h3>
                     <p className="text-xs text-foreground/70 flex items-center gap-1 mb-3">

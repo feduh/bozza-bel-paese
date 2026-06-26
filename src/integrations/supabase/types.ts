@@ -55,7 +55,6 @@ export type Database = {
           author_name: string
           category: string
           content: string
-          content_en: string | null
           copyright_check_notes: string | null
           copyright_check_status: string
           copyright_checked_at: string | null
@@ -63,7 +62,6 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           excerpt: string
-          excerpt_en: string | null
           id: string
           published_at: string
           reply_to_id: string | null
@@ -71,8 +69,6 @@ export type Database = {
           slug: string
           status: string
           title: string
-          title_en: string | null
-          translated_at: string | null
           updated_at: string
           user_id: string
         }
@@ -80,7 +76,6 @@ export type Database = {
           author_name: string
           category: string
           content?: string
-          content_en?: string | null
           copyright_check_notes?: string | null
           copyright_check_status?: string
           copyright_checked_at?: string | null
@@ -88,7 +83,6 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           excerpt: string
-          excerpt_en?: string | null
           id?: string
           published_at?: string
           reply_to_id?: string | null
@@ -96,8 +90,6 @@ export type Database = {
           slug: string
           status?: string
           title: string
-          title_en?: string | null
-          translated_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -105,7 +97,6 @@ export type Database = {
           author_name?: string
           category?: string
           content?: string
-          content_en?: string | null
           copyright_check_notes?: string | null
           copyright_check_status?: string
           copyright_checked_at?: string | null
@@ -113,7 +104,6 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string
-          excerpt_en?: string | null
           id?: string
           published_at?: string
           reply_to_id?: string | null
@@ -121,8 +111,6 @@ export type Database = {
           slug?: string
           status?: string
           title?: string
-          title_en?: string | null
-          translated_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -454,10 +442,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string
-          description_en: string | null
           fb_link: string | null
           history: string
-          history_en: string | null
           id: string
           ig_link: string | null
           image_url: string | null
@@ -465,10 +451,8 @@ export type Database = {
           linkedin_link: string | null
           lng: number
           name: string
-          name_en: string | null
           region: string
           status: string
-          translated_at: string | null
           type: Database["public"]["Enums"]["reality_type"]
           updated_at: string
           website: string | null
@@ -491,10 +475,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string
-          description_en?: string | null
           fb_link?: string | null
           history?: string
-          history_en?: string | null
           id?: string
           ig_link?: string | null
           image_url?: string | null
@@ -502,10 +484,8 @@ export type Database = {
           linkedin_link?: string | null
           lng: number
           name: string
-          name_en?: string | null
           region: string
           status?: string
-          translated_at?: string | null
           type: Database["public"]["Enums"]["reality_type"]
           updated_at?: string
           website?: string | null
@@ -528,10 +508,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string
-          description_en?: string | null
           fb_link?: string | null
           history?: string
-          history_en?: string | null
           id?: string
           ig_link?: string | null
           image_url?: string | null
@@ -539,10 +517,8 @@ export type Database = {
           linkedin_link?: string | null
           lng?: number
           name?: string
-          name_en?: string | null
           region?: string
           status?: string
-          translated_at?: string | null
           type?: Database["public"]["Enums"]["reality_type"]
           updated_at?: string
           website?: string | null
@@ -725,10 +701,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      apply_translation: {
-        Args: { _fields: Json; _id: string; _table: string }
-        Returns: undefined
-      }
       auto_confirm_pending_realities: { Args: never; Returns: number }
       get_public_stats: {
         Args: never
