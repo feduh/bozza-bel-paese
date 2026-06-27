@@ -117,7 +117,7 @@ const Index = () => {
                 <div className={`micro-label ${f.inverted ? "text-secondary" : "text-primary"}`}>
                   {f.num} // {f.section}
                 </div>
-                <h3 className="text-3xl md:text-4xl uppercase leading-none tracking-tight" style={{ fontVariationSettings: "'wght' 700" }}>
+                <h3 className="text-2xl md:text-2xl lg:text-3xl xl:text-4xl uppercase leading-[0.95] tracking-tight break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>
                   {t(`home.features.${f.key}.title`)}
                 </h3>
                 <p className={`text-sm leading-relaxed ${f.inverted ? "text-primary-foreground/90" : "text-foreground/80"}`}>
