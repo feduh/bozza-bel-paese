@@ -306,29 +306,29 @@ const Mappatura = () => {
             <button
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
+              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors ${
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
-              <Map size={16} aria-hidden="true" /> {t("map.view.map")}
+              <Map size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.map")}</span>
             </button>
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
+              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
-              <List size={16} aria-hidden="true" /> {t("map.view.list")}
+              <List size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.list")}</span>
             </button>
             <button
               onClick={() => setView("magazine")}
               aria-pressed={view === "magazine"}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 text-xs uppercase tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
+              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
                 view === "magazine" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
-              <LayoutGrid size={16} aria-hidden="true" /> Magazine
+              <LayoutGrid size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">Magazine</span>
             </button>
           </div>
           <label className="flex-1">
