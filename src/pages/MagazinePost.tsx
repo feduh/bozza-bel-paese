@@ -178,7 +178,7 @@ const MagazinePost = () => {
           )}
         </div>
 
-        <h1 className="editorial-heading mb-6">{post.title}</h1>
+        <h1 className="font-display uppercase tracking-tight leading-[0.95] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>{post.title}</h1>
 
         <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border flex-wrap">
           <span className="flex items-center gap-1.5">
