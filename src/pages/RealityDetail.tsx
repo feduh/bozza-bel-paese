@@ -133,7 +133,7 @@ const RealityDetail = () => {
               )}
             </div>
           </div>
-          <h1 className="editorial-heading mb-4">{reality.name}</h1>
+          <h1 className="font-display uppercase tracking-tight leading-[0.95] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>{reality.name}</h1>
           <p className="editorial-body text-muted-foreground max-w-3xl">{reality.description}</p>
         </div>
 

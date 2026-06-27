@@ -126,7 +126,7 @@ const AutoreProfilo = () => {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="font-display text-4xl font-bold mb-2">{profile.display_name}</h1>
+            <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-words leading-tight">{profile.display_name}</h1>
             {(profile.role_collective || profile.role_real_life) && (
               <p className="font-body text-muted-foreground text-sm mb-2">
                 {[profile.role_collective, profile.role_real_life].filter(Boolean).join(" · ")}
