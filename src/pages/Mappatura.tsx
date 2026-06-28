@@ -262,7 +262,9 @@ const Mappatura = () => {
       <div className="editorial-container">
         <header className="border-b-2 border-foreground pb-10 mb-10 max-w-3xl">
           <h1 className="editorial-heading mb-6">
-            <span className="text-primary">{t("map.title")}</span> {t("map.titleSuffix")}
+            <span className="text-primary">{t("map.title")}</span>
+            <br />
+            {t("map.titleSuffix")}
           </h1>
           <p className="editorial-body text-foreground/80">
             {t("map.lead")}
