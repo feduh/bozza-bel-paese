@@ -15,6 +15,7 @@ import {
   getCategory,
   categoryConfig,
 } from "@/lib/realityCategory";
+import { escapeHtml } from "@/lib/utils";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
