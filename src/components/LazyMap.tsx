@@ -99,16 +99,17 @@ const ClusterLayer = ({ markers, cluster }: { markers: MarkerData[]; cluster: bo
         icon: buildIcon(m.color ?? "#8B5CFF", !!m.outline),
       });
 
-      // Build popup HTML from popupContent if it's a React element with simple content,
-      // otherwise fall back to the marker name.
+      // Build popup HTML from popupContent if it's a string of trusted (pre-escaped) HTML,
+      // otherwise fall back to the marker name with HTML-escaped fields.
       const popupEl = document.createElement("div");
       popupEl.className = "ibp-popup-body";
-      // We accept either string popups or rely on the name for portability.
       if (typeof m.popupContent === "string") {
         popupEl.innerHTML = m.popupContent;
       } else {
-        popupEl.innerHTML = `<strong style="font-family:var(--font-display,serif)">${m.name}</strong>${
-          m.city ? `<br/><span style="font-size:12px;opacity:.7">${m.city}</span>` : ""
+        const esc = (s: string) =>
+          s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+        popupEl.innerHTML = `<strong style="font-family:var(--font-display,serif)">${esc(m.name)}</strong>${
+          m.city ? `<br/><span style="font-size:12px;opacity:.7">${esc(m.city)}</span>` : ""
         }`;
       }
       marker.bindPopup(popupEl);
