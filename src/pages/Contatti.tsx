@@ -53,7 +53,9 @@ const Contatti = () => {
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
           <h1 className="editorial-heading mb-6 uppercase">
-            <span className="text-primary">SCRIVICI</span>&nbsp;DUE RIGHE
+            <span className="text-primary">SCRIVICI</span>&nbsp;
+            <br />
+            DUE RIGHE
           </h1>
           <p className="editorial-body text-foreground/80 max-w-3xl">
             Per collaborazioni, proposte editoriali, segnalazioni o semplicemente per scambiare due parole:
