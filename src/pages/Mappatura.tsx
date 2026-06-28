@@ -232,10 +232,10 @@ const Mappatura = () => {
           outline: cfg.outline,
           popupContent: `
             <div style="font-family:var(--font-body)">
-              <strong style="font-family:var(--font-display);font-size:14px">${r.name.replace(/</g, "&lt;")}</strong><br/>
-              <span style="font-size:12px">${r.city}, ${r.region}</span><br/>
-              <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.7">${cfg.label}</span><br/>
-              <a href="/realta/${r.id}" style="font-size:12px;color:hsl(var(--primary));text-decoration:underline">Vai alla scheda →</a>
+              <strong style="font-family:var(--font-display);font-size:14px">${escapeHtml(r.name)}</strong><br/>
+              <span style="font-size:12px">${escapeHtml(r.city)}, ${escapeHtml(r.region)}</span><br/>
+              <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.7">${escapeHtml(cfg.label)}</span><br/>
+              <a href="/realta/${encodeURIComponent(r.id)}" style="font-size:12px;color:hsl(var(--primary));text-decoration:underline">Vai alla scheda →</a>
             </div>`,
         };
       }),
