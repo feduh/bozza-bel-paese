@@ -159,7 +159,7 @@ const RealityDetail = () => {
                         lat: reality.lat,
                         lng: reality.lng,
                         name: reality.name,
-                        popupContent: `<strong>${reality.name}</strong><br/><span style="font-size:12px;opacity:.7">${reality.city}</span>`,
+                        popupContent: `<strong>${escapeHtml(reality.name)}</strong><br/><span style="font-size:12px;opacity:.7">${escapeHtml(reality.city)}</span>`,
                         color: config.markerColor,
                         outline: config.outline,
                       },
