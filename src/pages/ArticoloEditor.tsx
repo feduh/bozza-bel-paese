@@ -335,7 +335,7 @@ const ArticoloEditor = () => {
     const authorName = prof?.display_name || user.email || "Anonimo";
 
     if (editingId) {
-      const updates: Record<string, unknown> = {
+      const updates: any = {
         title: parsed.data.title,
         category: parsed.data.category,
         excerpt: parsed.data.excerpt,
