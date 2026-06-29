@@ -83,7 +83,7 @@ const RealityDetail = () => {
   const Icon = config.icon;
 
   return (
-    <div className="py-12">
+    <div className="bg-background py-16 md:py-20">
       <SEO
         title={`${reality.name} — ${reality.city}`}
         description={reality.description}
