@@ -120,7 +120,7 @@ const MagazinePost = () => {
   }
 
   return (
-    <article className="py-16">
+    <article className="bg-background py-16 md:py-20">
       <SEO
         title={post.title}
         description={post.excerpt}
