@@ -403,9 +403,10 @@ const ArticoloEditor = () => {
     <div className="py-16">
       <SEO
         title={isEdit ? "Modifica articolo" : "Nuovo articolo"}
-        description="Editor articolo Magazine"
+        description="Editor del Magazine di Il Bel Paese: scrivi, modifica e pubblica articoli sulla scena artistica indipendente italiana, con copertina, categoria e tag."
         canonicalPath="/area-personale"
       />
+
       <div className="editorial-container max-w-3xl">
         <Link
           to="/area-personale"

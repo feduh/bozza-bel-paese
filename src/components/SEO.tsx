@@ -36,8 +36,18 @@ const upsertCanonical = (href: string) => {
 
 const SEO = ({ title, description, image, type = "website", canonicalPath, jsonLd }: SEOProps) => {
   useEffect(() => {
-    const fullTitle = title.includes(SITE_NAME) ? title : `${title} — ${SITE_NAME}`;
-    const trimmedTitle = fullTitle.length > 60 ? fullTitle.slice(0, 57) + "..." : fullTitle;
+    const suffix = ` — ${SITE_NAME}`;
+    const MAX = 60;
+    let trimmedTitle: string;
+    if (title.includes(SITE_NAME)) {
+      trimmedTitle = title.length > MAX ? title.slice(0, MAX - 1).trimEnd() + "…" : title;
+    } else if (title.length + suffix.length <= MAX) {
+      trimmedTitle = `${title}${suffix}`;
+    } else {
+      const room = MAX - suffix.length - 1; // 1 char for ellipsis
+      trimmedTitle = `${title.slice(0, room).trimEnd()}…${suffix}`;
+    }
+
     const desc = (description ?? "Mappatura delle realtà artistiche italiane indipendenti.").slice(0, 160);
     const path = canonicalPath ?? (typeof window !== "undefined" ? window.location.pathname : "/");
     const url = `${SITE_URL}${path}`;

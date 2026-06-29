@@ -19,11 +19,16 @@ const staticEntries: SitemapEntry[] = [
   { path: "/mappatura", changefreq: "weekly", priority: "0.9" },
   { path: "/la-rete", changefreq: "weekly", priority: "0.8" },
   { path: "/magazine", changefreq: "weekly", priority: "0.8" },
+  { path: "/blog", changefreq: "weekly", priority: "0.7" },
   { path: "/cosa-facciamo", changefreq: "monthly", priority: "0.7" },
+  { path: "/la-vostra-voce", changefreq: "monthly", priority: "0.6" },
   { path: "/segnala-realta", changefreq: "monthly", priority: "0.6" },
   { path: "/contatti", changefreq: "monthly", priority: "0.5" },
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+  { path: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
+  { path: "/termini", changefreq: "yearly", priority: "0.3" },
 ];
+
 
 async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
@@ -60,8 +65,23 @@ async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
     });
   });
 
+  const { data: authors } = await supabase
+    .from("profiles")
+    .select("user_id, updated_at")
+    .eq("consent_public", true)
+    .limit(5000);
+  authors?.forEach((a: { user_id: string; updated_at?: string }) => {
+    entries.push({
+      path: `/autori/${a.user_id}`,
+      lastmod: a.updated_at?.slice(0, 10),
+      changefreq: "monthly",
+      priority: "0.5",
+    });
+  });
+
   return entries;
 }
+
 
 function generate(entries: SitemapEntry[]) {
   const urls = entries.map((e) =>

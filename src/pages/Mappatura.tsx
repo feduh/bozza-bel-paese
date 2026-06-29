@@ -271,7 +271,9 @@ const Mappatura = () => {
           </p>
         </header>
 
+        <h2 className="sr-only">Filtri di ricerca</h2>
         <div className="mb-6 relative inline-block">
+
           <button
             onClick={() => setBucketMenuOpen((o) => !o)}
             aria-haspopup="menu"
@@ -455,9 +457,11 @@ const Mappatura = () => {
           </span>
         </div>
 
+        <h2 className="sr-only">Risultati</h2>
         <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>
+
 
         {/* Map view */}
         {view === "map" && (

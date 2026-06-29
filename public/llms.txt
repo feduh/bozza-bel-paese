@@ -1,0 +1,22 @@
+# Il Bel Paese
+
+> Mappatura della scena artistica indipendente italiana: spazi attivi, realtà nomadi, luoghi che furono, magazine editoriale e rete di coordinatori sul territorio.
+
+Il Bel Paese è un progetto editoriale e di ricerca dedicato alle realtà artistiche indipendenti in Italia. Raccoglie, mappa e racconta spazi, collettivi e progetti che alimentano la cultura contemporanea fuori dai circuiti istituzionali, attraverso una mappa interattiva, una rete di coordinatori regionali e un magazine di interviste, saggi e dibattiti.
+
+## Pages
+
+- [Home](/): Manifesto del progetto e accesso alle sezioni principali.
+- [Cosa facciamo](/cosa-facciamo): Pilastri, metodo e ambiti d'intervento del progetto.
+- [Mappatura](/mappatura): Mappa interattiva delle realtà artistiche italiane, filtrabile per regione, categoria e stato (spazi attivi, nomadi, chiusi).
+- [La rete](/la-rete): Coordinatori regionali e membri della redazione di Il Bel Paese.
+- [Magazine](/magazine): Interviste, saggi e dibattiti sulla scena artistica indipendente italiana (e non solo).
+- [La vostra voce](/la-vostra-voce): Podcast e testimonianze orali, in collaborazione con radio e piattaforme indipendenti.
+- [Segnala una realtà](/segnala-realta): Form pubblico per proporre nuove realtà alla mappatura.
+- [Contatti](/contatti): Contatti della redazione.
+
+## Optional
+
+- [Privacy](/privacy): Informativa privacy e trattamento dei dati.
+- [Cookie policy](/cookie-policy): Uso dei cookie e tecnologie di tracciamento.
+- [Termini](/termini): Termini di utilizzo del sito.

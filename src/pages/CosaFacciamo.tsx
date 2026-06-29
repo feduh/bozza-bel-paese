@@ -86,9 +86,10 @@ const CosaFacciamo = () => {
                 <div key={h} className="brutalist-card p-6 flex flex-col gap-3">
                   <div className="micro-label text-primary">0{i + 1}</div>
                   <Icon className="text-foreground" size={22} aria-hidden="true" />
-                  <h4 className="text-lg tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
+                  <h3 className="text-lg tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
                     {t(`what.how.${h}.title`)}
-                  </h4>
+                  </h3>
+
                   <p className="text-sm text-foreground/80 leading-relaxed">{t(`what.how.${h}.desc`)}</p>
                 </div>
               );
