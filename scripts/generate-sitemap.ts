@@ -65,8 +65,23 @@ async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
     });
   });
 
+  const { data: authors } = await supabase
+    .from("profiles")
+    .select("user_id, updated_at")
+    .eq("consent_public", true)
+    .limit(5000);
+  authors?.forEach((a: { user_id: string; updated_at?: string }) => {
+    entries.push({
+      path: `/autori/${a.user_id}`,
+      lastmod: a.updated_at?.slice(0, 10),
+      changefreq: "monthly",
+      priority: "0.5",
+    });
+  });
+
   return entries;
 }
+
 
 function generate(entries: SitemapEntry[]) {
   const urls = entries.map((e) =>
