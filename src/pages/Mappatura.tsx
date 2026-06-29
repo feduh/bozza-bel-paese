@@ -271,7 +271,9 @@ const Mappatura = () => {
           </p>
         </header>
 
+        <h2 className="sr-only">Filtri di ricerca</h2>
         <div className="mb-6 relative inline-block">
+
           <button
             onClick={() => setBucketMenuOpen((o) => !o)}
             aria-haspopup="menu"
