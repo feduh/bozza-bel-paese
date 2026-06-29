@@ -70,7 +70,7 @@ export default function RealityGalleryAdmin() {
 
   return (
     <div className="py-12">
-      <SEO title={`Galleria — ${reality.name}`} description="Gestisci le immagini della realtà" />
+      <SEO title={`Galleria — ${reality.name}`} description={`Gestisci la galleria immagini di ${reality.name} su Il Bel Paese: carica, ordina e rimuovi foto per raccontare visivamente questa realtà artistica indipendente.`} />
       <div className="editorial-container max-w-4xl">
         <Link
           to={`/realta/${reality.id}`}
