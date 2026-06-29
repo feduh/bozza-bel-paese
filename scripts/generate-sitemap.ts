@@ -19,11 +19,16 @@ const staticEntries: SitemapEntry[] = [
   { path: "/mappatura", changefreq: "weekly", priority: "0.9" },
   { path: "/la-rete", changefreq: "weekly", priority: "0.8" },
   { path: "/magazine", changefreq: "weekly", priority: "0.8" },
+  { path: "/blog", changefreq: "weekly", priority: "0.7" },
   { path: "/cosa-facciamo", changefreq: "monthly", priority: "0.7" },
+  { path: "/la-vostra-voce", changefreq: "monthly", priority: "0.6" },
   { path: "/segnala-realta", changefreq: "monthly", priority: "0.6" },
   { path: "/contatti", changefreq: "monthly", priority: "0.5" },
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+  { path: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
+  { path: "/termini", changefreq: "yearly", priority: "0.3" },
 ];
+
 
 async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
