@@ -89,7 +89,7 @@ const AutoreProfilo = () => {
   }
 
   return (
-    <div className="py-20">
+    <div className="bg-background py-16 md:py-20">
       <SEO
         title={profile.display_name}
         description={profile.bio || `Profilo di ${profile.display_name} su Il Bel Paese.`}
