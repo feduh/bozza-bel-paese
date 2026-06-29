@@ -10,7 +10,7 @@ const LaVostraVoce = () => {
         description="Interviste e testimonianze orali della scena indipendente italiana, in collaborazione con radio e piattaforme podcast indipendenti."
         canonicalPath="/la-vostra-voce"
       />
-      <div className="editorial-container max-w-4xl space-y-12 md:space-y-16">
+      <div className="editorial-container space-y-12 md:space-y-16">
         <header className="border-b-2 border-foreground pb-10">
           <h1 className="editorial-heading mb-6">
             La <span className="text-primary">vostra</span> voce
