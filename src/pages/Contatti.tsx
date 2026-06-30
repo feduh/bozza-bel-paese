@@ -56,7 +56,7 @@ const Contatti = () => {
             <span className="text-primary">SCRIVICI</span>&nbsp;<br className="md:hidden" />
             DUE RIGHE
           </h1>
-          <p className="editorial-body text-foreground/80 max-w-3xl">
+          <p className="editorial-body text-foreground/80">
             Per collaborazioni, proposte editoriali, segnalazioni o semplicemente per scambiare due parole:
             accogliamo ogni tipo di messaggio.
           </p>

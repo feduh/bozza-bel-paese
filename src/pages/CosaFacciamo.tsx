@@ -33,7 +33,7 @@ const CosaFacciamo = () => {
           <h1 className="editorial-heading mb-6">
             {t("what.title")} <span className="text-primary">{t("what.titleAccent")}</span>
           </h1>
-          <div className="editorial-body text-foreground/80 space-y-4 max-w-3xl">
+          <div className="editorial-body text-foreground/80 space-y-4">
             <p>
               <Trans i18nKey="what.intro_html" components={{ strong: <strong className="text-foreground" /> }} />
             </p>

@@ -61,16 +61,7 @@ const Footer = () => {
           <p>© {new Date().getFullYear()} Il Bel Paese. {t("footer.rights")}</p>
           <p>
             Sito realizzato da{" "}
-            <span className="font-medium text-foreground">Federica Gaglianone</span> con{" "}
-            <a
-              href="https://lovable.dev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Lovable
-            </a>
-            .
+            <span className="font-medium text-foreground">Federica Gaglianone</span>.
           </p>
         </div>
       </div>
