@@ -145,8 +145,7 @@ const PanelRealta = ({ isAdmin, pending, onCreated }: Props) => {
         )}
       </div>
 
-      {(
-        <div className="pt-8 border-t border-border")
+      <div className="pt-8 border-t border-border">
           <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
             <Pencil size={18} /> Modifica realtà esistenti
           </h3>
@@ -199,8 +198,7 @@ const PanelRealta = ({ isAdmin, pending, onCreated }: Props) => {
           <p className="mt-3 text-xs text-muted-foreground font-body">
             Massimo 50 risultati. Affina la ricerca per nome.
           </p>
-        </div>
-      )}
+      </div>
     </section>
   );
 };
