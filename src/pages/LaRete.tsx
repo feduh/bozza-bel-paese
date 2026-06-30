@@ -114,13 +114,13 @@ const LaRete = () => {
         description="Coordinatori, autori e contributor che animano Il Bel Paese."
         canonicalPath="/la-rete"
       />
-      <div className="editorial-container max-w-6xl space-y-16 md:space-y-20">
+      <div className="editorial-container space-y-16 md:space-y-20">
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
           <h1 className="editorial-heading mb-6">
             La nostra <span className="text-primary">rete</span>
           </h1>
-          <div className="space-y-3 editorial-body text-foreground/80 max-w-3xl">
+          <div className="space-y-3 editorial-body text-foreground/80">
             <p><em>Il Bel Paese</em> vive perché la rete lo nutre, e viceversa.</p>
             <p>Aiutaci a costruire un racconto che rispetti le condizioni di chi alimenta da dentro questo sistema.</p>
           </div>

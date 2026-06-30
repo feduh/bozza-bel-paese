@@ -214,9 +214,8 @@ const DroneHero = () => {
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-4 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] pointer-events-none">
         <div className="flex items-center gap-2 text-[#8B5CFF]">
           <span className="w-2 h-2 bg-[#8B5CFF] rounded-full animate-pulse" />
-          Drone · IT · Live
+          IT · Live
         </div>
-        <div className="text-[#8B5CFF]/70 hidden md:block">MMXXVI</div>
       </div>
 
       {/* manifesto */}

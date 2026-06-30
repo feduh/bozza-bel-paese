@@ -155,8 +155,7 @@ const Index = () => {
         {/* ============ WORDMARK FOOTER ACCENT ============ */}
         <div className="w-full flex flex-wrap justify-between items-center gap-2 text-xs uppercase tracking-[0.4em] border-b-2 border-foreground pb-3">
           <span style={{ fontVariationSettings: "'wght' 700" }}>ILBELPAESE</span>
-          <span className="text-muted-foreground hidden sm:inline">Italian Art Archive</span>
-          <span className="text-muted-foreground">MMXXVI</span>
+          <span className="text-muted-foreground">Scena indipendente italiana</span>
         </div>
       </div>
     </div>
