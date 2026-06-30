@@ -22,17 +22,17 @@ const Footer = () => {
   return (
     <footer className="border-t border-border bg-card py-12 mt-20">
       <div className="editorial-container">
-        <div className="grid md:grid-cols-4 gap-8">
-          <div>
+        <div className="grid md:grid-cols-12 gap-8 md:gap-12">
+          <div className="md:col-span-5 md:pr-8">
             <div className="flex items-center gap-2 mb-3">
               <LogoPittogramma className="w-7 h-7 text-foreground" flameClassName="text-foreground" />
               <h3 className="font-display text-lg font-bold text-foreground tracking-tight uppercase">ILBELPAESE</h3>
             </div>
-            <p className="font-body text-sm text-muted-foreground leading-relaxed">
+            <p className="font-body text-sm text-muted-foreground leading-relaxed max-w-sm">
               {t("footer.tagline")}
             </p>
           </div>
-          <div>
+          <div className="md:col-span-3">
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.navigation")}</h4>
             <div className="space-y-2">
               {navLinks.map((l) => (
@@ -42,7 +42,7 @@ const Footer = () => {
               ))}
             </div>
           </div>
-          <div>
+          <div className="md:col-span-2">
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.legal")}</h4>
             <div className="space-y-2">
               {legalLinks.map((l) => (
@@ -52,9 +52,9 @@ const Footer = () => {
               ))}
             </div>
           </div>
-          <div>
+          <div className="md:col-span-2">
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.contacts")}</h4>
-            <p className="text-sm text-muted-foreground">info@ilbelpaese.it</p>
+            <p className="text-sm text-muted-foreground break-words">info@ilbelpaese.it</p>
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-1">
