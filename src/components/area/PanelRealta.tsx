@@ -29,7 +29,6 @@ const PanelRealta = ({ isAdmin, pending, onCreated }: Props) => {
   const [loadingList, setLoadingList] = useState(false);
 
   useEffect(() => {
-    if (!isAdmin) return;
     let alive = true;
     setLoadingList(true);
     const handle = setTimeout(async () => {
@@ -146,8 +145,8 @@ const PanelRealta = ({ isAdmin, pending, onCreated }: Props) => {
         )}
       </div>
 
-      {isAdmin && (
-        <div className="pt-8 border-t border-border">
+      {(
+        <div className="pt-8 border-t border-border")
           <h3 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
             <Pencil size={18} /> Modifica realtà esistenti
           </h3>
