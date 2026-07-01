@@ -27,13 +27,23 @@ const ZOOM = 4.2;
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
   const panelRef = useRef<HTMLDivElement>(null);
-  // focus normalizzato 0..1 nel viewBox dell'Italia (dove la "telecamera" guarda)
   const target = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const current = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [playMode, setPlayMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const update = () => setIsTouchDevice(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
 
   useEffect(() => {
     if (!panelRef.current) return;
@@ -137,10 +147,12 @@ const DroneHero = () => {
 
   const rocketRotation = cursor.current.angle;
 
+  const touchActive = !isTouchDevice || playMode;
+
   return (
     <div
       ref={panelRef}
-      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none touch-none"
+      className={`relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none ${touchActive ? "touch-none" : ""}`}
       style={{ cursor: hovering ? "none" : "auto" }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
@@ -149,11 +161,12 @@ const DroneHero = () => {
         target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
+      onTouchStart={touchActive ? handleTouchStart : undefined}
+      onTouchMove={touchActive ? handleTouchMove : undefined}
+      onTouchEnd={touchActive ? handleTouchEnd : undefined}
+      onTouchCancel={touchActive ? handleTouchEnd : undefined}
     >
+
       <svg
         viewBox={`0 0 ${panel.w} ${panel.h}`}
         className="absolute inset-0 w-full h-full"
@@ -282,7 +295,41 @@ const DroneHero = () => {
           />
         </div>
       )}
+
+      {/* toggle interazione razzo — solo su touch device */}
+      {isTouchDevice && (
+        <div className="absolute right-4 bottom-4 z-30 flex flex-col items-end gap-1.5 pointer-events-auto">
+          {playMode ? (
+            <button
+              type="button"
+              onClick={() => {
+                setPlayMode(false);
+                setHovering(false);
+                target.current.x = PIEMONTE.x;
+                target.current.y = PIEMONTE.y;
+              }}
+              className="bg-secondary text-secondary-foreground border-2 border-secondary px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+            >
+              Chiudi gioco
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setPlayMode(true)}
+                className="bg-transparent text-background border-2 border-background/60 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+              >
+                Gioca col razzo
+              </button>
+              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-background/50">
+                Muovi il dito sulla mappa
+              </span>
+            </>
+          )}
+        </div>
+      )}
     </div>
+
   );
 };
 
