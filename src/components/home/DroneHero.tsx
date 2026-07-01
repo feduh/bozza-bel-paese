@@ -27,13 +27,23 @@ const ZOOM = 4.2;
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
   const panelRef = useRef<HTMLDivElement>(null);
-  // focus normalizzato 0..1 nel viewBox dell'Italia (dove la "telecamera" guarda)
   const target = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const current = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [playMode, setPlayMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const update = () => setIsTouchDevice(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
 
   useEffect(() => {
     if (!panelRef.current) return;
