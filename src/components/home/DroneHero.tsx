@@ -295,7 +295,41 @@ const DroneHero = () => {
           />
         </div>
       )}
+
+      {/* toggle interazione razzo — solo su touch device */}
+      {isTouchDevice && (
+        <div className="absolute right-4 bottom-4 z-30 flex flex-col items-end gap-1.5 pointer-events-auto">
+          {playMode ? (
+            <button
+              type="button"
+              onClick={() => {
+                setPlayMode(false);
+                setHovering(false);
+                target.current.x = PIEMONTE.x;
+                target.current.y = PIEMONTE.y;
+              }}
+              className="bg-secondary text-secondary-foreground border-2 border-secondary px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+            >
+              Chiudi gioco
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setPlayMode(true)}
+                className="bg-transparent text-background border-2 border-background/60 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+              >
+                Gioca col razzo
+              </button>
+              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-background/50">
+                Muovi il dito sulla mappa
+              </span>
+            </>
+          )}
+        </div>
+      )}
     </div>
+
   );
 };
 
