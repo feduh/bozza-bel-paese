@@ -147,10 +147,12 @@ const DroneHero = () => {
 
   const rocketRotation = cursor.current.angle;
 
+  const touchActive = !isTouchDevice || playMode;
+
   return (
     <div
       ref={panelRef}
-      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none touch-none"
+      className={`relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none ${touchActive ? "touch-none" : ""}`}
       style={{ cursor: hovering ? "none" : "auto" }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
@@ -159,11 +161,12 @@ const DroneHero = () => {
         target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
+      onTouchStart={touchActive ? handleTouchStart : undefined}
+      onTouchMove={touchActive ? handleTouchMove : undefined}
+      onTouchEnd={touchActive ? handleTouchEnd : undefined}
+      onTouchCancel={touchActive ? handleTouchEnd : undefined}
     >
+
       <svg
         viewBox={`0 0 ${panel.w} ${panel.h}`}
         className="absolute inset-0 w-full h-full"
