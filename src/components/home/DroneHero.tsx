@@ -296,10 +296,26 @@ const DroneHero = () => {
         </div>
       )}
 
-      {/* toggle interazione razzo — solo su touch device */}
+      {/* toggle interazione razzo — solo su touch device, minimal e centrale */}
       {isTouchDevice && (
-        <div className="absolute right-4 bottom-4 z-30 flex flex-col items-end gap-1.5 pointer-events-auto">
-          {playMode ? (
+        <>
+          {!playMode && (
+            <button
+              type="button"
+              onClick={() => setPlayMode(true)}
+              aria-label="Attiva l'interazione con il razzo"
+              className="absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-1 bg-transparent p-2 pointer-events-auto opacity-60 active:opacity-100"
+            >
+              <LogoPittogramma
+                className="w-8 h-8 text-secondary"
+                flameClassName="text-[#FF8C00]"
+              />
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-background/70">
+                tap
+              </span>
+            </button>
+          )}
+          {playMode && (
             <button
               type="button"
               onClick={() => {
@@ -308,26 +324,15 @@ const DroneHero = () => {
                 target.current.x = PIEMONTE.x;
                 target.current.y = PIEMONTE.y;
               }}
-              className="bg-secondary text-secondary-foreground border-2 border-secondary px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+              aria-label="Chiudi interazione razzo"
+              className="absolute right-3 top-3 z-30 font-mono text-[9px] uppercase tracking-[0.2em] text-background/70 bg-background/10 px-2 py-1 pointer-events-auto"
             >
-              Chiudi gioco
+              Chiudi
             </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => setPlayMode(true)}
-                className="bg-transparent text-background border-2 border-background/60 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.18em]"
-              >
-                Gioca col razzo
-              </button>
-              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-background/50">
-                Muovi il dito sulla mappa
-              </span>
-            </>
           )}
-        </div>
+        </>
       )}
+
     </div>
 
   );
