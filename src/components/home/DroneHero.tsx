@@ -35,6 +35,10 @@ const DroneHero = () => {
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [playMode, setPlayMode] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const lastInteraction = useRef<number>(Date.now());
+  const idleTimer = useRef<number | null>(null);
+  const hintTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -58,8 +62,11 @@ const DroneHero = () => {
   // rAF smoothing
   useEffect(() => {
     let raf = 0;
+    let t0 = performance.now();
     const tick = () => {
       raf = requestAnimationFrame(tick);
+      const now = performance.now();
+      const t = (now - t0) / 1000;
       current.current.x += (target.current.x - current.current.x) * 0.07;
       current.current.y += (target.current.y - current.current.y) * 0.07;
 
@@ -69,22 +76,29 @@ const DroneHero = () => {
       const dy = c.y - c.lastY;
       c.lastX = c.x;
       c.lastY = c.y;
-      c.svx += (dx - c.svx) * 0.18;
-      c.svy += (dy - c.svy) * 0.18;
+      c.svx += (dx - c.svx) * 0.28;
+      c.svy += (dy - c.svy) * 0.28;
       const speed = Math.hypot(c.svx, c.svy);
-      if (speed > 1.2) {
+      if (speed > 0.6) {
         const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
         const diff = ((targetAngle - c.angle + 540) % 360) - 180;
-        const ease = Math.min(0.25, 0.06 + speed * 0.01);
+        const ease = Math.min(0.32, 0.10 + speed * 0.015);
         c.angle += diff * ease;
+      } else if (playMode && hovering) {
+        // micro-oscillazione a riposo (razzo in hovering)
+        const idle = Math.sin(t * 1.4) * 0.6;
+        c.angle += (idle - (c.angle - (c.angle | 0))) * 0.02;
       }
-      // else: tieni l'ultimo angolo (no jitter quando quasi fermo)
 
       force((n) => (n + 1) & 1023);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [playMode, hovering]);
+
+  const bumpActivity = () => {
+    lastInteraction.current = Date.now();
+  };
 
   const updateFromPoint = (clientX: number, clientY: number) => {
     const rect = panelRef.current?.getBoundingClientRect();
@@ -97,6 +111,7 @@ const DroneHero = () => {
     const ny = Math.min(1, Math.max(0, y / rect.height));
     target.current.x = 0.42 + nx * 0.18;
     target.current.y = 0.60 + ny * 0.22;
+    bumpActivity();
   };
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -122,10 +137,42 @@ const DroneHero = () => {
   };
 
   const handleTouchEnd = () => {
-    setHovering(false);
-    target.current.x = PIEMONTE.x;
-    target.current.y = PIEMONTE.y;
+    // razzo persiste alla posizione corrente (non torna a Piemonte, non scompare)
+    bumpActivity();
   };
+
+  // auto-exit dopo 15s di inattività in playMode (C)
+  useEffect(() => {
+    if (!playMode) return;
+    bumpActivity();
+    const check = window.setInterval(() => {
+      if (Date.now() - lastInteraction.current > 15000) {
+        setPlayMode(false);
+        setHovering(false);
+        target.current.x = PIEMONTE.x;
+        target.current.y = PIEMONTE.y;
+      }
+    }, 1000);
+    idleTimer.current = check;
+    return () => {
+      if (idleTimer.current) window.clearInterval(idleTimer.current);
+    };
+  }, [playMode]);
+
+  // hint iniziale 2s alla prima attivazione (D)
+  useEffect(() => {
+    if (!playMode) {
+      setShowHint(false);
+      if (hintTimer.current) window.clearTimeout(hintTimer.current);
+      return;
+    }
+    setShowHint(true);
+    hintTimer.current = window.setTimeout(() => setShowHint(false), 2200);
+    return () => {
+      if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    };
+  }, [playMode]);
+
 
   // ---- rotating word ----
   const [wordIdx, setWordIdx] = useState(0);
@@ -302,36 +349,53 @@ const DroneHero = () => {
           {!playMode && (
             <button
               type="button"
-              onClick={() => setPlayMode(true)}
+              onClick={() => {
+                setPlayMode(true);
+                // posiziona il razzo al centro visivo del pannello
+                cursor.current.x = panel.w / 2;
+                cursor.current.y = panel.h / 2;
+                cursor.current.lastX = panel.w / 2;
+                cursor.current.lastY = panel.h / 2;
+                setHovering(true);
+                bumpActivity();
+              }}
               aria-label="Attiva l'interazione con il razzo"
-              className="absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-1 bg-transparent p-2 pointer-events-auto opacity-60 active:opacity-100"
+              className="absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2 bg-transparent p-2 pointer-events-auto"
             >
               <LogoPittogramma
-                className="w-8 h-8 text-secondary"
-                flameClassName="text-[#FF8C00]"
+                className="w-12 h-12 text-secondary drop-shadow-[0_0_10px_hsl(var(--secondary)/0.7)]"
+                flameClassName="text-[#FF8C00] drop-shadow-[0_0_6px_rgba(255,140,0,0.8)]"
               />
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-background/70">
+              <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-background font-bold">
                 tap
               </span>
             </button>
           )}
           {playMode && (
-            <button
-              type="button"
-              onClick={() => {
-                setPlayMode(false);
-                setHovering(false);
-                target.current.x = PIEMONTE.x;
-                target.current.y = PIEMONTE.y;
-              }}
-              aria-label="Chiudi interazione razzo"
-              className="absolute right-3 top-3 z-30 font-mono text-[9px] uppercase tracking-[0.2em] text-background/70 bg-background/10 px-2 py-1 pointer-events-auto"
-            >
-              Chiudi
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setPlayMode(false);
+                  setHovering(false);
+                  target.current.x = PIEMONTE.x;
+                  target.current.y = PIEMONTE.y;
+                }}
+                aria-label="Esci dall'interazione razzo"
+                className="absolute right-3 top-3 z-30 font-mono text-xs uppercase tracking-[0.25em] font-bold text-foreground bg-[#FF8C00] px-3 py-2 pointer-events-auto border-2 border-[#FF8C00] shadow-[0_0_16px_rgba(255,140,0,0.6)] active:scale-95 transition-transform"
+              >
+                Exit
+              </button>
+              {showHint && (
+                <div className="absolute left-1/2 top-6 -translate-x-1/2 z-30 pointer-events-none font-mono text-[10px] uppercase tracking-[0.25em] text-background bg-foreground/60 px-3 py-1.5 animate-fade-in">
+                  Muovi il dito per pilotare
+                </div>
+              )}
+            </>
           )}
         </>
       )}
+
 
     </div>
 
