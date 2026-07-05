@@ -349,36 +349,53 @@ const DroneHero = () => {
           {!playMode && (
             <button
               type="button"
-              onClick={() => setPlayMode(true)}
+              onClick={() => {
+                setPlayMode(true);
+                // posiziona il razzo al centro visivo del pannello
+                cursor.current.x = panel.w / 2;
+                cursor.current.y = panel.h / 2;
+                cursor.current.lastX = panel.w / 2;
+                cursor.current.lastY = panel.h / 2;
+                setHovering(true);
+                bumpActivity();
+              }}
               aria-label="Attiva l'interazione con il razzo"
-              className="absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-1 bg-transparent p-2 pointer-events-auto opacity-60 active:opacity-100"
+              className="absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2 bg-transparent p-2 pointer-events-auto"
             >
               <LogoPittogramma
-                className="w-8 h-8 text-secondary"
-                flameClassName="text-[#FF8C00]"
+                className="w-12 h-12 text-secondary drop-shadow-[0_0_10px_hsl(var(--secondary)/0.7)]"
+                flameClassName="text-[#FF8C00] drop-shadow-[0_0_6px_rgba(255,140,0,0.8)]"
               />
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-background/70">
+              <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-background font-bold">
                 tap
               </span>
             </button>
           )}
           {playMode && (
-            <button
-              type="button"
-              onClick={() => {
-                setPlayMode(false);
-                setHovering(false);
-                target.current.x = PIEMONTE.x;
-                target.current.y = PIEMONTE.y;
-              }}
-              aria-label="Chiudi interazione razzo"
-              className="absolute right-3 top-3 z-30 font-mono text-[9px] uppercase tracking-[0.2em] text-background/70 bg-background/10 px-2 py-1 pointer-events-auto"
-            >
-              Chiudi
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setPlayMode(false);
+                  setHovering(false);
+                  target.current.x = PIEMONTE.x;
+                  target.current.y = PIEMONTE.y;
+                }}
+                aria-label="Esci dall'interazione razzo"
+                className="absolute right-3 top-3 z-30 font-mono text-xs uppercase tracking-[0.25em] font-bold text-foreground bg-[#FF8C00] px-3 py-2 pointer-events-auto border-2 border-[#FF8C00] shadow-[0_0_16px_rgba(255,140,0,0.6)] active:scale-95 transition-transform"
+              >
+                Exit
+              </button>
+              {showHint && (
+                <div className="absolute left-1/2 top-6 -translate-x-1/2 z-30 pointer-events-none font-mono text-[10px] uppercase tracking-[0.25em] text-background bg-foreground/60 px-3 py-1.5 animate-fade-in">
+                  Muovi il dito per pilotare
+                </div>
+              )}
+            </>
           )}
         </>
       )}
+
 
     </div>
 
