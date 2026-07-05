@@ -24,17 +24,22 @@ const ROTATING_WORDS = [
 const PIEMONTE = { x: 0.475, y: 0.655 }; // normalizzato nel viewBox Europa (Mercator)
 const ZOOM = 4.2;
 
+const AUTO_EXIT_MS = 15000;
+
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
   const panelRef = useRef<HTMLDivElement>(null);
   const target = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const current = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
+  const restingRef = useRef(false);
+  const lastInteractionRef = useRef(Date.now());
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [playMode, setPlayMode] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -44,6 +49,38 @@ const DroneHero = () => {
     mq.addEventListener?.("change", update);
     return () => mq.removeEventListener?.("change", update);
   }, []);
+
+  // ---- exit playMode helper ----
+  const exitPlayMode = () => {
+    setPlayMode(false);
+    setHovering(false);
+    restingRef.current = false;
+    target.current.x = PIEMONTE.x;
+    target.current.y = PIEMONTE.y;
+  };
+
+  // ---- D: initial hint on activation ----
+  useEffect(() => {
+    if (!playMode) {
+      setShowHint(false);
+      return;
+    }
+    setShowHint(true);
+    const t = setTimeout(() => setShowHint(false), 2200);
+    return () => clearTimeout(t);
+  }, [playMode]);
+
+  // ---- C: auto-exit after inactivity ----
+  useEffect(() => {
+    if (!playMode) return;
+    lastInteractionRef.current = Date.now();
+    const id = setInterval(() => {
+      if (Date.now() - lastInteractionRef.current > AUTO_EXIT_MS) {
+        exitPlayMode();
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [playMode]);
 
   useEffect(() => {
     if (!panelRef.current) return;
