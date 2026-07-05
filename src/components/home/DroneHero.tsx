@@ -375,6 +375,7 @@ const DroneHero = () => {
             <>
               <button
                 type="button"
+                onMouseEnter={() => setHovering(false)}
                 onClick={() => {
                   setPlayMode(false);
                   setHovering(false);
@@ -382,6 +383,7 @@ const DroneHero = () => {
                   target.current.y = PIEMONTE.y;
                 }}
                 aria-label="Esci dall'interazione razzo"
+                style={{ cursor: "pointer" }}
                 className="absolute right-3 top-3 z-30 font-mono text-xs uppercase tracking-[0.25em] font-bold text-foreground bg-[#FF8C00] px-3 py-2 pointer-events-auto border-2 border-[#FF8C00] shadow-[0_0_16px_rgba(255,140,0,0.6)] active:scale-95 transition-transform"
               >
                 Exit
