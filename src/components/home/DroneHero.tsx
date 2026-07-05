@@ -24,22 +24,17 @@ const ROTATING_WORDS = [
 const PIEMONTE = { x: 0.475, y: 0.655 }; // normalizzato nel viewBox Europa (Mercator)
 const ZOOM = 4.2;
 
-const AUTO_EXIT_MS = 15000;
-
 const DroneHero = () => {
   // ---- parallax state (smoothed) ----
   const panelRef = useRef<HTMLDivElement>(null);
   const target = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const current = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
-  const restingRef = useRef(false);
-  const lastInteractionRef = useRef(Date.now());
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [playMode, setPlayMode] = useState(false);
-  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -49,38 +44,6 @@ const DroneHero = () => {
     mq.addEventListener?.("change", update);
     return () => mq.removeEventListener?.("change", update);
   }, []);
-
-  // ---- exit playMode helper ----
-  const exitPlayMode = () => {
-    setPlayMode(false);
-    setHovering(false);
-    restingRef.current = false;
-    target.current.x = PIEMONTE.x;
-    target.current.y = PIEMONTE.y;
-  };
-
-  // ---- D: initial hint on activation ----
-  useEffect(() => {
-    if (!playMode) {
-      setShowHint(false);
-      return;
-    }
-    setShowHint(true);
-    const t = setTimeout(() => setShowHint(false), 2200);
-    return () => clearTimeout(t);
-  }, [playMode]);
-
-  // ---- C: auto-exit after inactivity ----
-  useEffect(() => {
-    if (!playMode) return;
-    lastInteractionRef.current = Date.now();
-    const id = setInterval(() => {
-      if (Date.now() - lastInteractionRef.current > AUTO_EXIT_MS) {
-        exitPlayMode();
-      }
-    }, 1000);
-    return () => clearInterval(id);
-  }, [playMode]);
 
   useEffect(() => {
     if (!panelRef.current) return;
@@ -106,28 +69,16 @@ const DroneHero = () => {
       const dy = c.y - c.lastY;
       c.lastX = c.x;
       c.lastY = c.y;
-      c.svx += (dx - c.svx) * 0.28;
-      c.svy += (dy - c.svy) * 0.28;
+      c.svx += (dx - c.svx) * 0.18;
+      c.svy += (dy - c.svy) * 0.18;
       const speed = Math.hypot(c.svx, c.svy);
-      if (speed > 0.6) {
+      if (speed > 1.2) {
         const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
         const diff = ((targetAngle - c.angle + 540) % 360) - 180;
-        const ease = Math.min(0.35, 0.1 + speed * 0.015);
+        const ease = Math.min(0.25, 0.06 + speed * 0.01);
         c.angle += diff * ease;
       }
       // else: tieni l'ultimo angolo (no jitter quando quasi fermo)
-
-      // B: micro-oscillazione quando il razzo è "a riposo" (in playMode, dito alzato)
-      if (restingRef.current) {
-        const t = performance.now() / 1000;
-        const ox = Math.sin(t * 1.3) * 3;
-        const oy = Math.cos(t * 1.1) * 3;
-        c.x += (c.x - c.lastX) * 0; // no-op, keep lastX sync
-        // apply oscillation to visual position via cursor.x/y offsets
-        // (we don't move target: solo il razzo galleggia dolcemente)
-        c.x = c.lastX + ox;
-        c.y = c.lastY + oy;
-      }
 
       force((n) => (n + 1) & 1023);
     };
@@ -146,7 +97,6 @@ const DroneHero = () => {
     const ny = Math.min(1, Math.max(0, y / rect.height));
     target.current.x = 0.42 + nx * 0.18;
     target.current.y = 0.60 + ny * 0.22;
-    lastInteractionRef.current = Date.now();
   };
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -157,7 +107,6 @@ const DroneHero = () => {
     const t = e.touches[0];
     if (!t) return;
     setHovering(true);
-    restingRef.current = false;
     const rect = panelRef.current?.getBoundingClientRect();
     if (rect) {
       cursor.current.lastX = t.clientX - rect.left;
@@ -173,18 +122,9 @@ const DroneHero = () => {
   };
 
   const handleTouchEnd = () => {
-    // razzo persistente: resta visibile in position, galleggia leggermente
-    if (playMode) {
-      // ancora l'oscillazione all'ultima posizione toccata
-      cursor.current.lastX = cursor.current.x;
-      cursor.current.lastY = cursor.current.y;
-      restingRef.current = true;
-      lastInteractionRef.current = Date.now();
-    } else {
-      setHovering(false);
-      target.current.x = PIEMONTE.x;
-      target.current.y = PIEMONTE.y;
-    }
+    setHovering(false);
+    target.current.x = PIEMONTE.x;
+    target.current.y = PIEMONTE.y;
   };
 
   // ---- rotating word ----
