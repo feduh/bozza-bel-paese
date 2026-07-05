@@ -35,6 +35,10 @@ const DroneHero = () => {
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [playMode, setPlayMode] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const lastInteraction = useRef<number>(Date.now());
+  const idleTimer = useRef<number | null>(null);
+  const hintTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
