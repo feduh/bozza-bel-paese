@@ -6,8 +6,8 @@ import LogoPittogramma from "@/components/LogoPittogramma";
 
 /**
  * DroneHero — hero editoriale con mappa vettoriale dell'Europa
- * che reagisce in parallasse al movimento del cursore-razzo.
- * Nessun pin reale, nessuna query al database: è puro racconto visivo.
+ * che reagisce in parallasse al movimento del cursore-razzo (desktop),
+ * oppure vola in autoplay tra città italiane ed europee (mobile/touch).
  */
 
 const { W: VB_W, H: VB_H } = EUROPE_VB;
@@ -21,24 +21,43 @@ const ROTATING_WORDS = [
 ];
 
 // punto di partenza (Piemonte) e zoom della mappa — su Europa, Italia in primo piano
-const PIEMONTE = { x: 0.475, y: 0.655 }; // normalizzato nel viewBox Europa (Mercator)
+const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
 
+// Waypoint autoplay per touch device — coordinate normalizzate nel viewBox Europa.
+// dwell = ms di sosta "hovering" sopra la scena.
+type Waypoint = { x: number; y: number; dwell: number; name: string };
+const AUTOPLAY_ROUTE: Waypoint[] = [
+  { x: 0.475, y: 0.655, dwell: 900, name: "Torino" },
+  { x: 0.495, y: 0.650, dwell: 700, name: "Milano" },
+  { x: 0.525, y: 0.660, dwell: 600, name: "Venezia" },
+  { x: 0.515, y: 0.685, dwell: 500, name: "Bologna" },
+  { x: 0.520, y: 0.710, dwell: 700, name: "Firenze" },
+  { x: 0.540, y: 0.750, dwell: 1100, name: "Roma" },
+  { x: 0.560, y: 0.780, dwell: 700, name: "Napoli" },
+  { x: 0.555, y: 0.840, dwell: 800, name: "Palermo" },
+  { x: 0.500, y: 0.830, dwell: 600, name: "Cagliari" },
+  { x: 0.435, y: 0.680, dwell: 500, name: "Marsiglia" },
+  { x: 0.410, y: 0.560, dwell: 700, name: "Parigi" },
+  { x: 0.485, y: 0.680, dwell: 500, name: "Genova" },
+  { x: 0.560, y: 0.500, dwell: 800, name: "Berlino" },
+  { x: 0.590, y: 0.580, dwell: 600, name: "Vienna" },
+  { x: 0.545, y: 0.660, dwell: 500, name: "Trieste" },
+];
+
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
 const DroneHero = () => {
-  // ---- parallax state (smoothed) ----
   const panelRef = useRef<HTMLDivElement>(null);
   const target = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const current = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
+  const lastTarget = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const [, force] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [playMode, setPlayMode] = useState(false);
-  const [showHint, setShowHint] = useState(false);
-  const lastInteraction = useRef<number>(Date.now());
-  const idleTimer = useRef<number | null>(null);
-  const hintTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -59,7 +78,59 @@ const DroneHero = () => {
     return () => ro.disconnect();
   }, []);
 
-  // rAF smoothing
+  // Autoplay: pilota target.current lungo la rotta su touch device
+  useEffect(() => {
+    if (!isTouchDevice) return;
+    let raf = 0;
+    let idx = 0;
+    let phase: "travel" | "dwell" = "travel";
+    let phaseStart = performance.now();
+    let from = { x: target.current.x, y: target.current.y };
+    let to = AUTOPLAY_ROUTE[0];
+    let travelDur = 2000;
+
+    const nextLeg = (now: number) => {
+      from = { x: to.x, y: to.y };
+      idx = (idx + 1) % AUTOPLAY_ROUTE.length;
+      to = AUTOPLAY_ROUTE[idx];
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const dist = Math.hypot(dx, dy);
+      // durata proporzionale alla distanza + jitter ±15%
+      const jitter = 0.85 + Math.random() * 0.3;
+      travelDur = (1400 + dist * 4200) * jitter;
+      phase = "travel";
+      phaseStart = now;
+    };
+
+    const step = () => {
+      raf = requestAnimationFrame(step);
+      const now = performance.now();
+      if (phase === "travel") {
+        const t = Math.min(1, (now - phaseStart) / travelDur);
+        const e = easeInOutCubic(t);
+        target.current.x = from.x + (to.x - from.x) * e;
+        target.current.y = from.y + (to.y - from.y) * e;
+        if (t >= 1) {
+          phase = "dwell";
+          phaseStart = now;
+        }
+      } else {
+        // micro-oscillazione durante la sosta
+        const osc = (now - phaseStart) / 1000;
+        target.current.x = to.x + Math.sin(osc * 1.7) * 0.0025;
+        target.current.y = to.y + Math.cos(osc * 1.3) * 0.0018;
+        if (now - phaseStart >= to.dwell) {
+          nextLeg(now);
+        }
+      }
+    };
+
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [isTouchDevice]);
+
+  // rAF smoothing + angolo razzo
   useEffect(() => {
     let raf = 0;
     let t0 = performance.now();
@@ -70,109 +141,75 @@ const DroneHero = () => {
       current.current.x += (target.current.x - current.current.x) * 0.07;
       current.current.y += (target.current.y - current.current.y) * 0.07;
 
-      // smoothed velocity (low-pass), derive angle only above threshold
       const c = cursor.current;
-      const dx = c.x - c.lastX;
-      const dy = c.y - c.lastY;
-      c.lastX = c.x;
-      c.lastY = c.y;
-      c.svx += (dx - c.svx) * 0.28;
-      c.svy += (dy - c.svy) * 0.28;
-      const speed = Math.hypot(c.svx, c.svy);
-      if (speed > 0.6) {
-        const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
-        const diff = ((targetAngle - c.angle + 540) % 360) - 180;
-        const ease = Math.min(0.32, 0.10 + speed * 0.015);
-        c.angle += diff * ease;
-      } else if (playMode && hovering) {
-        // micro-oscillazione a riposo (razzo in hovering)
-        const idle = Math.sin(t * 1.4) * 0.6;
-        c.angle += (idle - (c.angle - (c.angle | 0))) * 0.02;
+
+      if (isTouchDevice) {
+        // razzo ancorato al centro del pannello, angolo derivato dal moto del target
+        const cx = panel.w / 2;
+        const cy = panel.h / 2;
+        // piccolo drift sinusoidale per dare vita
+        c.x = cx + Math.sin(t * 0.9) * 6;
+        c.y = cy + Math.cos(t * 1.1) * 5;
+
+        // delta target proiettato in pixel-space per il calcolo angolo
+        const dtx = (target.current.x - lastTarget.current.x) * panel.w * 40;
+        const dty = (target.current.y - lastTarget.current.y) * panel.h * 40;
+        lastTarget.current.x = target.current.x;
+        lastTarget.current.y = target.current.y;
+        c.svx += (dtx - c.svx) * 0.28;
+        c.svy += (dty - c.svy) * 0.28;
+        const speed = Math.hypot(c.svx, c.svy);
+        if (speed > 0.6) {
+          const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
+          const diff = ((targetAngle - c.angle + 540) % 360) - 180;
+          const ease = Math.min(0.28, 0.08 + speed * 0.012);
+          c.angle += diff * ease;
+        } else {
+          // hovering idle
+          const idle = Math.sin(t * 1.4) * 0.6;
+          c.angle += idle * 0.02;
+        }
+      } else {
+        // desktop: derivazione dal cursore
+        const dx = c.x - c.lastX;
+        const dy = c.y - c.lastY;
+        c.lastX = c.x;
+        c.lastY = c.y;
+        c.svx += (dx - c.svx) * 0.28;
+        c.svy += (dy - c.svy) * 0.28;
+        const speed = Math.hypot(c.svx, c.svy);
+        if (speed > 0.6) {
+          const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
+          const diff = ((targetAngle - c.angle + 540) % 360) - 180;
+          const ease = Math.min(0.32, 0.10 + speed * 0.015);
+          c.angle += diff * ease;
+        }
       }
 
       force((n) => (n + 1) & 1023);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playMode, hovering]);
+  }, [isTouchDevice, panel.w, panel.h]);
 
-  const bumpActivity = () => {
-    lastInteraction.current = Date.now();
-  };
+  // Su touch device il razzo è sempre visibile
+  useEffect(() => {
+    if (isTouchDevice) setHovering(true);
+  }, [isTouchDevice]);
 
-  const updateFromPoint = (clientX: number, clientY: number) => {
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isTouchDevice) return;
     const rect = panelRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     cursor.current.x = x;
     cursor.current.y = y;
     const nx = Math.min(1, Math.max(0, x / rect.width));
     const ny = Math.min(1, Math.max(0, y / rect.height));
     target.current.x = 0.42 + nx * 0.18;
     target.current.y = 0.60 + ny * 0.22;
-    bumpActivity();
   };
-
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    updateFromPoint(e.clientX, e.clientY);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    const t = e.touches[0];
-    if (!t) return;
-    setHovering(true);
-    const rect = panelRef.current?.getBoundingClientRect();
-    if (rect) {
-      cursor.current.lastX = t.clientX - rect.left;
-      cursor.current.lastY = t.clientY - rect.top;
-    }
-    updateFromPoint(t.clientX, t.clientY);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    const t = e.touches[0];
-    if (!t) return;
-    updateFromPoint(t.clientX, t.clientY);
-  };
-
-  const handleTouchEnd = () => {
-    // razzo persiste alla posizione corrente (non torna a Piemonte, non scompare)
-    bumpActivity();
-  };
-
-  // auto-exit dopo 15s di inattività in playMode (C)
-  useEffect(() => {
-    if (!playMode) return;
-    bumpActivity();
-    const check = window.setInterval(() => {
-      if (Date.now() - lastInteraction.current > 15000) {
-        setPlayMode(false);
-        setHovering(false);
-        target.current.x = PIEMONTE.x;
-        target.current.y = PIEMONTE.y;
-      }
-    }, 1000);
-    idleTimer.current = check;
-    return () => {
-      if (idleTimer.current) window.clearInterval(idleTimer.current);
-    };
-  }, [playMode]);
-
-  // hint iniziale 2s alla prima attivazione (D)
-  useEffect(() => {
-    if (!playMode) {
-      setShowHint(false);
-      if (hintTimer.current) window.clearTimeout(hintTimer.current);
-      return;
-    }
-    setShowHint(true);
-    hintTimer.current = window.setTimeout(() => setShowHint(false), 2200);
-    return () => {
-      if (hintTimer.current) window.clearTimeout(hintTimer.current);
-    };
-  }, [playMode]);
-
 
   // ---- rotating word ----
   const [wordIdx, setWordIdx] = useState(0);
@@ -188,32 +225,25 @@ const DroneHero = () => {
   const scale = fit * ZOOM;
   const fx = current.current.x * VB_W;
   const fy = current.current.y * VB_H;
-  // leggera inclinazione "drone" proporzionale alla distanza dal centro
   const tiltDeg = (current.current.x - 0.5) * 3;
   const groupTransform = `translate(${cx} ${cy}) rotate(${tiltDeg.toFixed(2)}) scale(${scale.toFixed(3)}) translate(${(-fx).toFixed(2)} ${(-fy).toFixed(2)})`;
 
   const rocketRotation = cursor.current.angle;
 
-  const touchActive = !isTouchDevice || playMode;
-
   return (
     <div
       ref={panelRef}
-      className={`relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none ${touchActive ? "touch-none" : ""}`}
-      style={{ cursor: hovering ? "none" : "auto" }}
-      onMouseEnter={() => setHovering(true)}
+      className="relative w-full h-[88vh] min-h-[600px] max-h-[920px] bg-foreground text-background overflow-hidden select-none"
+      style={{ cursor: !isTouchDevice && hovering ? "none" : "auto" }}
+      onMouseEnter={() => !isTouchDevice && setHovering(true)}
       onMouseLeave={() => {
+        if (isTouchDevice) return;
         setHovering(false);
         target.current.x = PIEMONTE.x;
         target.current.y = PIEMONTE.y;
       }}
       onMouseMove={handleMove}
-      onTouchStart={touchActive ? handleTouchStart : undefined}
-      onTouchMove={touchActive ? handleTouchMove : undefined}
-      onTouchEnd={touchActive ? handleTouchEnd : undefined}
-      onTouchCancel={touchActive ? handleTouchEnd : undefined}
     >
-
       <svg
         viewBox={`0 0 ${panel.w} ${panel.h}`}
         className="absolute inset-0 w-full h-full"
@@ -229,12 +259,9 @@ const DroneHero = () => {
           </pattern>
         </defs>
 
-        {/* grid sfondo */}
         <rect x="0" y="0" width={panel.w} height={panel.h} fill="url(#dh-grid)" />
 
-        {/* layer mappa con parallasse */}
         <g transform={groupTransform}>
-          {/* alone esterno tenue */}
           <path
             d={EUROPE_PATH}
             fill="hsl(var(--secondary) / 0.06)"
@@ -243,7 +270,6 @@ const DroneHero = () => {
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
-          {/* Europa vettoriale */}
           <path
             d={EUROPE_PATH}
             fill="hsl(var(--secondary) / 0.10)"
@@ -256,11 +282,9 @@ const DroneHero = () => {
           />
         </g>
 
-        {/* vignettatura */}
         <rect x="0" y="0" width={panel.w} height={panel.h} fill="url(#dh-vignette)" pointerEvents="none" />
       </svg>
 
-      {/* scanlines */}
       <div
         className="absolute inset-0 pointer-events-none opacity-25 mix-blend-overlay"
         style={{
@@ -270,7 +294,6 @@ const DroneHero = () => {
         aria-hidden
       />
 
-      {/* top bar */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-4 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] pointer-events-none">
         <div className="flex items-center gap-2 text-[#8B5CFF]">
           <span className="w-2 h-2 bg-[#8B5CFF] rounded-full animate-pulse" />
@@ -278,7 +301,6 @@ const DroneHero = () => {
         </div>
       </div>
 
-      {/* manifesto */}
       <div className="absolute left-5 md:left-8 bottom-6 md:bottom-10 max-w-[640px] space-y-4 pointer-events-none">
         <h1
           className="text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.95] tracking-tight"
@@ -324,7 +346,6 @@ const DroneHero = () => {
         </div>
       </div>
 
-      {/* cursore razzo */}
       {hovering && (
         <div
           className="absolute pointer-events-none z-20"
@@ -342,65 +363,7 @@ const DroneHero = () => {
           />
         </div>
       )}
-
-      {/* toggle interazione razzo — solo su touch device, minimal e centrale */}
-      {isTouchDevice && (
-        <>
-          {!playMode && (
-            <button
-              type="button"
-              onClick={() => {
-                setPlayMode(true);
-                // posiziona il razzo al centro visivo del pannello
-                cursor.current.x = panel.w / 2;
-                cursor.current.y = panel.h / 2;
-                cursor.current.lastX = panel.w / 2;
-                cursor.current.lastY = panel.h / 2;
-                setHovering(true);
-                bumpActivity();
-              }}
-              aria-label="Attiva l'interazione con il razzo"
-              className="absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2 bg-transparent p-2 pointer-events-auto"
-            >
-              <LogoPittogramma
-                className="w-12 h-12 text-secondary drop-shadow-[0_0_10px_hsl(var(--secondary)/0.7)]"
-                flameClassName="text-[#FF8C00] drop-shadow-[0_0_6px_rgba(255,140,0,0.8)]"
-              />
-              <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-background font-bold">
-                tap
-              </span>
-            </button>
-          )}
-          {playMode && (
-            <>
-              <button
-                type="button"
-                onMouseEnter={() => setHovering(false)}
-                onClick={() => {
-                  setPlayMode(false);
-                  setHovering(false);
-                  target.current.x = PIEMONTE.x;
-                  target.current.y = PIEMONTE.y;
-                }}
-                aria-label="Esci dall'interazione razzo"
-                style={{ cursor: "pointer" }}
-                className="absolute right-3 top-3 z-30 font-mono text-xs uppercase tracking-[0.25em] font-bold text-foreground bg-[#FF8C00] px-3 py-2 pointer-events-auto border-2 border-[#FF8C00] shadow-[0_0_16px_rgba(255,140,0,0.6)] active:scale-95 transition-transform"
-              >
-                Exit
-              </button>
-              {showHint && (
-                <div className="absolute left-1/2 top-6 -translate-x-1/2 z-30 pointer-events-none font-mono text-[10px] uppercase tracking-[0.25em] text-background bg-foreground/60 px-3 py-1.5 animate-fade-in">
-                  Muovi il dito per pilotare
-                </div>
-              )}
-            </>
-          )}
-        </>
-      )}
-
-
     </div>
-
   );
 };
 
