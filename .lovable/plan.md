@@ -1,61 +1,41 @@
-## Obiettivo
-Su mobile eliminare completamente l'interattività touch del razzo (fonte dei bug di scroll) e sostituirla con un'animazione autonoma: il razzo vola da solo tra varie città italiane, con qualche incursione europea, a velocità variabile.
+## Diagnosi
+Lo scroll laggy ovunque nella home su Brave iOS (mentre Safari regge) è causato dal loop rAF del `DroneHero` che fa `setState` ad ogni frame (`force((n) => (n + 1) & 1023)`). Questo forza React a ri-renderizzare tutta la sezione — inclusa la path SVG dell'Europa e la vignette a piena pagina — 60 volte al secondo, anche quando l'hero è **fuori dalla viewport**. Safari/WebKit ottimizza aggressivamente, Brave/Chromium iOS no.
 
-## Modifiche a `src/components/home/DroneHero.tsx`
+Non è quindi il touch: è il costo continuo del render.
 
-### 1. Rimozione totale del touch interattivo su mobile
-- Eliminare `playMode`, `showHint`, `lastInteraction`, `idleTimer`, `hintTimer`, `bumpActivity`.
-- Rimuovere handler `onTouchStart/Move/End/Cancel` dal container.
-- Rimuovere il bottone centrale "tap" e il bottone "Exit".
-- Rimuovere `touch-none` dal container su mobile: lo scroll verticale torna nativo e fluido.
-- `isTouchDevice` resta solo per decidere quale modalità attivare (autoplay vs cursore).
+## Piano di intervento (solo `src/components/home/DroneHero.tsx`)
 
-### 2. Autoplay del razzo su touch device
-Nuovo comportamento quando `isTouchDevice === true`:
-- Il razzo è sempre visibile (nessun tap richiesto).
-- Segue un percorso predefinito di waypoint con velocità variabile e piccole pause "hovering" sopra alcune città.
-- La mappa fa parallasse seguendo il razzo, esattamente come già succede col cursore desktop.
+### 1. Rimuovere il re-render per frame
+Sostituire l'aggiornamento via `setState` con manipolazione diretta del DOM tramite `ref`:
+- `gRef` sul `<g>` della mappa → aggiornare `setAttribute("transform", ...)` nel rAF.
+- `rocketRef` sul div del razzo → aggiornare `style.transform` / `left` / `top`.
+- Rimuovere completamente lo state `force`.
 
-**Waypoint (coordinate normalizzate nel viewBox Europa, riuso della stessa scala di `PIEMONTE`):**
-- Torino / Piemonte (start)
-- Milano
-- Venezia
-- Bologna
-- Firenze
-- Roma
-- Napoli
-- Palermo
-- Cagliari
-- risalita → Marsiglia (incursione EU)
-- Parigi (incursione EU breve)
-- rientro → Genova
-- Berlino (incursione EU)
-- Vienna
-- rientro → Trieste
-- loop back a Torino
+React ri-renderizza solo per: cambio parola rotante, resize del pannello, `hovering`, `isTouchDevice`. Il resto è tutto imperativo via ref → costo per frame quasi zero.
 
-Ogni waypoint ha: `{ x, y, dwell }` dove `dwell` è il tempo di sosta (400–1400 ms) per simulare "hovering" sopra la scena.
+### 2. Pausare rAF fuori viewport
+`IntersectionObserver` sull'elemento hero:
+- `isVisible = false` → `cancelAnimationFrame` e non ripartire.
+- `isVisible = true` → ripartire il loop.
 
-**Motore d'animazione:**
-- Nuovo `useEffect` attivo solo se `isTouchDevice`.
-- Stato interno con `waypointIndex`, `phase: "travel" | "dwell"`, `travelStart`.
-- In fase `travel`: interpolazione con easing `easeInOutCubic` tra waypoint corrente e successivo, durata proporzionale alla distanza (base 1800 ms + distanza × fattore, con leggera variazione random ±15% per non essere metronomico).
-- In fase `dwell`: `target` resta fermo sul waypoint per `dwell` ms, con micro-oscillazione già presente in `hovering` idle.
-- Aggiornamento di `target.current.x/y` e di `cursor.current.x/y` (posizione schermo del razzo, calcolata dal viewBox → panel).
-- `hovering` forzato a `true` per mostrare il razzo.
-- L'angolo del razzo continua a derivare dalla velocità smoothed esistente, quindi ruota naturalmente lungo il percorso.
+Vale sia per il loop di smoothing sia per l'autoplay dei waypoint.
 
-### 3. Desktop invariato
-Tutto il ramo non-touch resta identico: cursore razzo, parallax, hover enter/leave, ritorno a Piemonte.
+### 3. Pausare anche quando il tab è in background
+`document.visibilitychange` → stessa logica di pausa. Evita drift dei timer e batteria sprecata.
 
-### 4. Pulizie
-- Rimuovere `handleTouchStart/Move/End` e `touchActive`.
-- Rimuovere il blocco JSX `{isTouchDevice && (...)}` con bottoni e hint.
+### 4. Rispettare `prefers-reduced-motion`
+Se l'utente ha ridotto le animazioni: nessun rAF, nessun autoplay, mappa statica sul Piemonte, razzo nascosto su mobile. Migliora accessibilità e performance su device deboli.
+
+### 5. Micro-ottimizzazioni
+- `will-change: transform` sul `<g>` della mappa e sul razzo (già presente sul razzo).
+- Ridurre da 60fps a ~45fps su mobile (`isTouchDevice`) con un piccolo throttle temporale nel tick — impercettibile visivamente, ma dimezza il lavoro di composizione.
+- La `rotating word` continua a usare `setInterval` React come oggi (1 render ogni 2.6s, trascurabile).
 
 ## Fuori scope
-Nessuna modifica a copy, palette, tipografia, manifesto, CTA, o al resto della home.
+Niente modifiche a copy, layout, palette, o altre sezioni della home. Nessun cambio all'autoplay dei waypoint o al comportamento desktop — solo il modo in cui vengono applicati i frame.
 
-## Dettagli tecnici
-- La conversione waypoint → coordinate schermo del razzo usa la stessa `groupTransform` inversa: dato `target = (tx, ty)` normalizzato, il razzo va disegnato al centro del pannello (`cx, cy`) perché la mappa si muove sotto di lui — quindi `cursor.current.x/y` si può fissare a `(cx, cy)` con piccolo offset sinusoidale per dare vita.
-- In alternativa, mantenere `cursor.current` sincronizzato al centro pannello semplifica: l'illusione di volo la dà la mappa che scorre, non il razzo.
-- L'angolo del razzo viene calcolato dal delta di `target.current` tra frame (già smoothed via `svx/svy` se applichiamo un piccolo offset schermo derivato dal delta target).
+## Verifica post-implementazione
+1. React DevTools Profiler: `DroneHero` non deve più comparire nei render frequenti.
+2. Su Brave iOS: scroll fluido dall'hero fino al footer.
+3. Su desktop: parallax del razzo invariato.
+4. Su mobile: autoplay dei waypoint invariato visivamente.
