@@ -153,17 +153,23 @@ const RealityDetail = () => {
                     center={[reality.lat, reality.lng]}
                     zoom={14}
                     cluster={false}
-                    markers={[
-                      {
+                  markers={[
+                    (() => {
+                      const addr = [reality.address, reality.city, reality.region].filter(Boolean).join(", ");
+                      const locLine = reality.type === "nomade"
+                        ? "Realtà itinerante — senza sede fissa"
+                        : (addr || "Sede non specificata");
+                      return {
                         id: reality.id,
                         lat: reality.lat,
                         lng: reality.lng,
                         name: reality.name,
-                        popupContent: `<strong>${escapeHtml(reality.name)}</strong><br/><span style="font-size:12px;opacity:.7">${escapeHtml(reality.city)}</span>`,
+                        popupContent: `<strong style="font-family:var(--font-display,serif)">${escapeHtml(reality.name)}</strong><br/><span style="font-size:12px;opacity:.8">${escapeHtml(locLine)}</span>`,
                         color: config.markerColor,
                         outline: config.outline,
-                      },
-                    ]}
+                      };
+                    })(),
+                  ]}
                   />
                 </Suspense>
               </div>
