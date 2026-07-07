@@ -68,11 +68,13 @@ const RealityForm = ({
   const [yearClosed, setYearClosed] = useState<string>("");
   const [website, setWebsite] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [description, setDescription] = useState("");
   const [history, setHistory] = useState("");
   const [ig, setIg] = useState("");
   const [fb, setFb] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [vimeo, setVimeo] = useState("");
   const [confirmedStatus, setConfirmedStatus] = useState<ConfirmedStatus>("pendente");
   const [categories, setCategories] = useState<string[]>([]);
 
