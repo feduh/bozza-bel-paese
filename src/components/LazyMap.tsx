@@ -211,8 +211,8 @@ const LazyMap = ({
   maxZoom = 18,
   maxBounds = ITALY_BOUNDS,
   userLocation = null,
-  hudLabel = "Drone · IT · Live",
-}: LazyMapProps & { hudLabel?: string }) => {
+  autoFit = true,
+}: LazyMapProps & { autoFit?: boolean }) => {
   return (
     <div className="ibp-map-frame relative" style={{ height, width: "100%" }}>
       <MapContainer
@@ -235,14 +235,9 @@ const LazyMap = ({
         />
         <ZoomControl position="bottomright" />
         <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
+        <AutoFitLayer markers={markers} enabled={autoFit && !userLocation} />
         <UserLocationLayer pos={userLocation} />
       </MapContainer>
-      {hudLabel && (
-        <div className="ibp-map-hud" aria-hidden>
-          <span className="ibp-map-hud__dot" />
-          <span>{hudLabel}</span>
-        </div>
-      )}
     </div>
   );
 };
