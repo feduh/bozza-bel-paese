@@ -314,8 +314,8 @@ const RealityForm = ({
       if (!isEditing) {
         setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
         setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
-        setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-        setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
+        setWebsite(""); setContactEmail(""); setContactPhone(""); setDescription(""); setHistory("");
+        setIg(""); setFb(""); setLinkedin(""); setVimeo(""); setGeocoded(false); setCategories([]);
       }
       onCreated?.();
     }
