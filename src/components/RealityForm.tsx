@@ -246,8 +246,8 @@ const RealityForm = ({
 
     const parsed = realitySchema(t).safeParse({
       name, type, country, city, address, zipCode, region,
-      lat, lng, yearFounded, yearClosed, website, contactEmail,
-      description, history, ig, fb, linkedin, confirmedStatus,
+      lat, lng, yearFounded, yearClosed, website, contactEmail, contactPhone,
+      description, history, ig, fb, linkedin, vimeo, confirmedStatus,
     });
 
     if (!parsed.success) {
