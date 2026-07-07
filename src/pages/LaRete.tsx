@@ -141,13 +141,13 @@ const LaRete = () => {
             <p className="text-sm text-foreground/70 italic">Nessun coordinatore pubblico al momento.</p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {coordinatori.map((c, i) => (
+              {coordinatori.map((c) => (
                 <Link
                   key={c.user_id}
                   to={`/autori/${c.user_id}`}
                   className="brutalist-card p-6 flex flex-col gap-4 group bg-primary text-primary-foreground"
                 >
-                  <div className="micro-label text-secondary">0{i + 1} // Coordinatore</div>
+                  <div className="micro-label text-secondary">Coordinatore</div>
                   <div className="flex items-start gap-4">
                     {c.avatar_url ? (
                       <img src={c.avatar_url} alt="" className="w-16 h-16 object-cover brutalist-border bg-muted" loading="lazy" />
