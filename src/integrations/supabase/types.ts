@@ -437,6 +437,7 @@ export type Database = {
           confirmed_by: string | null
           confirmed_status: string
           contact_email: string | null
+          contact_phone: string | null
           contacted_at: string | null
           country: string
           created_at: string
@@ -452,6 +453,7 @@ export type Database = {
           lng: number
           name: string
           region: string
+          social_vimeo: string | null
           status: string
           type: Database["public"]["Enums"]["reality_type"]
           updated_at: string
@@ -470,6 +472,7 @@ export type Database = {
           confirmed_by?: string | null
           confirmed_status?: string
           contact_email?: string | null
+          contact_phone?: string | null
           contacted_at?: string | null
           country?: string
           created_at?: string
@@ -485,6 +488,7 @@ export type Database = {
           lng: number
           name: string
           region: string
+          social_vimeo?: string | null
           status?: string
           type: Database["public"]["Enums"]["reality_type"]
           updated_at?: string
@@ -503,6 +507,7 @@ export type Database = {
           confirmed_by?: string | null
           confirmed_status?: string
           contact_email?: string | null
+          contact_phone?: string | null
           contacted_at?: string | null
           country?: string
           created_at?: string
@@ -518,6 +523,7 @@ export type Database = {
           lng?: number
           name?: string
           region?: string
+          social_vimeo?: string | null
           status?: string
           type?: Database["public"]["Enums"]["reality_type"]
           updated_at?: string

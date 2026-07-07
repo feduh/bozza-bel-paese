@@ -130,6 +130,33 @@ const ClusterLayer = ({ markers, cluster }: { markers: MarkerData[]; cluster: bo
   return null;
 };
 
+/**
+ * Auto-focus the map when the marker set changes (e.g. after applying a filter):
+ * fits bounds to the visible markers, or zooms to a single point.
+ * Skipped when there are no markers (leaves current view intact).
+ */
+const AutoFitLayer = ({ markers, enabled }: { markers: MarkerData[]; enabled: boolean }) => {
+  const map = useMap();
+  const firstRunRef = useRef(true);
+  useEffect(() => {
+    if (!enabled) return;
+    if (markers.length === 0) {
+      firstRunRef.current = false;
+      return;
+    }
+    if (markers.length === 1) {
+      const m = markers[0];
+      map.setView([m.lat, m.lng], Math.max(map.getZoom(), 12), { animate: !firstRunRef.current });
+    } else {
+      const bounds = L.latLngBounds(markers.map((m) => [m.lat, m.lng] as [number, number]));
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11, animate: !firstRunRef.current });
+    }
+    firstRunRef.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markers]);
+  return null;
+};
+
 const UserLocationLayer = ({ pos }: { pos: { lat: number; lng: number } | null | undefined }) => {
   const map = useMap();
   const markerRef = useRef<L.Marker | null>(null);
@@ -184,8 +211,8 @@ const LazyMap = ({
   maxZoom = 18,
   maxBounds = ITALY_BOUNDS,
   userLocation = null,
-  hudLabel = "Drone · IT · Live",
-}: LazyMapProps & { hudLabel?: string }) => {
+  autoFit = true,
+}: LazyMapProps & { autoFit?: boolean }) => {
   return (
     <div className="ibp-map-frame relative" style={{ height, width: "100%" }}>
       <MapContainer
@@ -208,14 +235,9 @@ const LazyMap = ({
         />
         <ZoomControl position="bottomright" />
         <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
+        <AutoFitLayer markers={markers} enabled={autoFit && !userLocation} />
         <UserLocationLayer pos={userLocation} />
       </MapContainer>
-      {hudLabel && (
-        <div className="ibp-map-hud" aria-hidden>
-          <span className="ibp-map-hud__dot" />
-          <span>{hudLabel}</span>
-        </div>
-      )}
     </div>
   );
 };

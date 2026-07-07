@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowLeft, Globe, Mail, Instagram, Facebook, Linkedin, ImagePlus, Users } from "lucide-react";
+import { MapPin, ArrowLeft, Globe, Mail, Phone, Instagram, Facebook, Linkedin, Video, ImagePlus, Users } from "lucide-react";
 import BookmarkButton from "@/components/BookmarkButton";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -153,17 +153,23 @@ const RealityDetail = () => {
                     center={[reality.lat, reality.lng]}
                     zoom={14}
                     cluster={false}
-                    markers={[
-                      {
+                  markers={[
+                    (() => {
+                      const addr = [reality.address, reality.city, reality.region].filter(Boolean).join(", ");
+                      const locLine = reality.type === "nomade"
+                        ? "Realtà itinerante — senza sede fissa"
+                        : (addr || "Sede non specificata");
+                      return {
                         id: reality.id,
                         lat: reality.lat,
                         lng: reality.lng,
                         name: reality.name,
-                        popupContent: `<strong>${escapeHtml(reality.name)}</strong><br/><span style="font-size:12px;opacity:.7">${escapeHtml(reality.city)}</span>`,
+                        popupContent: `<strong style="font-family:var(--font-display,serif)">${escapeHtml(reality.name)}</strong><br/><span style="font-size:12px;opacity:.8">${escapeHtml(locLine)}</span>`,
                         color: config.markerColor,
                         outline: config.outline,
-                      },
-                    ]}
+                      };
+                    })(),
+                  ]}
                   />
                 </Suspense>
               </div>
@@ -198,27 +204,20 @@ const RealityDetail = () => {
                   <dt className="text-muted-foreground">{t("reality.region")}</dt>
                   <dd className="font-medium">{reality.region}</dd>
                 </div>
-                {reality.website && (
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">{t("reality.website")}</dt>
-                    <dd>
-                      <a href={reality.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                        <Globe size={12} /> {t("reality.visit")}
-                      </a>
-                    </dd>
-                  </div>
-                )}
               </dl>
             </div>
+
 
             <div className="p-6 rounded-lg bg-card border border-border">
               <h3 className="font-display text-lg font-semibold mb-4">Contatti</h3>
               {(() => {
                 const items: { icon: any; label: string; href: string; text: string }[] = [];
                 if (reality.contact_email) items.push({ icon: Mail, label: "Email", href: `mailto:${reality.contact_email}`, text: reality.contact_email });
+                if (reality.contact_phone) items.push({ icon: Phone, label: "Telefono", href: `tel:${String(reality.contact_phone).replace(/\s+/g, "")}`, text: reality.contact_phone });
                 if (reality.ig_link) items.push({ icon: Instagram, label: "Instagram", href: reality.ig_link, text: reality.ig_link.replace(/^https?:\/\/(www\.)?/, "") });
                 if (reality.fb_link) items.push({ icon: Facebook, label: "Facebook", href: reality.fb_link, text: reality.fb_link.replace(/^https?:\/\/(www\.)?/, "") });
                 if (reality.linkedin_link) items.push({ icon: Linkedin, label: "LinkedIn", href: reality.linkedin_link, text: reality.linkedin_link.replace(/^https?:\/\/(www\.)?/, "") });
+                if (reality.social_vimeo) items.push({ icon: Video, label: "Vimeo", href: reality.social_vimeo, text: reality.social_vimeo.replace(/^https?:\/\/(www\.)?/, "") });
                 if (reality.website) items.push({ icon: Globe, label: "Sito web", href: reality.website, text: reality.website.replace(/^https?:\/\/(www\.)?/, "") });
                 if (items.length === 0) {
                   return <p className="text-sm text-muted-foreground font-body">Nessun contatto disponibile.</p>;
@@ -230,8 +229,8 @@ const RealityDetail = () => {
                         <Icon size={16} className="mt-0.5 text-primary shrink-0" />
                         <a
                           href={href}
-                          target={href.startsWith("mailto:") ? undefined : "_blank"}
-                          rel={href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                          target={href.startsWith("mailto:") || href.startsWith("tel:") ? undefined : "_blank"}
+                          rel={href.startsWith("mailto:") || href.startsWith("tel:") ? undefined : "noopener noreferrer"}
                           className="text-foreground hover:text-primary hover:underline break-all"
                         >
                           {text}

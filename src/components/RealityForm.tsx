@@ -68,11 +68,13 @@ const RealityForm = ({
   const [yearClosed, setYearClosed] = useState<string>("");
   const [website, setWebsite] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [description, setDescription] = useState("");
   const [history, setHistory] = useState("");
   const [ig, setIg] = useState("");
   const [fb, setFb] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [vimeo, setVimeo] = useState("");
   const [confirmedStatus, setConfirmedStatus] = useState<ConfirmedStatus>("pendente");
   const [categories, setCategories] = useState<string[]>([]);
 
@@ -187,11 +189,13 @@ const RealityForm = ({
       setYearClosed(data.year_closed != null ? String(data.year_closed) : "");
       setWebsite(data.website ?? "");
       setContactEmail(data.contact_email ?? "");
+      setContactPhone((data as any).contact_phone ?? "");
       setDescription(data.description ?? "");
       setHistory(data.history ?? "");
       setIg(data.ig_link ?? "");
       setFb(data.fb_link ?? "");
       setLinkedin(data.linkedin_link ?? "");
+      setVimeo((data as any).social_vimeo ?? "");
       setConfirmedStatus((data.confirmed_status as ConfirmedStatus) ?? "pendente");
       setCategories(data.categories ?? (data.category ? [data.category] : []));
       setGeocoded(!!(data.lat && data.lng));
@@ -242,8 +246,8 @@ const RealityForm = ({
 
     const parsed = realitySchema(t).safeParse({
       name, type, country, city, address, zipCode, region,
-      lat, lng, yearFounded, yearClosed, website, contactEmail,
-      description, history, ig, fb, linkedin, confirmedStatus,
+      lat, lng, yearFounded, yearClosed, website, contactEmail, contactPhone,
+      description, history, ig, fb, linkedin, vimeo, confirmedStatus,
     });
 
     if (!parsed.success) {
@@ -270,12 +274,14 @@ const RealityForm = ({
       year_founded: v.yearFounded,
       year_closed: v.yearClosed ?? null,
       website: v.website ?? null,
-      contact_email: v.contactEmail ?? null,
+      contact_email: v.contactEmail,
+      contact_phone: v.contactPhone ?? null,
       description: v.description ?? "",
       history: v.history ?? "",
       ig_link: v.ig ?? null,
       fb_link: v.fb ?? null,
       linkedin_link: v.linkedin ?? null,
+      social_vimeo: v.vimeo ?? null,
       confirmed_status: effectiveStatus,
       status: effectiveStatus === "storico" ? "archiviato" : "attivo",
       categories,
@@ -308,8 +314,8 @@ const RealityForm = ({
       if (!isEditing) {
         setName(""); setAddress(""); setCity(""); setZipCode(""); setRegion("");
         setLat(""); setLng(""); setYearFounded(""); setYearClosed("");
-        setWebsite(""); setContactEmail(""); setDescription(""); setHistory("");
-        setIg(""); setFb(""); setLinkedin(""); setGeocoded(false); setCategories([]);
+        setWebsite(""); setContactEmail(""); setContactPhone(""); setDescription(""); setHistory("");
+        setIg(""); setFb(""); setLinkedin(""); setVimeo(""); setGeocoded(false); setCategories([]);
       }
       onCreated?.();
     }
@@ -482,12 +488,12 @@ const RealityForm = ({
 
       <div>
         <label className="block text-sm font-medium mb-2">Descrizione</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={cls("description")} {...aria("description")} />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className={cls("description")} {...aria("description")} placeholder="Chi siete, cosa fate, cosa vi caratterizza." />
         <FieldError id="err-description" message={errs.description} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-2">Storia</label>
-        <textarea value={history} onChange={(e) => setHistory(e.target.value)} rows={3} className={cls("history")} {...aria("history")} />
+        <label className="block text-sm font-medium mb-2">Storia <span className="text-muted-foreground font-normal">(opzionale)</span></label>
+        <textarea value={history} onChange={(e) => setHistory(e.target.value)} rows={3} className={cls("history")} {...aria("history")} placeholder="Compila solo se la storia della realtà è distinta dalla descrizione (es. anni, tappe, momenti chiave)." />
         <FieldError id="err-history" message={errs.history} />
       </div>
 
@@ -498,9 +504,22 @@ const RealityForm = ({
           <FieldError id="err-website" message={errs.website} />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Email di contatto</label>
-          <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className={cls("contactEmail")} {...aria("contactEmail")} />
+          <label className="block text-sm font-medium mb-2">Email di contatto *</label>
+          <input type="email" required value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="info@esempio.it" className={cls("contactEmail")} {...aria("contactEmail")} />
           <FieldError id="err-contactEmail" message={errs.contactEmail} />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Telefono <span className="text-muted-foreground font-normal">(opzionale)</span></label>
+          <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="+39 …" className={cls("contactPhone")} {...aria("contactPhone")} />
+          <FieldError id="err-contactPhone" message={errs.contactPhone} />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Vimeo <span className="text-muted-foreground font-normal">(opzionale)</span></label>
+          <input value={vimeo} onChange={(e) => setVimeo(e.target.value)} placeholder="https://vimeo.com/…" className={cls("vimeo")} {...aria("vimeo")} />
+          <FieldError id="err-vimeo" message={errs.vimeo} />
         </div>
       </div>
 
@@ -521,6 +540,7 @@ const RealityForm = ({
           <FieldError id="err-linkedin" message={errs.linkedin} />
         </div>
       </div>
+
 
       {!isCollaborator && (
         <div>

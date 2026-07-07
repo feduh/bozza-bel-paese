@@ -76,25 +76,25 @@ const Index = () => {
       {/* ============ HERO — DRONE POV FULL BLEED ============ */}
       <DroneHero />
 
+      {/* ============ MARQUEE FULL-WIDTH (fuori dal container, come navbar/footer) ============ */}
+      <section className="w-full border-y-2 border-foreground bg-foreground text-background py-4">
+        <Marquee speedSec={60}>
+          {tickerItems.map((r, i) => (
+            <span key={i} className="flex items-center gap-4 whitespace-nowrap">
+              <span className="text-secondary text-2xl" aria-hidden>✦</span>
+              <span className="text-xl md:text-2xl uppercase" style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.01em" }}>
+                {r.name}
+              </span>
+              <span className="micro-label text-background/60">
+                {r.city} · {r.region}
+              </span>
+            </span>
+          ))}
+        </Marquee>
+      </section>
+
       <div className="editorial-container py-10 md:py-16 space-y-12 md:space-y-20">
 
-
-        {/* ============ MARQUEE FULL-WIDTH (testata) ============ */}
-        <section className="-mx-6 md:-mx-10 border-y-2 border-foreground bg-foreground text-background py-4">
-          <Marquee speedSec={60}>
-            {tickerItems.map((r, i) => (
-              <span key={i} className="flex items-center gap-4 whitespace-nowrap">
-                <span className="text-secondary text-2xl" aria-hidden>✦</span>
-                <span className="text-xl md:text-2xl uppercase" style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.01em" }}>
-                  {r.name}
-                </span>
-                <span className="micro-label text-background/60">
-                  {r.city} · {r.region}
-                </span>
-              </span>
-            ))}
-          </Marquee>
-        </section>
 
         {/* ============ FEATURES ============ */}
         <section>
