@@ -156,11 +156,14 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
           <label className="block text-sm font-body font-medium mb-2">Bio</label>
           <textarea
             value={profile.bio}
-            onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-            rows={3}
-            maxLength={500}
-            className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            onChange={(e) => setProfile({ ...profile, bio: e.target.value.slice(0, 1500) })}
+            rows={6}
+            maxLength={1500}
+            className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-y"
           />
+          <p className="text-xs text-muted-foreground font-body mt-1 text-right">
+            {(profile.bio ?? "").length} / 1500
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
