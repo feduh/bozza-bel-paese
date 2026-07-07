@@ -207,10 +207,6 @@ const RealityDetail = () => {
               </dl>
             </div>
 
-            <div className="p-6 rounded-lg bg-card border border-border" hidden>
-              {/* Sito web spostato nella card Contatti */}
-              </dl>
-            </div>
 
             <div className="p-6 rounded-lg bg-card border border-border">
               <h3 className="font-display text-lg font-semibold mb-4">Contatti</h3>
