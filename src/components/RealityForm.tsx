@@ -189,11 +189,13 @@ const RealityForm = ({
       setYearClosed(data.year_closed != null ? String(data.year_closed) : "");
       setWebsite(data.website ?? "");
       setContactEmail(data.contact_email ?? "");
+      setContactPhone((data as any).contact_phone ?? "");
       setDescription(data.description ?? "");
       setHistory(data.history ?? "");
       setIg(data.ig_link ?? "");
       setFb(data.fb_link ?? "");
       setLinkedin(data.linkedin_link ?? "");
+      setVimeo((data as any).social_vimeo ?? "");
       setConfirmedStatus((data.confirmed_status as ConfirmedStatus) ?? "pendente");
       setCategories(data.categories ?? (data.category ? [data.category] : []));
       setGeocoded(!!(data.lat && data.lng));
