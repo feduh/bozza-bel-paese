@@ -488,12 +488,12 @@ const RealityForm = ({
 
       <div>
         <label className="block text-sm font-medium mb-2">Descrizione</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={cls("description")} {...aria("description")} />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className={cls("description")} {...aria("description")} placeholder="Chi siete, cosa fate, cosa vi caratterizza." />
         <FieldError id="err-description" message={errs.description} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-2">Storia</label>
-        <textarea value={history} onChange={(e) => setHistory(e.target.value)} rows={3} className={cls("history")} {...aria("history")} />
+        <label className="block text-sm font-medium mb-2">Storia <span className="text-muted-foreground font-normal">(opzionale)</span></label>
+        <textarea value={history} onChange={(e) => setHistory(e.target.value)} rows={3} className={cls("history")} {...aria("history")} placeholder="Compila solo se la storia della realtà è distinta dalla descrizione (es. anni, tappe, momenti chiave)." />
         <FieldError id="err-history" message={errs.history} />
       </div>
 
@@ -504,9 +504,22 @@ const RealityForm = ({
           <FieldError id="err-website" message={errs.website} />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Email di contatto</label>
-          <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className={cls("contactEmail")} {...aria("contactEmail")} />
+          <label className="block text-sm font-medium mb-2">Email di contatto *</label>
+          <input type="email" required value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="info@esempio.it" className={cls("contactEmail")} {...aria("contactEmail")} />
           <FieldError id="err-contactEmail" message={errs.contactEmail} />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Telefono <span className="text-muted-foreground font-normal">(opzionale)</span></label>
+          <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="+39 …" className={cls("contactPhone")} {...aria("contactPhone")} />
+          <FieldError id="err-contactPhone" message={errs.contactPhone} />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Vimeo <span className="text-muted-foreground font-normal">(opzionale)</span></label>
+          <input value={vimeo} onChange={(e) => setVimeo(e.target.value)} placeholder="https://vimeo.com/…" className={cls("vimeo")} {...aria("vimeo")} />
+          <FieldError id="err-vimeo" message={errs.vimeo} />
         </div>
       </div>
 
@@ -527,6 +540,7 @@ const RealityForm = ({
           <FieldError id="err-linkedin" message={errs.linkedin} />
         </div>
       </div>
+
 
       {!isCollaborator && (
         <div>
