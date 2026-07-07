@@ -66,12 +66,21 @@ export const realitySchema = (t: TFunction) =>
       yearFounded: yearField(t, { required: true }),
       yearClosed: yearField(t),
       website: optionalUrl(t),
-      contactEmail: optionalEmail(t),
+      contactEmail: z
+        .string({ required_error: t("validation.email") })
+        .trim()
+        .min(1, t("validation.email"))
+        .email(t("validation.email")),
+      contactPhone: z.preprocess(
+        emptyToUndefined,
+        z.string().trim().min(4).max(40).optional(),
+      ),
       description: z.preprocess(emptyToUndefined, z.string().max(2000).optional()),
       history: z.preprocess(emptyToUndefined, z.string().max(5000).optional()),
       ig: optionalUrl(t),
       fb: optionalUrl(t),
       linkedin: optionalUrl(t),
+      vimeo: optionalUrl(t),
       confirmedStatus: z.enum(["pendente", "confermato", "storico"]),
     })
     .refine(
