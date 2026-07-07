@@ -204,16 +204,11 @@ const RealityDetail = () => {
                   <dt className="text-muted-foreground">{t("reality.region")}</dt>
                   <dd className="font-medium">{reality.region}</dd>
                 </div>
-                {reality.website && (
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">{t("reality.website")}</dt>
-                    <dd>
-                      <a href={reality.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                        <Globe size={12} /> {t("reality.visit")}
-                      </a>
-                    </dd>
-                  </div>
-                )}
+              </dl>
+            </div>
+
+            <div className="p-6 rounded-lg bg-card border border-border" hidden>
+              {/* Sito web spostato nella card Contatti */}
               </dl>
             </div>
 
