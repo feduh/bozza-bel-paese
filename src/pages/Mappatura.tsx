@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, List, Map, ArrowRight, X, ChevronDown, Navigation, Loader2, LayoutGrid, ImageOff } from "lucide-react";
+import { MapPin, List, Map, ArrowRight, X, Navigation, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,7 +40,7 @@ type Reality = {
   tags: string[];
 };
 
-type ViewMode = "list" | "map" | "magazine";
+type ViewMode = "list" | "map";
 type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
@@ -51,7 +51,7 @@ const Mappatura = () => {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<ViewMode>(() => {
     const v = searchParams.get("vista");
-    return v === "list" || v === "magazine" ? v : "map";
+    return v === "list" ? v : "map";
   });
   const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
     (searchParams.get("sezione") as Bucket | null) ?? "all"
@@ -61,7 +61,6 @@ const Mappatura = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
   const [sortMode, setSortMode] = useState<SortMode>("default");
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
-  const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
   const [yearMin, setYearMin] = useState<string>(searchParams.get("annoMin") ?? "");
   const [yearMax, setYearMax] = useState<string>(searchParams.get("annoMax") ?? "");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
@@ -272,37 +271,30 @@ const Mappatura = () => {
         </header>
 
         <h2 className="sr-only">Filtri di ricerca</h2>
-        <div className="mb-6 relative inline-block">
 
-          <button
-            onClick={() => setBucketMenuOpen((o) => !o)}
-            aria-haspopup="menu"
-            aria-expanded={bucketMenuOpen}
-            className="inline-flex items-center gap-2 px-5 py-3 brutalist-border bg-background micro-label hover:bg-foreground hover:text-background transition-colors"
-          >
-            {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
-            <ChevronDown size={14} aria-hidden="true" />
-          </button>
-          {bucketMenuOpen && (
-            <div role="menu" className="absolute z-20 mt-2 w-64 brutalist-border bg-background shadow-brutalist overflow-hidden">
-              {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
-                <button
-                  key={val}
-                  role="menuitemradio"
-                  aria-checked={bucketFilter === val}
-                  onClick={() => {
-                    setBucketFilter(val as "all" | Bucket);
-                    setBucketMenuOpen(false);
-                  }}
-                  className={`block w-full text-left px-4 py-2.5 text-sm border-b-2 border-foreground/10 last:border-b-0 hover:bg-secondary/30 ${
-                    bucketFilter === val ? "bg-primary text-primary-foreground" : ""
-                  }`}
-                >
-                  {val === "all" ? t("common.all") : t(`map.buckets.${val}`)}
-                </button>
-              ))}
-            </div>
-          )}
+        {/* Riga 2 (bucket chip selector, mono-selezione con label italiane richieste) */}
+        <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+          {([
+            { val: "all", label: t("common.all") },
+            { val: "spazi", label: t("map.buckets.spazi") },
+            { val: "spazi-senza-spazi", label: t("map.buckets.spazi-senza-spazi") },
+            { val: "spazi-che-furono", label: t("map.buckets.spazi-che-furono") },
+          ] as const).map((b) => {
+            const active = bucketFilter === b.val;
+            return (
+              <button
+                key={b.val}
+                type="button"
+                onClick={() => setBucketFilter(b.val as "all" | Bucket)}
+                aria-pressed={active}
+                className={`px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+                  active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
+                }`}
+              >
+                {b.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* View toggle + Search */}
@@ -325,15 +317,6 @@ const Mappatura = () => {
               }`}
             >
               <List size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.list")}</span>
-            </button>
-            <button
-              onClick={() => setView("magazine")}
-              aria-pressed={view === "magazine"}
-              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
-                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
-              }`}
-            >
-              <LayoutGrid size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">Magazine</span>
             </button>
           </div>
           <label className="flex-1">
@@ -365,7 +348,7 @@ const Mappatura = () => {
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
-            aria-label="Filtra per categoria artistica"
+            aria-label="Filtra per disciplina"
           >
             <option value="all">{t("map.filterCategory")}</option>
             {REALITY_CATEGORIES.map((c) => (
@@ -465,17 +448,32 @@ const Mappatura = () => {
 
         {/* Map view */}
         {view === "map" && (
-          <div className="brutalist-border shadow-brutalist overflow-hidden h-[600px]">
+          <div className="brutalist-border shadow-brutalist overflow-hidden h-[600px] relative">
             <Suspense fallback={<MapFallback height="600px" />}>
               <LazyMap
                 center={[41.8719, 12.5674]}
                 zoom={6}
                 markers={mapMarkers}
-                scrollWheelZoom={false}
+                scrollWheelZoom={true}
                 height="600px"
                 userLocation={userPos}
               />
             </Suspense>
+            {filtered.length === 0 && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-[500]">
+                <div className="pointer-events-auto bg-background/95 brutalist-border shadow-brutalist px-6 py-5 max-w-sm text-center">
+                  <p className="font-body text-sm text-foreground mb-3">
+                    Nessuna realtà corrisponde ai filtri impostati.
+                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.15em] font-bold bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                  >
+                    <X size={12} /> Reimposta filtri
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -529,74 +527,6 @@ const Mappatura = () => {
           </div>
         )}
 
-        {/* Magazine view: editorial card grid with cover images */}
-        {view === "magazine" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((r) => {
-              const cat = getCategory(r.type, r.status);
-              const cfg = categoryConfig[cat];
-              const Icon = cfg.icon;
-              return (
-                <Link
-                  to={`/realta/${r.id}`}
-                  key={r.id}
-                  className="group brutalist-card flex flex-col overflow-hidden"
-                >
-                  <div className="relative aspect-[4/3] bg-muted overflow-hidden border-b-2 border-foreground">
-                    {r.image_url ? (
-                      <img
-                        src={r.image_url}
-                        alt={r.name}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                        <ImageOff size={32} className="text-foreground/30" aria-hidden="true" />
-                      </div>
-                    )}
-                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
-                      <Icon size={11} /> {cfg.label}
-                    </span>
-                    <div
-                      className="absolute top-3 right-3"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <BookmarkButton realityId={r.id} variant="compact" />
-                    </div>
-                  </div>
-                  <div className="flex-1 flex flex-col p-5">
-                    {((r.categories && r.categories.length > 0) || r.category) && (
-                      <p className="micro-label text-primary mb-2">
-                        {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
-                      </p>
-                    )}
-                    <h3 className="text-lg mb-2 leading-tight tracking-tight group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 600" }}>
-                      {r.name}
-                    </h3>
-                    <p className="text-xs text-foreground/70 flex items-center gap-1 mb-3">
-                      <MapPin size={11} /> {r.city}, {r.region}
-                      <span className="ml-auto">
-                        {r.year_founded}{r.year_closed ? `–${r.year_closed}` : ""}
-                      </span>
-                    </p>
-                    <p className="text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
-                      {r.description}
-                    </p>
-                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
-                      {t("home.discover")} <ArrowRight size={14} />
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-            {filtered.length === 0 && (
-              <div className="col-span-full text-center py-16 text-foreground/60">
-                {t("map.empty")}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

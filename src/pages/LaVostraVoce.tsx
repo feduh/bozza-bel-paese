@@ -1,13 +1,36 @@
 import { Link } from "react-router-dom";
-import { Radio, Mic, ArrowRight } from "lucide-react";
+import { Radio, Mic, ArrowRight, PlayCircle, Headphones } from "lucide-react";
 import SEO from "@/components/SEO";
+
+// Prima versione: due esempi finti per prototipare la sezione podcast/video.
+// Copertine estratte automaticamente (YouTube thumbnail per il video).
+const examples = [
+  {
+    kind: "video" as const,
+    title: "Intervista a un collettivo che non ha una sede",
+    author: "Il Bel Paese",
+    duration: "12'40\"",
+    cover: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+    href: "#",
+    tag: "Video",
+  },
+  {
+    kind: "podcast" as const,
+    title: "Radio indipendenti: geografie del suono",
+    author: "Ospite: nome radio partner",
+    duration: "34'12\"",
+    cover: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&auto=format&fit=crop",
+    href: "#",
+    tag: "Podcast",
+  },
+];
 
 const LaVostraVoce = () => {
   return (
     <div className="bg-background py-16 md:py-20">
       <SEO
         title="La vostra voce — Il Bel Paese"
-        description="Interviste e testimonianze orali della scena indipendente italiana, in collaborazione con radio e piattaforme podcast indipendenti."
+        description="Interviste, video e podcast della scena indipendente italiana, in collaborazione con radio e piattaforme podcast indipendenti."
         canonicalPath="/la-vostra-voce"
       />
       <div className="editorial-container space-y-12 md:space-y-16">
@@ -15,10 +38,68 @@ const LaVostraVoce = () => {
           <h1 className="editorial-heading mb-6">
             La <span className="text-primary">vostra</span> voce
           </h1>
-          <p className="editorial-body text-foreground/80">
-            Per il momento non c'è nulla, ma qui troverai tutta la parte di interviste e testimonianze orali.
+          <p className="editorial-body text-foreground/80 max-w-3xl">
+            Uno spazio per interviste, testimonianze orali e video documentari della scena
+            indipendente italiana. In collaborazione con radio e piattaforme podcast
+            altrettanto indipendenti.
           </p>
         </header>
+
+        {/* Esempi finti — prototipo card */}
+        <section aria-labelledby="esempi-heading">
+          <div className="flex items-end justify-between mb-6 border-b-2 border-foreground pb-4">
+            <h2 id="esempi-heading" className="editorial-subheading">
+              <span className="text-primary">Anteprima</span> — come sarà
+            </h2>
+            <span className="micro-label text-foreground/60">Esempi</span>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {examples.map((e) => {
+              const Icon = e.kind === "video" ? PlayCircle : Headphones;
+              return (
+                <a
+                  key={e.title}
+                  href={e.href}
+                  onClick={(ev) => ev.preventDefault()}
+                  className="brutalist-card overflow-hidden group cursor-not-allowed"
+                >
+                  <div className="relative aspect-video bg-muted overflow-hidden border-b-2 border-foreground">
+                    <img
+                      src={e.cover}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(ev) => {
+                        (ev.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
+                      <Icon size={56} className="text-background drop-shadow-lg" aria-hidden="true" />
+                    </div>
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
+                      {e.tag}
+                    </span>
+                    <span className="absolute bottom-3 right-3 micro-label bg-foreground text-background px-2 py-0.5">
+                      {e.duration}
+                    </span>
+                  </div>
+                  <div className="p-5 space-y-2">
+                    <h3
+                      className="text-lg leading-tight tracking-tight"
+                      style={{ fontVariationSettings: "'wght' 600" }}
+                    >
+                      {e.title}
+                    </h3>
+                    <p className="text-xs text-foreground/60">{e.author}</p>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+          <p className="mt-4 text-xs text-foreground/60 font-body italic">
+            Questi sono esempi finti per definire il layout: non riproducono contenuti reali.
+          </p>
+        </section>
 
         <section className="brutalist-card p-8 md:p-10">
           <div className="flex items-start gap-5">

@@ -1,20 +1,39 @@
 import { Link } from "react-router-dom";
-import { MapPin, Megaphone, Search, ArrowRight, RefreshCw, Sliders, Share2, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
 import SEO from "@/components/SEO";
 
-const pillars = [
-  { icon: MapPin, key: "mapping", withHtml: true },
-  { icon: Megaphone, key: "promotion", withHtml: false },
-  { icon: Search, key: "research", withHtml: false },
-] as const;
-
-const howIcons: Record<string, typeof RefreshCw> = {
-  update: RefreshCw,
-  personalized: Sliders,
-  milestones: Share2,
-};
-const how = ["update", "personalized", "milestones"] as const;
+/**
+ * Storytelling scroll-based per "Cosa Facciamo".
+ * Prima versione visiva: blocchi editoriali alternati (numero grande + titolo + testo)
+ * pensati per essere estesi in futuro con i contributi dei coordinatori.
+ */
+const chapters = [
+  {
+    num: "01",
+    title: "Un archivio che non si accontenta del centro",
+    body:
+      "Partiamo da una domanda semplice: **dove sono le realtà artistiche indipendenti italiane?** Non nelle grandi retrospettive, non nei circuiti istituzionali. Sono negli spazi off, nei collettivi che cambiano sede ogni due anni, nei luoghi che nascono in una cucina e finiscono per abitare un intero quartiere.",
+  },
+  {
+    num: "02",
+    title: "Mappare per non perdere memoria",
+    body:
+      "Ogni realtà che sparisce senza traccia è **un pezzo di paesaggio culturale che si dissolve**. Costruiamo una cartografia viva: attiva quando c'è, storica quando non c'è più, in ogni caso presente.",
+  },
+  {
+    num: "03",
+    title: "Un racconto contro il mainstream",
+    body:
+      "Non facciamo cronaca. Facciamo **contro-narrazione critica**: interviste, saggi, ricerche, un editoriale annuale curato da voci selezionate. La scena indipendente merita un linguaggio suo, non quello dei comunicati stampa.",
+  },
+  {
+    num: "04",
+    title: "Rete, non vetrina",
+    body:
+      "La mappa non è una directory. È **un punto di partenza per connettere chi fa cose simili in città diverse**: coordinatori, artisti, curatori, ricercatori. Si comincia da un profilo e si finisce in una collaborazione.",
+  },
+];
 
 const CosaFacciamo = () => {
   const { t } = useTranslation();
@@ -27,74 +46,71 @@ const CosaFacciamo = () => {
         description={t("what.seoDesc")}
         canonicalPath="/cosa-facciamo"
       />
-      <div className="editorial-container space-y-16 md:space-y-20">
+      <div className="editorial-container space-y-16 md:space-y-24">
         {/* Header */}
         <header className="border-b-2 border-foreground pb-10">
           <h1 className="editorial-heading mb-6">
             {t("what.title")} <span className="text-primary">{t("what.titleAccent")}</span>
           </h1>
-          <div className="editorial-body text-foreground/80 space-y-4">
+          <div className="editorial-body text-foreground/80 space-y-4 max-w-3xl">
             <p>
               <Trans i18nKey="what.intro_html" components={{ strong: <strong className="text-foreground" /> }} />
-            </p>
-            <p>
-              <Trans i18nKey="what.intro_html2" components={{ strong: <strong className="text-foreground" /> }} />
             </p>
           </div>
         </header>
 
-        {/* Pillars */}
-        <section>
-          <div className="flex items-end justify-between mb-8 border-b-2 border-foreground pb-4">
-            <h2 className="editorial-subheading">I <span className="text-primary">pilastri</span></h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {pillars.map((p, i) => (
-              <div key={p.key} className="brutalist-card p-8 flex flex-col gap-4">
-                <div className="micro-label text-primary">0{i + 1} // {p.key}</div>
-                <p.icon className="text-foreground" size={28} aria-hidden="true" />
-                <h3 className="text-2xl leading-none tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
-                  {t(`what.pillars.${p.key}.title`)}
-                </h3>
-                <div className="h-[2px] w-12 bg-foreground" />
-                <p className="text-sm leading-relaxed text-foreground/80">
-                  {p.withHtml ? (
-                    <Trans
-                      i18nKey={`what.pillars.${p.key}.desc_html`}
-                      components={{ strong: <strong className="text-foreground" /> }}
-                    />
-                  ) : (
-                    t(`what.pillars.${p.key}.desc`)
-                  )}
-                </p>
-              </div>
-            ))}
-          </div>
+        {/* Storytelling scroll */}
+        <section aria-label="Il progetto in quattro capitoli" className="space-y-12 md:space-y-20">
+          {chapters.map((c, i) => {
+            const rightAligned = i % 2 === 1;
+            return (
+              <article
+                key={c.num}
+                className={`grid md:grid-cols-12 gap-6 md:gap-10 items-start ${
+                  rightAligned ? "md:[&>*:first-child]:col-start-6" : ""
+                }`}
+              >
+                <div className={`md:col-span-3 ${rightAligned ? "md:order-2 md:text-right" : ""}`}>
+                  <div
+                    className="text-[6rem] md:text-[9rem] leading-none tracking-tight text-primary/90 select-none"
+                    style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.06em" }}
+                    aria-hidden="true"
+                  >
+                    {c.num}
+                  </div>
+                </div>
+                <div className={`md:col-span-8 space-y-4 ${rightAligned ? "md:order-1" : ""}`}>
+                  <h2
+                    className="text-2xl md:text-4xl leading-[1.05] tracking-tight"
+                    style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.02em" }}
+                  >
+                    {c.title}
+                  </h2>
+                  <div className="h-[2px] w-16 bg-foreground" />
+                  <p
+                    className="editorial-body text-foreground/80 max-w-2xl"
+                    dangerouslySetInnerHTML={{
+                      __html: c.body.replace(
+                        /\*\*([^*]+)\*\*/g,
+                        '<strong class="text-foreground">$1</strong>',
+                      ),
+                    }}
+                  />
+                </div>
+              </article>
+            );
+          })}
         </section>
 
-        {/* How */}
-        <section>
-          <div className="flex items-end justify-between mb-8 border-b-2 border-foreground pb-4">
-            <h2 className="editorial-subheading">
-              <span className="text-primary">{t("what.howIntro")}</span> {t("what.howSuffix")}
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {how.map((h, i) => {
-              const Icon = howIcons[h];
-              return (
-                <div key={h} className="brutalist-card p-6 flex flex-col gap-3">
-                  <div className="micro-label text-primary">0{i + 1}</div>
-                  <Icon className="text-foreground" size={22} aria-hidden="true" />
-                  <h3 className="text-lg tracking-tight" style={{ fontVariationSettings: "'wght' 600" }}>
-                    {t(`what.how.${h}.title`)}
-                  </h3>
-
-                  <p className="text-sm text-foreground/80 leading-relaxed">{t(`what.how.${h}.desc`)}</p>
-                </div>
-              );
-            })}
-          </div>
+        {/* Placeholder — voci dei coordinatori */}
+        <section className="brutalist-card p-8 md:p-12 bg-muted/40 border-dashed">
+          <div className="micro-label text-primary mb-3">In arrivo</div>
+          <h2 className="editorial-subheading mb-4">Le <span className="text-primary">voci</span> dei coordinatori</h2>
+          <p className="text-sm md:text-base text-foreground/70 max-w-2xl">
+            Presto qui troverai i contributi dei coordinatori del progetto: come è nato,
+            perché si è scelto questo approccio, cosa succederà nei prossimi mesi. Uno spazio di racconto
+            interno che vogliamo costruire insieme.
+          </p>
         </section>
 
         {/* Why */}

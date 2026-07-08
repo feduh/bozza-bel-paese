@@ -113,89 +113,98 @@ const AutoreProfilo = () => {
           <ArrowLeft size={14} /> La rete
         </Link>
 
-        <header className="flex flex-col sm:flex-row gap-8 items-start mb-12 pb-12 border-b border-border">
-          {profile.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt=""
-              className="w-28 h-28 rounded-full object-cover bg-muted shrink-0"
-            />
-          ) : (
-            <div className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-4xl shrink-0">
-              {profile.display_name.charAt(0).toUpperCase()}
+        <header className="mb-12 pb-12 border-b border-border">
+          <div className="flex flex-col sm:flex-row gap-8 items-start">
+            {profile.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt=""
+                className="w-28 h-28 rounded-full object-cover bg-muted shrink-0"
+              />
+            ) : (
+              <div className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-4xl shrink-0">
+                {profile.display_name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-words leading-tight">{profile.display_name}</h1>
+              {(profile.role_collective || profile.role_real_life) && (
+                <p className="font-body text-muted-foreground text-sm mb-2">
+                  {[profile.role_collective, profile.role_real_life].filter(Boolean).join(" · ")}
+                </p>
+              )}
+              {(reality || profile.affiliation) && (
+                <p className="font-body text-muted-foreground">
+                  {reality ? (
+                    <Link to={`/realta/${reality.id}`} className="inline-flex items-center gap-1.5 hover:text-primary transition-colors">
+                      <MapPin size={14} /> {reality.name} · {reality.city}
+                    </Link>
+                  ) : (
+                    profile.affiliation
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Bio full-width sotto l'header per evitare rotture con testi lunghi */}
+          {profile.bio && (
+            <div className="mt-8 max-w-3xl">
+              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line text-justify hyphens-auto">
+                {profile.bio}
+              </p>
             </div>
           )}
-          <div className="flex-1 min-w-0">
-            <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-words leading-tight">{profile.display_name}</h1>
-            {(profile.role_collective || profile.role_real_life) && (
-              <p className="font-body text-muted-foreground text-sm mb-2">
-                {[profile.role_collective, profile.role_real_life].filter(Boolean).join(" · ")}
-              </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {profile.public_email && (
+              <a
+                href={`mailto:${profile.public_email}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Mail size={14} /> Email
+              </a>
             )}
-            {(reality || profile.affiliation) && (
-              <p className="font-body text-muted-foreground mb-4">
-                {reality ? (
-                  <Link to={`/realta/${reality.id}`} className="inline-flex items-center gap-1.5 hover:text-primary transition-colors">
-                    <MapPin size={14} /> {reality.name} · {reality.city}
-                  </Link>
-                ) : (
-                  profile.affiliation
-                )}
-              </p>
+            {profile.website && (
+              <a
+                href={profile.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Globe size={14} /> Sito
+              </a>
             )}
-            {profile.bio && (
-              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line prose-justify">{profile.bio}</p>
+            {profile.social_linkedin && (
+              <a
+                href={profile.social_linkedin.startsWith("http") ? profile.social_linkedin : `https://linkedin.com/in/${profile.social_linkedin.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Linkedin size={14} /> LinkedIn
+              </a>
             )}
-            <div className="mt-5 flex flex-wrap gap-3">
-              {profile.public_email && (
-                <a
-                  href={`mailto:${profile.public_email}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Mail size={14} /> Email
-                </a>
-              )}
-              {profile.website && (
-                <a
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Globe size={14} /> Sito
-                </a>
-              )}
-              {profile.social_linkedin && (
-                <a
-                  href={profile.social_linkedin.startsWith("http") ? profile.social_linkedin : `https://linkedin.com/in/${profile.social_linkedin.replace(/^@/, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Linkedin size={14} /> LinkedIn
-                </a>
-              )}
-              {profile.social_instagram && (
-                <a
-                  href={profile.social_instagram.startsWith("http") ? profile.social_instagram : `https://instagram.com/${profile.social_instagram.replace(/^@/, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Instagram size={14} /> Instagram
-                </a>
-              )}
-              {profile.social_twitter && (
-                <a
-                  href={profile.social_twitter.startsWith("http") ? profile.social_twitter : `https://twitter.com/${profile.social_twitter.replace(/^@/, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Twitter size={14} /> Twitter
-                </a>
-              )}
-            </div>
+            {profile.social_instagram && (
+              <a
+                href={profile.social_instagram.startsWith("http") ? profile.social_instagram : `https://instagram.com/${profile.social_instagram.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Instagram size={14} /> Instagram
+              </a>
+            )}
+            {profile.social_twitter && (
+              <a
+                href={profile.social_twitter.startsWith("http") ? profile.social_twitter : `https://twitter.com/${profile.social_twitter.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Twitter size={14} /> Twitter
+              </a>
+            )}
           </div>
         </header>
 

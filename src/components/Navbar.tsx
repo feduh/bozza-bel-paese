@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 
@@ -19,19 +19,25 @@ import {
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [raccontoOpen, setRaccontoOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
-  // Link primari nella navbar (ordine richiesto)
+  // Sotto-voci del dropdown "Racconto"
+  const raccontoLinks = [
+    { to: "/editoriale", label: "Editoriale" },
+    { to: "/magazine", label: "Magazine libero" },
+    { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
+  ];
+
+  // Link primari nella navbar (ordine richiesto). "Racconto" viene reso come dropdown separato.
   const primaryLinks = [
     { to: "/cosa-facciamo", label: t("nav.what") },
     { to: "/la-rete", label: t("nav.network") },
     { to: "/mappatura", label: t("nav.map") },
-    { to: "/magazine", label: t("nav.magazine") },
-    { to: "/la-vostra-voce", label: t("nav.voice") },
     { to: "/contatti", label: t("nav.contacts") },
   ];
 
@@ -81,7 +87,41 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-x-7 ml-8">
 
 
-          {primaryLinks.map((link) => {
+          {primaryLinks.slice(0, 3).map((link) => {
+            const active = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                aria-current={active ? "page" : undefined}
+                className={`font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+          {/* Racconto dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`inline-flex items-center gap-1 font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary focus:outline-none ${
+                raccontoLinks.some((l) => location.pathname === l.to) ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              Racconto <ChevronDown size={14} aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[220px]">
+              {raccontoLinks.map((l) => (
+                <DropdownMenuItem key={l.to} asChild>
+                  <Link to={l.to} className="cursor-pointer">{l.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {primaryLinks.slice(3).map((link) => {
             const active = location.pathname === link.to;
             return (
               <Link
@@ -160,7 +200,55 @@ const Navbar = () => {
       {open && (
         <div id="mobile-nav" className="lg:hidden border-t border-border bg-background px-6 py-4 space-y-3">
 
-          {primaryLinks.map((link) => {
+          {primaryLinks.slice(0, 3).map((link) => {
+            const active = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={`block font-body text-sm font-medium uppercase ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+          {/* Racconto accordion */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setRaccontoOpen((o) => !o)}
+              aria-expanded={raccontoOpen}
+              className={`w-full flex items-center justify-between font-body text-sm font-medium uppercase ${
+                raccontoLinks.some((l) => location.pathname === l.to) ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <span>Racconto</span>
+              <ChevronDown size={14} className={`transition-transform ${raccontoOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+            </button>
+            {raccontoOpen && (
+              <div className="mt-2 pl-3 border-l border-border/60 space-y-2">
+                {raccontoLinks.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={() => { setOpen(false); setRaccontoOpen(false); }}
+                    className={`block font-body text-xs uppercase tracking-wide ${
+                      location.pathname === l.to ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {primaryLinks.slice(3).map((link) => {
             const active = location.pathname === link.to;
             return (
               <Link

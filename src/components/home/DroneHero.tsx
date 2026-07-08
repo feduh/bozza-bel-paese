@@ -20,9 +20,7 @@ const { W: VB_W, H: VB_H } = EUROPE_VB;
 const ROTATING_WORDS = [
   "realtà artistiche",
   "spazi indipendenti",
-  "atelier nascosti",
   "collettivi nomadi",
-  "luoghi che resistono",
 ];
 
 const PIEMONTE = { x: 0.475, y: 0.655 };

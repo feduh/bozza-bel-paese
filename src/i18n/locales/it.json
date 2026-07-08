@@ -126,8 +126,8 @@
   "what": {
     "title": "Cosa",
     "titleAccent": "Facciamo",
-    "intro_html": "<strong>Il Bel Paese</strong> è la prima piattaforma di mappatura, promozione e ricerca che mette a sistema e racconta la scena indipendente italiana.",
-    "intro_html2": "Attraverso una <strong>vetrina dinamica</strong> e un <strong>archivio storico</strong>, il progetto mette a sistema queste esperienze per favorire la creazione di reti e <strong>ridurre la distanza tra la scena indipendente e il sistema istituzionale</strong>.",
+    "intro_html": "<strong>Il Bel Paese</strong> è la piattaforma di mappatura, promozione e ricerca che mette a sistema e racconta la scena indipendente italiana.",
+    "intro_html2": "",
     "seoDesc": "Mappatura, promozione e ricerca: i tre pilastri con cui Il Bel Paese racconta la scena artistica indipendente italiana.",
     "pillars": {
       "mapping": {
@@ -181,7 +181,7 @@
     "search": "Cerca per nome o città...",
     "filterRegion": "Tutte le regioni",
     "filterMedia": "Tutti i media artistici",
-    "filterCategory": "Tutte le categorie",
+    "filterCategory": "Tutte le discipline",
     "year": "Anno:",
     "nearMe": "Vicino a me",
     "nearYou": "Vicino a te",
