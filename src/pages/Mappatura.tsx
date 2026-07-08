@@ -318,13 +318,6 @@ const Mappatura = () => {
             >
               <List size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.list")}</span>
             </button>
-              aria-pressed={view === "magazine"}
-              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
-                view === "magazine" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
-              }`}
-            >
-              <LayoutGrid size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">Magazine</span>
-            </button>
           </div>
           <label className="flex-1">
             <span className="sr-only">{t("map.search")}</span>
