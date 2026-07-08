@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 
@@ -19,19 +19,25 @@ import {
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [raccontoOpen, setRaccontoOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
-  // Link primari nella navbar (ordine richiesto)
+  // Sotto-voci del dropdown "Racconto"
+  const raccontoLinks = [
+    { to: "/editoriale", label: "Editoriale" },
+    { to: "/magazine", label: "Magazine libero" },
+    { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
+  ];
+
+  // Link primari nella navbar (ordine richiesto). "Racconto" viene reso come dropdown separato.
   const primaryLinks = [
     { to: "/cosa-facciamo", label: t("nav.what") },
     { to: "/la-rete", label: t("nav.network") },
     { to: "/mappatura", label: t("nav.map") },
-    { to: "/magazine", label: t("nav.magazine") },
-    { to: "/la-vostra-voce", label: t("nav.voice") },
     { to: "/contatti", label: t("nav.contacts") },
   ];
 
