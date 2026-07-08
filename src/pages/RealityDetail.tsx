@@ -135,15 +135,17 @@ const RealityDetail = () => {
             </div>
           </div>
           <h1 className="font-display uppercase tracking-tight leading-[0.95] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>{reality.name}</h1>
-          <p className="editorial-body text-muted-foreground max-w-3xl">{reality.description}</p>
+          <p className="editorial-body text-muted-foreground max-w-3xl whitespace-pre-line text-justify hyphens-auto">{reality.description}</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-10">
+        <div className="grid lg:grid-cols-3 gap-10 items-start">
           <div className="lg:col-span-2 space-y-10">
-            <section>
-              <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.history")}</h2>
-              <p className="font-body text-muted-foreground leading-relaxed">{reality.history}</p>
-            </section>
+            {reality.history && String(reality.history).trim() && (
+              <section>
+                <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.history")}</h2>
+                <p className="font-body text-muted-foreground leading-relaxed whitespace-pre-line text-justify hyphens-auto">{reality.history}</p>
+              </section>
+            )}
 
             <section>
               <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.location")}</h2>
@@ -283,11 +285,20 @@ const RealityDetail = () => {
             <div className="p-6 rounded-lg bg-card border border-border">
               <h3 className="font-display text-lg font-semibold mb-4">{t("reality.disciplines")}</h3>
               <div className="flex flex-wrap gap-2">
-                {tags.map((d) => (
-                  <span key={d} className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                    {d}
-                  </span>
-                ))}
+                {(() => {
+                  const cats: string[] = Array.isArray(reality.categories) && reality.categories.length > 0
+                    ? reality.categories
+                    : reality.category ? [reality.category] : [];
+                  const all = Array.from(new Set([...cats, ...tags]));
+                  if (all.length === 0) {
+                    return <p className="text-sm text-muted-foreground font-body">Nessuna disciplina indicata.</p>;
+                  }
+                  return all.map((d) => (
+                    <span key={d} className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                      {d}
+                    </span>
+                  ));
+                })()}
               </div>
             </div>
           </aside>
