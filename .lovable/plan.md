@@ -1,85 +1,66 @@
-# Interventi richiesti
+# Piano modifiche sito
 
-Raggruppo le modifiche per area. Due punti richiedono una tua decisione prima di procedere (vedi § Domande in fondo): fusione descrizione/storia e comportamento responsive fuori fullscreen.
+Lavoro suddiviso per area. Alcune voci ambiziose (nuova sezione "Editoriale", storytelling "Cosa Facciamo") sono trattate come **prima versione visiva** che potremo rifinire insieme in un secondo giro.
 
-## 1. Form realtà (RealityForm)
+---
 
-- **Email di contatto obbligatoria** per chi crea/modifica una realtà (coordinatori e admin). Aggiungo validazione client + messaggio errore in italiano. Nota: a livello DB `contact_email` resta `nullable` per non rompere i record legacy; l'obbligo è sulla UI di inserimento/modifica.
-- **Nuovi campi opzionali**:
-  - `contact_phone` (telefono) — con formato libero, hint "+39 …"
-  - `social_vimeo` — URL Vimeo, validato come `https://vimeo.com/…`
-- Richiede una **migrazione** che aggiunge `contact_phone text` e `social_vimeo text` alla tabella `realities` (entrambi nullable, senza default).
+## 1. Home
 
-## 2. Pagina singola realtà (RealityDetail)
+- **Scritte dinamiche (WordRotate)**: rimuovere "atelier nascosti" e "luoghi che resistono" dall'elenco (file `it.json`).
+- **Card "pilastri"**: eliminare la piccola label viola (es. `Cartografia`, `Network`, `Editoria`) e lasciare solo il numero (`01 //`, `02 //`, `03 //`).
+- **Riga sotto le statistiche**: rimuovere il blocco "ILBELPAESE / Scena indipendente italiana" sotto i contatori animati.
 
-- **Rimuovo dalla card "Informazioni" la voce "Sito web"** (resta in "Contatti").
-- **Aggiungo telefono e Vimeo** nella card "Contatti" quando presenti.
-- **Rimuovo l'etichetta "Drone · IT · Live"** dalla mappa: elimino l'HUD `hudLabel` da `LazyMap` (default e uso ovunque). "Drone" scompare dall'intero prodotto lato utente (resta solo il nome interno del componente `DroneHero.tsx`, non visibile).
-- **Popup pin sulla mappa della singola realtà**: sostituisco il popup attuale con indirizzo. Logica:
-  - se `address` presente → mostra indirizzo completo (`address, city, region`)
-  - altrimenti → messaggio "Spazio nomade — nessuna sede fisica" (copy da rifinire)
+## 2. Navbar
 
-## 3. Mappa realtà (`/mappatura`)
+- Nuova voce **RACCONTO** (dropdown) al posto delle attuali voci separate `Magazine` e `La vostra voce`:
+  - `Editoriale` (nuova pagina — vedi sotto)
+  - `Magazine libero` (attuale `/magazine`)
+  - `Podcast / La vostra voce` (attuale `/la-vostra-voce`)
+- Implementata con `DropdownMenu` (già in uso) sia su desktop sia nel menu mobile (accordion).
+- **Nuova pagina `/editoriale**`: prima versione con hero editoriale differenziato (tipografia più grande, sfondo scuro/accent, badge "Tema dell'anno"), spazio per il tema curato e griglia articoli associati. Per adesso mostra un placeholder + eventuali `blog_posts` filtrati per tag `editoriale` (nessuna nuova tabella; useremo un tag esistente).
 
-Cambio filtri → auto-focus mappa:
+## 3. Cosa Facciamo
 
-- Quando si seleziona una **regione**, la mappa fa `fitBounds` sui marker filtrati (con `padding` e `maxZoom` sensato ~10). Se 0 risultati, resta sulla vista Italia.
-- Stessa cosa per cambio **categoria**, **disciplina**, **sezione**, **ricerca testuale**, **anno**: la mappa riadatta i bounds al set filtrato.
-- Se un solo risultato, `setView([lat,lng], 12)`.
-- Implementazione: dentro `LazyMap` un nuovo effetto che ricalcola bounds quando cambia l'array `markers` (usando `L.latLngBounds`). Skippato quando l'utente ha appena mosso manualmente la mappa entro 500ms (per evitare jitter).
+- Correggere l'incipit: togliere la parola "prima" dalla prima frase (i18n).
+- Rimuovere la frase: *"Attraverso una vetrina dinamica e un archivio storico…"*.
+- **Rimuovere le sezioni "I pilastri" e "Come lo facciamo"** e sostituirle con una **prima versione di storytelling scroll-based**: sequenza di blocchi editoriali alternati (numero grande + titolo + paragrafo + immagine/illustrazione), pensati per essere estesi in futuro. Sezione "prima di noi coordinatori" lasciata come blocco placeholder pronto per il contenuto che ci darete.
 
-## 4. Pagina "La Rete"
+## 4. Mappatura
 
-- **Card coordinatori**: rimuovo l'indicatore `01 // Coordinatore`, `02 // Coordinatore` ecc. La numerazione resta solo nell'ordine di lettura DB, non mostrata in UI. Sostituisco con label semplice `Coordinatore`.
+- **Filtri riorganizzati visivamente** in tre righe:
+  - Riga 1: `Mappa | Elenco` · Barra di ricerca · `Vicino a me`
+  - Riga 2: chip multiselezione — `Spazi | Spazi senza spazi | Spazi che furono (verdi) | Spazi che furono (viola)`
+  - Riga 3: `Regioni | Discipline | Ordine predefinito` (solo in modalità elenco) `| Anno`
+- Rimuovere la modalità `Magazine` dai filtri.
+- Rinominare "Categorie" → "Discipline" nell'etichetta filtro.
+- **Nessun risultato**: overlay al centro della mappa con messaggio ("Nessuna realtà corrisponde ai filtri impostati") + pulsante "Reimposta filtri".
+- **Nomi mappa**: forzare la tile CartoDB in italiano (usare tile `light_all` con `lang=it` dove supportato, altrimenti fallback a versione internazionale, per evitare mix IT/EN).
+- **Zoom touch/pinch/trackpad**: abilitare `scrollWheelZoom`, `touchZoom`, `doubleClickZoom` sul `MapContainer`.
+- **Bug tag/discipline invisibili** su nuove realtà (es. Mucho Mas!, ALMARE): verificare che le tag inserite in `RealityForm` vengano salvate in `reality_tags` anche quando la realtà è ancora `pendente`, e che vengano lette anche per realtà non ancora confermate nell'anteprima admin. Verificheremo anche perché non vengono pubblicate (probabile trigger auto-confirm che non scatta per realtà proposte da coordinatori — da confermare in build mode leggendo lo stato reale delle due realtà).
+- **Storia**: nascondere completamente la card "Storia" sulla scheda realtà se il campo è vuoto; **descrizione sempre obbligatoria** (già in validazione). Riorganizzare la scheda in modo che le card `Contatti` / `Informazioni` inizino alla stessa altezza della descrizione (layout 2 colonne allineate top).
+- **Descrizione + bio con formattazione**: consentire a-capo e **grassetto** nella descrizione delle realtà e nella bio profilo; rendering con testo giustificato. Editor semplice (toolbar minimale: **B**, nuova riga) basato sul `MarkdownEditor` già esistente, oppure textarea che supporta `**bold**` + `\n` con render markdown lato lettura.
 
-## 5. Homepage — banner/striscia dinamica
+## 5. Sezione Racconto
 
-- Il marquee usa `-mx-6 md:-mx-10` dentro `editorial-container` → non arriva ai bordi ai viewport più larghi (dove il container ha padding maggiore o max-width).
-- Lo sposto **fuori** da `editorial-container` come sezione full-bleed (`w-screen` con `left: 50%; margin-left: -50vw` oppure semplicemente estratto al livello top del wrapper come già fatto per l'hero) allineandolo al comportamento di navbar/footer che coprono l'intera larghezza viewport.
-- Mantengo contenuto e stile invariati (Marquee attuale, palette avorio/ink).
+- **Podcast / La vostra voce**: aggiungere 2 esempi finti (1 video + 1 podcast audio) per prototipare card, player e metadati. Card con copertina, titolo, autore, durata, embed player.
+- **Estrazione copertina URL**: migliorare la funzione che estrae la thumbnail per link YouTube (usare `img.youtube.com/vi/<id>/maxresdefault.jpg`) e per siti indipendenti (parse `og:image` / `twitter:image` via edge function o fallback).
 
-## 6. Profili utente — bio lunga
+## 6. Altro
 
-- Alzo il limite `maxLength` della bio da **500 → 1500** in `PanelProfilo.tsx` (tutti i ruoli: autori, coordinatori, admin).
-- Nessuna migrazione: la colonna `profiles.bio` è già `text` senza vincolo di lunghezza.
-- Aggiungo un contatore caratteri sotto la textarea (`n / 1500`).
+- **Occhietto password** su `/login` (toggle show/hide con icona `Eye`/`EyeOff`).
+- **Timeout di sessione**: verificare che l'auto-refresh di Supabase sia attivo e valutare timeout esplicito con avviso ("La sessione sta per scadere"). Proposta: 8h di inattività, avviso a 5 minuti dal termine. **In alternativa** demandare a Cloudflare (soluzione non consigliata perché la sessione è gestita da Supabase). Attendo conferma se procedere con avviso lato app.
+- **Bio profilo**: rivedere layout `AutoreProfilo` per evitare che le bio lunghe rompano l'impaginazione (es. profilo di Federica) — colonna dedicata max-w, spaziatura tra header e bio, wrapping corretto.
 
-## 7. "Drone" — pulizia globale
+---
 
-Ricerca `rg -i drone` nel sorgente utente-visibile e rimozione. Ad oggi le uniche stringhe visibili sono:
-- `LazyMap.tsx` HUD `"Drone · IT · Live"` → rimosso (punto 2)
-Il file `DroneHero.tsx` resta col suo nome interno (non user-facing).
+## Nota tecnica
 
-## Migrazione DB
+- Nessuna nuova tabella DB necessaria. Se il filtro/rendering `disciplines` richiede una vista dedicata, useremo `reality_tags` esistente.
+- I18n aggiornato per tutte le nuove label e i placeholder.
+- Il changeset resta focalizzato su UI/presentazione, tranne la piccola correzione lettura tag per realtà pendenti.
 
-```sql
-ALTER TABLE public.realities
-  ADD COLUMN contact_phone text,
-  ADD COLUMN social_vimeo  text;
-```
-(Nessun GRANT nuovo: la tabella esiste già con permessi corretti.)
+## Domande aperte
 
-## File toccati (previsione)
-
-- `src/components/RealityForm.tsx` — email obbligatoria, campi telefono/Vimeo
-- `src/pages/RealityDetail.tsx` — rimozione "Sito web" da info, aggiunta telefono/Vimeo in contatti, popup mappa
-- `src/components/LazyMap.tsx` — rimozione HUD "Drone", auto-fit bounds su cambio markers
-- `src/pages/Mappatura.tsx` — nessuna modifica se il fit viene fatto in LazyMap
-- `src/pages/LaRete.tsx` — rimozione `0{i+1} //`
-- `src/pages/Index.tsx` — marquee full-bleed
-- `src/components/area/PanelProfilo.tsx` — bio 1500 char + counter
-- `src/integrations/supabase/types.ts` — rigenerato dopo migrazione
-
-## Domande aperte (rispondi prima di implementare)
-
-1. **Descrizione + Storia**: preferisci
-   - (a) **fondere** i due campi in un unico "Descrizione" (mostrando in UI il vecchio `history` accodato per i record esistenti), oppure
-   - (b) **lasciare due campi separati** ma rendere `storia` opzionale e più leggero (placeholder che chiarisce "opzionale — solo se distinta dalla descrizione"), oppure
-   - (c) tenerli entrambi obbligatori come ora?
-
-2. **Responsive fuori fullscreen**: attualmente il layout usa breakpoint Tailwind standard (sm/md/lg/xl). Una finestra "a metà schermo" su desktop viene trattata come un viewport più piccolo e passa già al layout tablet/mobile ai breakpoint corrispondenti. Cosa noti che non funziona? Possibili opzioni:
-   - (a) va bene così, era solo una domanda
-   - (b) vuoi che il layout desktop rimanga anche in finestre strette (minor adattività, più scroll orizzontale) — sconsigliato
-   - (c) c'è una pagina specifica che si rompe: dimmi quale e la sistemo puntualmente
-
-Appena confermi (1) e (2) procedo con l'implementazione completa.
+1. **Timeout sessione**: preferisci implementarlo lato app con avviso (8h / avviso 5min) o lasciar gestire a Cloudflare? FACCIAMO SU SUPABASE PER ORA.
+2. **Pagina "Editoriale"**: gli articoli da mostrare vanno filtrati per un tag specifico (es. `editoriale`) o ci sarà un flag dedicato in futuro? Per la v1 uso il tag. FLAG IN FUTURO (CAPIAMO COME IMPLEMENTARLO).
+3. **Grassetto/formattazione descrizione**: preferisci una **toolbar visuale** (bottone B, invio) o mantenere sintassi markdown (`**testo**`) con anteprima? TOOLBAR VISUALE PER TUTTI I MEMBRI.
