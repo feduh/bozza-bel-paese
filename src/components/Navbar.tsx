@@ -87,7 +87,41 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-x-7 ml-8">
 
 
-          {primaryLinks.map((link) => {
+          {primaryLinks.slice(0, 3).map((link) => {
+            const active = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                aria-current={active ? "page" : undefined}
+                className={`font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+          {/* Racconto dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`inline-flex items-center gap-1 font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary focus:outline-none ${
+                raccontoLinks.some((l) => location.pathname === l.to) ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              Racconto <ChevronDown size={14} aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[220px]">
+              {raccontoLinks.map((l) => (
+                <DropdownMenuItem key={l.to} asChild>
+                  <Link to={l.to} className="cursor-pointer">{l.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {primaryLinks.slice(3).map((link) => {
             const active = location.pathname === link.to;
             return (
               <Link
