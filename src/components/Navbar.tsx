@@ -200,7 +200,55 @@ const Navbar = () => {
       {open && (
         <div id="mobile-nav" className="lg:hidden border-t border-border bg-background px-6 py-4 space-y-3">
 
-          {primaryLinks.map((link) => {
+          {primaryLinks.slice(0, 3).map((link) => {
+            const active = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={`block font-body text-sm font-medium uppercase ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+          {/* Racconto accordion */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setRaccontoOpen((o) => !o)}
+              aria-expanded={raccontoOpen}
+              className={`w-full flex items-center justify-between font-body text-sm font-medium uppercase ${
+                raccontoLinks.some((l) => location.pathname === l.to) ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <span>Racconto</span>
+              <ChevronDown size={14} className={`transition-transform ${raccontoOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+            </button>
+            {raccontoOpen && (
+              <div className="mt-2 pl-3 border-l border-border/60 space-y-2">
+                {raccontoLinks.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={() => { setOpen(false); setRaccontoOpen(false); }}
+                    className={`block font-body text-xs uppercase tracking-wide ${
+                      location.pathname === l.to ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {primaryLinks.slice(3).map((link) => {
             const active = location.pathname === link.to;
             return (
               <Link
