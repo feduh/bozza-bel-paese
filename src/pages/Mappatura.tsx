@@ -40,7 +40,7 @@ type Reality = {
   tags: string[];
 };
 
-type ViewMode = "list" | "map" | "magazine";
+type ViewMode = "list" | "map";
 type SortMode = "default" | "az" | "za" | "latest";
 
 const Mappatura = () => {
@@ -51,7 +51,7 @@ const Mappatura = () => {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<ViewMode>(() => {
     const v = searchParams.get("vista");
-    return v === "list" || v === "magazine" ? v : "map";
+    return v === "list" ? v : "map";
   });
   const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
     (searchParams.get("sezione") as Bucket | null) ?? "all"
@@ -61,7 +61,6 @@ const Mappatura = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
   const [sortMode, setSortMode] = useState<SortMode>("default");
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
-  const [bucketMenuOpen, setBucketMenuOpen] = useState(false);
   const [yearMin, setYearMin] = useState<string>(searchParams.get("annoMin") ?? "");
   const [yearMax, setYearMax] = useState<string>(searchParams.get("annoMax") ?? "");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
