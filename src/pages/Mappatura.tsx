@@ -348,7 +348,7 @@ const Mappatura = () => {
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
-            aria-label="Filtra per categoria artistica"
+            aria-label="Filtra per disciplina"
           >
             <option value="all">{t("map.filterCategory")}</option>
             {REALITY_CATEGORIES.map((c) => (
@@ -448,17 +448,32 @@ const Mappatura = () => {
 
         {/* Map view */}
         {view === "map" && (
-          <div className="brutalist-border shadow-brutalist overflow-hidden h-[600px]">
+          <div className="brutalist-border shadow-brutalist overflow-hidden h-[600px] relative">
             <Suspense fallback={<MapFallback height="600px" />}>
               <LazyMap
                 center={[41.8719, 12.5674]}
                 zoom={6}
                 markers={mapMarkers}
-                scrollWheelZoom={false}
+                scrollWheelZoom={true}
                 height="600px"
                 userLocation={userPos}
               />
             </Suspense>
+            {filtered.length === 0 && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-[500]">
+                <div className="pointer-events-auto bg-background/95 brutalist-border shadow-brutalist px-6 py-5 max-w-sm text-center">
+                  <p className="font-body text-sm text-foreground mb-3">
+                    Nessuna realtà corrisponde ai filtri impostati.
+                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.15em] font-bold bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                  >
+                    <X size={12} /> Reimposta filtri
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -512,74 +527,6 @@ const Mappatura = () => {
           </div>
         )}
 
-        {/* Magazine view: editorial card grid with cover images */}
-        {view === "magazine" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((r) => {
-              const cat = getCategory(r.type, r.status);
-              const cfg = categoryConfig[cat];
-              const Icon = cfg.icon;
-              return (
-                <Link
-                  to={`/realta/${r.id}`}
-                  key={r.id}
-                  className="group brutalist-card flex flex-col overflow-hidden"
-                >
-                  <div className="relative aspect-[4/3] bg-muted overflow-hidden border-b-2 border-foreground">
-                    {r.image_url ? (
-                      <img
-                        src={r.image_url}
-                        alt={r.name}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                        <ImageOff size={32} className="text-foreground/30" aria-hidden="true" />
-                      </div>
-                    )}
-                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
-                      <Icon size={11} /> {cfg.label}
-                    </span>
-                    <div
-                      className="absolute top-3 right-3"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <BookmarkButton realityId={r.id} variant="compact" />
-                    </div>
-                  </div>
-                  <div className="flex-1 flex flex-col p-5">
-                    {((r.categories && r.categories.length > 0) || r.category) && (
-                      <p className="micro-label text-primary mb-2">
-                        {(r.categories && r.categories.length > 0 ? r.categories : [r.category!]).join(" · ")}
-                      </p>
-                    )}
-                    <h3 className="text-lg mb-2 leading-tight tracking-tight group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 600" }}>
-                      {r.name}
-                    </h3>
-                    <p className="text-xs text-foreground/70 flex items-center gap-1 mb-3">
-                      <MapPin size={11} /> {r.city}, {r.region}
-                      <span className="ml-auto">
-                        {r.year_founded}{r.year_closed ? `–${r.year_closed}` : ""}
-                      </span>
-                    </p>
-                    <p className="text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
-                      {r.description}
-                    </p>
-                    <span className="inline-flex items-center gap-1 mt-4 text-primary text-xs uppercase tracking-[0.15em] font-bold group-hover:gap-2 transition-all">
-                      {t("home.discover")} <ArrowRight size={14} />
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-            {filtered.length === 0 && (
-              <div className="col-span-full text-center py-16 text-foreground/60">
-                {t("map.empty")}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
