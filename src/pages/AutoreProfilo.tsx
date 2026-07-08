@@ -155,56 +155,56 @@ const AutoreProfilo = () => {
               </p>
             </div>
           )}
-            <div className="mt-5 flex flex-wrap gap-3">
-              {profile.public_email && (
-                <a
-                  href={`mailto:${profile.public_email}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Mail size={14} /> Email
-                </a>
-              )}
-              {profile.website && (
-                <a
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Globe size={14} /> Sito
-                </a>
-              )}
-              {profile.social_linkedin && (
-                <a
-                  href={profile.social_linkedin.startsWith("http") ? profile.social_linkedin : `https://linkedin.com/in/${profile.social_linkedin.replace(/^@/, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Linkedin size={14} /> LinkedIn
-                </a>
-              )}
-              {profile.social_instagram && (
-                <a
-                  href={profile.social_instagram.startsWith("http") ? profile.social_instagram : `https://instagram.com/${profile.social_instagram.replace(/^@/, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Instagram size={14} /> Instagram
-                </a>
-              )}
-              {profile.social_twitter && (
-                <a
-                  href={profile.social_twitter.startsWith("http") ? profile.social_twitter : `https://twitter.com/${profile.social_twitter.replace(/^@/, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
-                >
-                  <Twitter size={14} /> Twitter
-                </a>
-              )}
-            </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {profile.public_email && (
+              <a
+                href={`mailto:${profile.public_email}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Mail size={14} /> Email
+              </a>
+            )}
+            {profile.website && (
+              <a
+                href={profile.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Globe size={14} /> Sito
+              </a>
+            )}
+            {profile.social_linkedin && (
+              <a
+                href={profile.social_linkedin.startsWith("http") ? profile.social_linkedin : `https://linkedin.com/in/${profile.social_linkedin.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Linkedin size={14} /> LinkedIn
+              </a>
+            )}
+            {profile.social_instagram && (
+              <a
+                href={profile.social_instagram.startsWith("http") ? profile.social_instagram : `https://instagram.com/${profile.social_instagram.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Instagram size={14} /> Instagram
+              </a>
+            )}
+            {profile.social_twitter && (
+              <a
+                href={profile.social_twitter.startsWith("http") ? profile.social_twitter : `https://twitter.com/${profile.social_twitter.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-sm font-body hover:bg-muted/70 transition-colors"
+              >
+                <Twitter size={14} /> Twitter
+              </a>
+            )}
           </div>
         </header>
 
