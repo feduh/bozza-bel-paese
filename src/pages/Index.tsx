@@ -43,9 +43,9 @@ const Index = () => {
   });
 
   const features = [
-    { num: "01", section: "Cartografia", key: "mapping", link: "/mappatura", inverted: false },
-    { num: "02", section: "Network",     key: "community", link: "/la-rete", inverted: true },
-    { num: "03", section: "Editoria",    key: "stories",   link: "/magazine", inverted: false },
+    { num: "01", key: "mapping", link: "/mappatura", inverted: false },
+    { num: "02", key: "community", link: "/la-rete", inverted: true },
+    { num: "03", key: "stories",   link: "/magazine", inverted: false },
   ] as const;
 
   const stats = [
@@ -115,7 +115,7 @@ const Index = () => {
                 }`}
               >
                 <div className={`micro-label ${f.inverted ? "text-secondary" : "text-primary"}`}>
-                  {f.num} // {f.section}
+                  {f.num} //
                 </div>
                 <h3 className="text-2xl md:text-2xl lg:text-3xl xl:text-4xl uppercase leading-[0.95] tracking-tight break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>
                   {t(`home.features.${f.key}.title`)}
@@ -152,11 +152,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* ============ WORDMARK FOOTER ACCENT ============ */}
-        <div className="w-full flex flex-wrap justify-between items-center gap-2 text-xs uppercase tracking-[0.4em] border-b-2 border-foreground pb-3">
-          <span style={{ fontVariationSettings: "'wght' 700" }}>ILBELPAESE</span>
-          <span className="text-muted-foreground">Scena indipendente italiana</span>
-        </div>
       </div>
     </div>
   );
