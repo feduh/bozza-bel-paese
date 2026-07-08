@@ -271,37 +271,30 @@ const Mappatura = () => {
         </header>
 
         <h2 className="sr-only">Filtri di ricerca</h2>
-        <div className="mb-6 relative inline-block">
 
-          <button
-            onClick={() => setBucketMenuOpen((o) => !o)}
-            aria-haspopup="menu"
-            aria-expanded={bucketMenuOpen}
-            className="inline-flex items-center gap-2 px-5 py-3 brutalist-border bg-background micro-label hover:bg-foreground hover:text-background transition-colors"
-          >
-            {t("map.section")}: {bucketFilter === "all" ? t("common.all") : t(`map.buckets.${bucketFilter}`)}
-            <ChevronDown size={14} aria-hidden="true" />
-          </button>
-          {bucketMenuOpen && (
-            <div role="menu" className="absolute z-20 mt-2 w-64 brutalist-border bg-background shadow-brutalist overflow-hidden">
-              {(["all", "spazi", "spazi-senza-spazi", "spazi-che-furono"] as const).map((val) => (
-                <button
-                  key={val}
-                  role="menuitemradio"
-                  aria-checked={bucketFilter === val}
-                  onClick={() => {
-                    setBucketFilter(val as "all" | Bucket);
-                    setBucketMenuOpen(false);
-                  }}
-                  className={`block w-full text-left px-4 py-2.5 text-sm border-b-2 border-foreground/10 last:border-b-0 hover:bg-secondary/30 ${
-                    bucketFilter === val ? "bg-primary text-primary-foreground" : ""
-                  }`}
-                >
-                  {val === "all" ? t("common.all") : t(`map.buckets.${val}`)}
-                </button>
-              ))}
-            </div>
-          )}
+        {/* Riga 2 (bucket chip selector, mono-selezione con label italiane richieste) */}
+        <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+          {([
+            { val: "all", label: t("common.all") },
+            { val: "spazi", label: t("map.buckets.spazi") },
+            { val: "spazi-senza-spazi", label: t("map.buckets.spazi-senza-spazi") },
+            { val: "spazi-che-furono", label: t("map.buckets.spazi-che-furono") },
+          ] as const).map((b) => {
+            const active = bucketFilter === b.val;
+            return (
+              <button
+                key={b.val}
+                type="button"
+                onClick={() => setBucketFilter(b.val as "all" | Bucket)}
+                aria-pressed={active}
+                className={`px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+                  active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
+                }`}
+              >
+                {b.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* View toggle + Search */}
@@ -325,8 +318,6 @@ const Mappatura = () => {
             >
               <List size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.list")}</span>
             </button>
-            <button
-              onClick={() => setView("magazine")}
               aria-pressed={view === "magazine"}
               className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
                 view === "magazine" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
