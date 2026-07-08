@@ -229,9 +229,16 @@ const LazyMap = ({
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
           subdomains="abcd"
           maxZoom={19}
+        />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={19}
+          attribution=""
+          className="ibp-labels-it"
         />
         <ZoomControl position="bottomright" />
         <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
