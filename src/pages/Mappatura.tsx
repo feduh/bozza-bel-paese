@@ -272,13 +272,57 @@ const Mappatura = () => {
 
         <h2 className="sr-only">Filtri di ricerca</h2>
 
-        {/* Riga 2 (bucket chip selector, mono-selezione con label italiane richieste) */}
-        <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+        {/* Riga 1: view toggle + ricerca (compatta) + geo */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="flex brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
+            <button
+              onClick={() => setView("map")}
+              aria-pressed={view === "map"}
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+                view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
+              }`}
+            >
+              <Map size={14} aria-hidden="true" /> <span>{t("map.view.map")}</span>
+            </button>
+            <button
+              onClick={() => setView("list")}
+              aria-pressed={view === "list"}
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors border-l-2 border-foreground ${
+                view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
+              }`}
+            >
+              <List size={14} aria-hidden="true" /> <span>{t("map.view.list")}</span>
+            </button>
+          </div>
+          <label className="w-full sm:w-auto sm:max-w-xs sm:flex-1">
+            <span className="sr-only">{t("map.search")}</span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("map.search")}
+              className="w-full px-3 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            />
+          </label>
+          <button
+            onClick={requestGeo}
+            disabled={geoStatus === "loading"}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
+              userPos ? "bg-secondary text-foreground" : "bg-background hover:bg-foreground hover:text-background"
+            } disabled:opacity-50`}
+          >
+            {geoStatus === "loading" ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
+            {userPos ? t("map.nearYou") : t("map.nearMe")}
+          </button>
+        </div>
+
+        {/* Riga 2: chip bucket con pallino colore integrato (fanno anche da legenda) */}
+        <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
           {([
-            { val: "all", label: t("common.all") },
-            { val: "spazi", label: t("map.buckets.spazi") },
-            { val: "spazi-senza-spazi", label: t("map.buckets.spazi-senza-spazi") },
-            { val: "spazi-che-furono", label: t("map.buckets.spazi-che-furono") },
+            { val: "all", label: t("common.all"), swatch: null as null | { color: string; outline: boolean } },
+            { val: "spazi", label: t("map.buckets.spazi"), swatch: { color: "hsl(var(--primary))", outline: false } },
+            { val: "spazi-senza-spazi", label: t("map.buckets.spazi-senza-spazi"), swatch: { color: "hsl(var(--secondary))", outline: false } },
+            { val: "spazi-che-furono", label: t("map.buckets.spazi-che-furono"), swatch: { color: "hsl(var(--primary))", outline: true } },
           ] as const).map((b) => {
             const active = bucketFilter === b.val;
             return (
@@ -287,49 +331,27 @@ const Mappatura = () => {
                 type="button"
                 onClick={() => setBucketFilter(b.val as "all" | Bucket)}
                 aria-pressed={active}
-                className={`px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+                className={`inline-flex items-center gap-2 px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                   active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
                 }`}
               >
+                {b.swatch && (
+                  <span
+                    aria-hidden="true"
+                    className="inline-block w-3 h-3 rounded-full"
+                    style={
+                      b.swatch.outline
+                        ? { background: "transparent", border: `2px solid ${b.swatch.color}` }
+                        : { background: b.swatch.color, border: `2px solid ${b.swatch.color}` }
+                    }
+                  />
+                )}
                 {b.label}
               </button>
             );
           })}
         </div>
 
-        {/* View toggle + Search */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex w-full sm:w-auto brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
-            <button
-              onClick={() => setView("map")}
-              aria-pressed={view === "map"}
-              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors ${
-                view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
-              }`}
-            >
-              <Map size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.map")}</span>
-            </button>
-            <button
-              onClick={() => setView("list")}
-              aria-pressed={view === "list"}
-              className={`flex-1 sm:flex-initial min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-3 text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-colors border-l-2 border-foreground ${
-                view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
-              }`}
-            >
-              <List size={14} className="shrink-0" aria-hidden="true" /> <span className="truncate">{t("map.view.list")}</span>
-            </button>
-          </div>
-          <label className="flex-1">
-            <span className="sr-only">{t("map.search")}</span>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("map.search")}
-              className="w-full px-4 py-3 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
-            />
-          </label>
-        </div>
 
 
         {/* Region + Discipline + Year + Geo filters */}
@@ -392,22 +414,6 @@ const Mappatura = () => {
               aria-label="Anno fondazione massimo"
             />
           </div>
-          <button
-            onClick={requestGeo}
-            disabled={geoStatus === "loading"}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
-              userPos
-                ? "bg-secondary text-foreground"
-                : "bg-background hover:bg-foreground hover:text-background"
-            } disabled:opacity-50`}
-          >
-            {geoStatus === "loading" ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Navigation size={14} />
-            )}
-            {userPos ? t("map.nearYou") : t("map.nearMe")}
-          </button>
           {hasFilters && (
             <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
@@ -425,20 +431,6 @@ const Mappatura = () => {
           </p>
         )}
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 micro-label text-foreground/70" aria-label="Legenda categorie">
-          <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-primary border-2 border-foreground" /> {t("map.buckets.spazi")}
-          </span>
-          <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-secondary border-2 border-foreground" /> {t("map.buckets.spazi-senza-spazi")}
-          </span>
-          <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-primary" />
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-secondary -ml-1" />
-            {t("map.buckets.spazi-che-furono")}
-          </span>
-        </div>
 
         <h2 className="sr-only">Risultati</h2>
         <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
@@ -491,7 +483,7 @@ const Mappatura = () => {
                   className="group brutalist-card p-6 block"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] font-bold px-2.5 py-1 rounded-full border ${cfg.badgeClass}`}>
                       <Icon size={12} /> {cfg.label}
                     </span>
                     <span className="text-xs text-foreground/60">

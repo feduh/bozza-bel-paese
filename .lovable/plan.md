@@ -1,66 +1,61 @@
-# Piano modifiche sito
+## Correzioni richieste
 
-Lavoro suddiviso per area. Alcune voci ambiziose (nuova sezione "Editoriale", storytelling "Cosa Facciamo") sono trattate come **prima versione visiva** che potremo rifinire insieme in un secondo giro.
+### 1. Mappatura — filtri + legenda
 
----
+- Ridurre la barra di ricerca: max-width ~`max-w-sm`(non più`flex-1`), allineata a sinistra accanto al toggle Mappa/Elenco.
+- **Unire legenda + chip di sezione**: i quattro pulsanti "Tutte / Spazi / Spazi senza spazi / Spazi che furono" mostreranno il pallino colore corrispondente (marker) a sinistra della label — così i chip fanno anche da legenda e la riga separata "Legend" viene rimossa.
+- Layout a 3 righe come richiesto in precedenza:
+  - Riga 1: toggle Mappa/Elenco · barra ricerca corta · pulsante "Vicino a me"
+  - Riga 2: chip multi-sezione con colore integrato
+  - Riga 3: Regione · Discipline · Ordine · Anno min–max · Reset
 
-## 1. Home
+### 2. Mappa — recuperare personalità mantenendo etichette in italiano
 
-- **Scritte dinamiche (WordRotate)**: rimuovere "atelier nascosti" e "luoghi che resistono" dall'elenco (file `it.json`).
-- **Card "pilastri"**: eliminare la piccola label viola (es. `Cartografia`, `Network`, `Editoria`) e lasciare solo il numero (`01 //`, `02 //`, `03 //`).
-- **Riga sotto le statistiche**: rimuovere il blocco "ILBELPAESE / Scena indipendente italiana" sotto i contatori animati.
+- Tornare a tile con più carattere (CartoDB **Voyager**) e sovrapporre un layer trasparente di sole etichette OSM Standard (in Italia i `name` sono già in italiano). Risultato: colori/tratto della versione precedente + toponimi italiani.
+- In alternativa (fallback se Voyager non convince): OSM Standard con filtro CSS `saturate/contrast` per riportare il tono editoriale.
 
-## 2. Navbar
+### 3. Pagina singola realtà — colonne indipendenti
 
-- Nuova voce **RACCONTO** (dropdown) al posto delle attuali voci separate `Magazine` e `La vostra voce`:
-  - `Editoriale` (nuova pagina — vedi sotto)
-  - `Magazine libero` (attuale `/magazine`)
-  - `Podcast / La vostra voce` (attuale `/la-vostra-voce`)
-- Implementata con `DropdownMenu` (già in uso) sia su desktop sia nel menu mobile (accordion).
-- **Nuova pagina `/editoriale**`: prima versione con hero editoriale differenziato (tipografia più grande, sfondo scuro/accent, badge "Tema dell'anno"), spazio per il tema curato e griglia articoli associati. Per adesso mostra un placeholder + eventuali `blog_posts` filtrati per tag `editoriale` (nessuna nuova tabella; useremo un tag esistente).
+- Spostare `descrizione` dentro la colonna sinistra (sopra "Storia" + "Location") così che **Descrizione + Storia** siano una colonna e **Informazioni + Contatti + Membri + Discipline** un'altra, davvero indipendenti nell'altezza.
+- La colonna destra resta `aside` sticky opzionale.
 
-## 3. Cosa Facciamo
+### 4. Tag colorati sulle card delle realtà (lista Mappatura)
 
-- Correggere l'incipit: togliere la parola "prima" dalla prima frase (i18n).
-- Rimuovere la frase: *"Attraverso una vetrina dinamica e un archivio storico…"*.
-- **Rimuovere le sezioni "I pilastri" e "Come lo facciamo"** e sostituirle con una **prima versione di storytelling scroll-based**: sequenza di blocchi editoriali alternati (numero grande + titolo + paragrafo + immagine/illustrazione), pensati per essere estesi in futuro. Sezione "prima di noi coordinatori" lasciata come blocco placeholder pronto per il contenuto che ci darete.
+- I  tag "spazio","spazio senza spazio","spazio che fu", sulle card assumono il colore del bucket (spazi = primary, spazi senza spazi = secondary, spazi che furono = variante outline), usando `categoryConfig[cat].badgeClass`.
 
-## 4. Mappatura
+### 5. Navbar — dropdown "Racconti" allineato allo stile area personale
 
-- **Filtri riorganizzati visivamente** in tre righe:
-  - Riga 1: `Mappa | Elenco` · Barra di ricerca · `Vicino a me`
-  - Riga 2: chip multiselezione — `Spazi | Spazi senza spazi | Spazi che furono (verdi) | Spazi che furono (viola)`
-  - Riga 3: `Regioni | Discipline | Ordine predefinito` (solo in modalità elenco) `| Anno`
-- Rimuovere la modalità `Magazine` dai filtri.
-- Rinominare "Categorie" → "Discipline" nell'etichetta filtro.
-- **Nessun risultato**: overlay al centro della mappa con messaggio ("Nessuna realtà corrisponde ai filtri impostati") + pulsante "Reimposta filtri".
-- **Nomi mappa**: forzare la tile CartoDB in italiano (usare tile `light_all` con `lang=it` dove supportato, altrimenti fallback a versione internazionale, per evitare mix IT/EN).
-- **Zoom touch/pinch/trackpad**: abilitare `scrollWheelZoom`, `touchZoom`, `doubleClickZoom` sul `MapContainer`.
-- **Bug tag/discipline invisibili** su nuove realtà (es. Mucho Mas!, ALMARE): verificare che le tag inserite in `RealityForm` vengano salvate in `reality_tags` anche quando la realtà è ancora `pendente`, e che vengano lette anche per realtà non ancora confermate nell'anteprima admin. Verificheremo anche perché non vengono pubblicate (probabile trigger auto-confirm che non scatta per realtà proposte da coordinatori — da confermare in build mode leggendo lo stato reale delle due realtà).
-- **Storia**: nascondere completamente la card "Storia" sulla scheda realtà se il campo è vuoto; **descrizione sempre obbligatoria** (già in validazione). Riorganizzare la scheda in modo che le card `Contatti` / `Informazioni` inizino alla stessa altezza della descrizione (layout 2 colonne allineate top).
-- **Descrizione + bio con formattazione**: consentire a-capo e **grassetto** nella descrizione delle realtà e nella bio profilo; rendering con testo giustificato. Editor semplice (toolbar minimale: **B**, nuova riga) basato sul `MarkdownEditor` già esistente, oppure textarea che supporta `**bold**` + `\n` con render markdown lato lettura.
+- Rinominare "Racconto" → **"Racconti"** ovunque (navbar desktop + mobile + link interni).
+- Aggiungere `sideOffset={12}` e `align="end"` (o wrapper con padding come il bottone rotondo dell'utente) al `DropdownMenuContent` così il pannello si stacca visivamente dalla navbar come quello dell'avatar.
 
-## 5. Sezione Racconto
+### 6. Homepage — card "Racconti" verso pagina hub
 
-- **Podcast / La vostra voce**: aggiungere 2 esempi finti (1 video + 1 podcast audio) per prototipare card, player e metadati. Card con copertina, titolo, autore, durata, embed player.
-- **Estrazione copertina URL**: migliorare la funzione che estrae la thumbnail per link YouTube (usare `img.youtube.com/vi/<id>/maxresdefault.jpg`) e per siti indipendenti (parse `og:image` / `twitter:image` via edge function o fallback).
+- Nuova rotta `/racconti` (`src/pages/Racconti.tsx`): pagina hub con tre card grandi (Editoriale · Magazine libero · Podcast / La vostra voce) e breve descrizione ciascuna.
+- La feature card della home punta a `/racconti` invece che direttamente a `/magazine`. Aggiornare anche i18n (`home.features.stories`).
 
-## 6. Altro
+### 7. Podcast — card cliccabili con pagina dedicata
 
-- **Occhietto password** su `/login` (toggle show/hide con icona `Eye`/`EyeOff`).
-- **Timeout di sessione**: verificare che l'auto-refresh di Supabase sia attivo e valutare timeout esplicito con avviso ("La sessione sta per scadere"). Proposta: 8h di inattività, avviso a 5 minuti dal termine. **In alternativa** demandare a Cloudflare (soluzione non consigliata perché la sessione è gestita da Supabase). Attendo conferma se procedere con avviso lato app.
-- **Bio profilo**: rivedere layout `AutoreProfilo` per evitare che le bio lunghe rompano l'impaginazione (es. profilo di Federica) — colonna dedicata max-w, spaziatura tra header e bio, wrapping corretto.
+- Ogni esempio diventa `<Link>` a una pagina placeholder `/racconti/podcast/:slug` (nuova rotta) con: cover grande, titolo, autore, durata, breve descrizione lorem-ipsum, CTA "torna alla sezione". Nessun contenuto reale, solo prototipo navigabile.
 
----
+### 8. Bio autori/coordinatori — riorganizzazione componente
 
-## Nota tecnica
+- Riprogettare `AutoreProfilo`:
+  - Header a due colonne compatto (avatar + nome + ruoli + affiliazione + azioni social) senza bio.
+  - Nuova **card dedicata "Biografia"** (stile identico alle card "Contatti"/"Informazioni" della realtà) full-width sotto l'header, con titolo, filetto e testo giustificato. Nasconde tutta la card se `bio` è vuota.
+  - Griglia successiva: sinistra = Articoli pubblicati, destra = eventuali metadati (categoria figura pubblica, link realtà). Così profili con bio corta o assente non hanno "buchi" e quelli lunghi restano leggibili (caso Federica).
 
-- Nessuna nuova tabella DB necessaria. Se il filtro/rendering `disciplines` richiede una vista dedicata, useremo `reality_tags` esistente.
-- I18n aggiornato per tutte le nuove label e i placeholder.
-- Il changeset resta focalizzato su UI/presentazione, tranne la piccola correzione lettura tag per realtà pendenti.
+## Dettagli tecnici
 
-## Domande aperte
+**File toccati:**
 
-1. **Timeout sessione**: preferisci implementarlo lato app con avviso (8h / avviso 5min) o lasciar gestire a Cloudflare? FACCIAMO SU SUPABASE PER ORA.
-2. **Pagina "Editoriale"**: gli articoli da mostrare vanno filtrati per un tag specifico (es. `editoriale`) o ci sarà un flag dedicato in futuro? Per la v1 uso il tag. FLAG IN FUTURO (CAPIAMO COME IMPLEMENTARLO).
-3. **Grassetto/formattazione descrizione**: preferisci una **toolbar visuale** (bottone B, invio) o mantenere sintassi markdown (`**testo**`) con anteprima? TOOLBAR VISUALE PER TUTTI I MEMBRI.
+- `src/pages/Mappatura.tsx` — riorganizzazione filtri, chip con pallini, rimozione legenda separata, colorazione tag sulle card
+- `src/components/LazyMap.tsx` — tile Voyager + overlay etichette OSM
+- `src/pages/RealityDetail.tsx` — descrizione spostata dentro colonna sinistra
+- `src/components/Navbar.tsx` — rename "Racconti", `sideOffset` sul dropdown
+- `src/pages/Racconti.tsx` (nuovo) + rotta in `src/App.tsx`
+- `src/pages/PodcastEpisodio.tsx` (nuovo, placeholder) + rotta `/racconti/podcast/:slug`
+- `src/pages/LaVostraVoce.tsx` — card cliccabili con `Link` reali
+- `src/pages/AutoreProfilo.tsx` — nuova sezione "Biografia" a card
+- `src/pages/Index.tsx` + `src/i18n/locales/it.json` — link della feature stories → `/racconti`, rename "Racconto"→"Racconti"
+
+**Fuori scopo (rinviato):** editor rich-text per grassetto, timeout sessione, thumbnail extraction avanzata da URL — restano nel backlog.

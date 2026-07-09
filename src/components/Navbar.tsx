@@ -26,8 +26,9 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
-  // Sotto-voci del dropdown "Racconto"
+  // Sotto-voci del dropdown "Racconti"
   const raccontoLinks = [
+    { to: "/racconti", label: "Panoramica" },
     { to: "/editoriale", label: "Editoriale" },
     { to: "/magazine", label: "Magazine libero" },
     { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
@@ -110,9 +111,9 @@ const Navbar = () => {
                 raccontoLinks.some((l) => location.pathname === l.to) ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              Racconto <ChevronDown size={14} aria-hidden="true" />
+              Racconti <ChevronDown size={14} aria-hidden="true" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[220px]">
+            <DropdownMenuContent align="start" sideOffset={16} className="min-w-[220px]">
               {raccontoLinks.map((l) => (
                 <DropdownMenuItem key={l.to} asChild>
                   <Link to={l.to} className="cursor-pointer">{l.label}</Link>
@@ -227,7 +228,7 @@ const Navbar = () => {
                 raccontoLinks.some((l) => location.pathname === l.to) ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              <span>Racconto</span>
+              <span>Racconti</span>
               <ChevronDown size={14} className={`transition-transform ${raccontoOpen ? "rotate-180" : ""}`} aria-hidden="true" />
             </button>
             {raccontoOpen && (
