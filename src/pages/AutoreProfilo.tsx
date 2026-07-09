@@ -147,16 +147,8 @@ const AutoreProfilo = () => {
             </div>
           </div>
 
-          {/* Bio full-width sotto l'header per evitare rotture con testi lunghi */}
-          {profile.bio && (
-            <div className="mt-8 max-w-3xl">
-              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line text-justify hyphens-auto">
-                {profile.bio}
-              </p>
-            </div>
-          )}
-
           <div className="mt-6 flex flex-wrap gap-3">
+
             {profile.public_email && (
               <a
                 href={`mailto:${profile.public_email}`}
