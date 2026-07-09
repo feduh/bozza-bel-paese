@@ -45,7 +45,7 @@ const Index = () => {
   const features = [
     { num: "01", key: "mapping", link: "/mappatura", inverted: false },
     { num: "02", key: "community", link: "/la-rete", inverted: true },
-    { num: "03", key: "stories",   link: "/magazine", inverted: false },
+    { num: "03", key: "stories",   link: "/racconti", inverted: false },
   ] as const;
 
   const stats = [
