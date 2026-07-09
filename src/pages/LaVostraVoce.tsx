@@ -57,11 +57,10 @@ const LaVostraVoce = () => {
             {examples.map((e) => {
               const Icon = e.kind === "video" ? PlayCircle : Headphones;
               return (
-                <a
+                <Link
                   key={e.title}
-                  href={e.href}
-                  onClick={(ev) => ev.preventDefault()}
-                  className="brutalist-card overflow-hidden group cursor-not-allowed"
+                  to={`/racconti/podcast/${e.slug}`}
+                  className="brutalist-card overflow-hidden group block"
                 >
                   <div className="relative aspect-video bg-muted overflow-hidden border-b-2 border-foreground">
                     <img
@@ -92,7 +91,7 @@ const LaVostraVoce = () => {
                     </h3>
                     <p className="text-xs text-foreground/60">{e.author}</p>
                   </div>
-                </a>
+                </Link>
               );
             })}
           </div>

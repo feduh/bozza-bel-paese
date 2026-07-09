@@ -32,6 +32,8 @@ const SegnalaRealta = lazy(() => import("./pages/SegnalaRealta"));
 const Contatti = lazy(() => import("./pages/Contatti"));
 const LaVostraVoce = lazy(() => import("./pages/LaVostraVoce"));
 const Editoriale = lazy(() => import("./pages/Editoriale"));
+const Racconti = lazy(() => import("./pages/Racconti"));
+const PodcastEpisodio = lazy(() => import("./pages/PodcastEpisodio"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Termini = lazy(() => import("./pages/Termini"));
@@ -71,6 +73,8 @@ const App = () => (
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />
                   <Route path="/contatti" element={<Contatti />} />
                   <Route path="/la-vostra-voce" element={<LaVostraVoce />} />
+                  <Route path="/racconti" element={<Racconti />} />
+                  <Route path="/racconti/podcast/:slug" element={<PodcastEpisodio />} />
                   <Route path="/editoriale" element={<Editoriale />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/cookie-policy" element={<CookiePolicy />} />
