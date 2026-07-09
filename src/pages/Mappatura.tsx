@@ -414,22 +414,6 @@ const Mappatura = () => {
               aria-label="Anno fondazione massimo"
             />
           </div>
-          <button
-            onClick={requestGeo}
-            disabled={geoStatus === "loading"}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
-              userPos
-                ? "bg-secondary text-foreground"
-                : "bg-background hover:bg-foreground hover:text-background"
-            } disabled:opacity-50`}
-          >
-            {geoStatus === "loading" ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Navigation size={14} />
-            )}
-            {userPos ? t("map.nearYou") : t("map.nearMe")}
-          </button>
           {hasFilters && (
             <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
@@ -447,20 +431,6 @@ const Mappatura = () => {
           </p>
         )}
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 micro-label text-foreground/70" aria-label="Legenda categorie">
-          <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-primary border-2 border-foreground" /> {t("map.buckets.spazi")}
-          </span>
-          <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-secondary border-2 border-foreground" /> {t("map.buckets.spazi-senza-spazi")}
-          </span>
-          <span className="flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-primary" />
-            <span aria-hidden="true" className="inline-block w-3 h-3 bg-background border-2 border-secondary -ml-1" />
-            {t("map.buckets.spazi-che-furono")}
-          </span>
-        </div>
 
         <h2 className="sr-only">Risultati</h2>
         <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
