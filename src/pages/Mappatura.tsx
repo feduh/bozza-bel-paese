@@ -483,7 +483,7 @@ const Mappatura = () => {
                   className="group brutalist-card p-6 block"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] font-bold px-2.5 py-1 rounded-full border ${cfg.badgeClass}`}>
                       <Icon size={12} /> {cfg.label}
                     </span>
                     <span className="text-xs text-foreground/60">
