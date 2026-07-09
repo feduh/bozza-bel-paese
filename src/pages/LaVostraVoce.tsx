@@ -3,27 +3,27 @@ import { Radio, Mic, ArrowRight, PlayCircle, Headphones } from "lucide-react";
 import SEO from "@/components/SEO";
 
 // Prima versione: due esempi finti per prototipare la sezione podcast/video.
-// Copertine estratte automaticamente (YouTube thumbnail per il video).
 const examples = [
   {
     kind: "video" as const,
+    slug: "collettivo-senza-sede",
     title: "Intervista a un collettivo che non ha una sede",
     author: "Il Bel Paese",
     duration: "12'40\"",
     cover: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-    href: "#",
     tag: "Video",
   },
   {
     kind: "podcast" as const,
+    slug: "radio-indipendenti",
     title: "Radio indipendenti: geografie del suono",
     author: "Ospite: nome radio partner",
     duration: "34'12\"",
     cover: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&auto=format&fit=crop",
-    href: "#",
     tag: "Podcast",
   },
 ];
+
 
 const LaVostraVoce = () => {
   return (
