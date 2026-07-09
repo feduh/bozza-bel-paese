@@ -200,6 +200,18 @@ const AutoreProfilo = () => {
           </div>
         </header>
 
+        {profile.bio && (
+          <section aria-labelledby="bio-heading" className="mb-12 p-6 md:p-8 rounded-lg bg-card border border-border">
+            <h2 id="bio-heading" className="font-display text-2xl font-semibold mb-4">Biografia</h2>
+            <div className="h-[2px] w-12 bg-foreground mb-5" />
+            <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line text-justify hyphens-auto max-w-3xl">
+              {profile.bio}
+            </p>
+          </section>
+        )}
+
+
+
         <section aria-labelledby="articoli-heading">
           <h2 id="articoli-heading" className="font-display text-2xl font-semibold mb-6 flex items-center gap-2">
             <FileText size={20} /> Articoli pubblicati
