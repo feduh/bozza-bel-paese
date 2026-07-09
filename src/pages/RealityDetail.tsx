@@ -135,11 +135,15 @@ const RealityDetail = () => {
             </div>
           </div>
           <h1 className="font-display uppercase tracking-tight leading-[0.95] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>{reality.name}</h1>
-          <p className="editorial-body text-muted-foreground max-w-3xl whitespace-pre-line text-justify hyphens-auto">{reality.description}</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-10 items-start">
           <div className="lg:col-span-2 space-y-10">
+            <section>
+              <h2 className="font-display text-2xl font-semibold mb-4">Descrizione</h2>
+              <p className="font-body text-foreground/90 leading-relaxed whitespace-pre-line text-justify hyphens-auto">{reality.description}</p>
+            </section>
+
             {reality.history && String(reality.history).trim() && (
               <section>
                 <h2 className="font-display text-2xl font-semibold mb-4">{t("reality.history")}</h2>
