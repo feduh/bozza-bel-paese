@@ -320,7 +320,7 @@ const Mappatura = () => {
         </div>
 
         {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
-        <div className="w-full mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+        <div className="w-full mb-4 grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
           {([
             { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
             { val: "spazio-senza-spazio", label: "Spazi senza spazi", color: "hsl(var(--secondary))", outline: false },
