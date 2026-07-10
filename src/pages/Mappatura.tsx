@@ -139,7 +139,7 @@ const Mappatura = () => {
     const yMin = yearMin ? parseInt(yearMin, 10) : null;
     const yMax = yearMax ? parseInt(yearMax, 10) : null;
     const list = realities.filter((r) => {
-      if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
+      if (selectedCategories.size > 0 && !selectedCategories.has(getCategory(r.type, r.status))) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
       const cats = r.categories && r.categories.length > 0
