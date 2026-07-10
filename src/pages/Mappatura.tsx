@@ -275,8 +275,8 @@ const Mappatura = () => {
 
         <h2 className="sr-only">Filtri di ricerca</h2>
 
-        {/* Riga 1: view toggle + ricerca (compatta) + geo */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
+        {/* Riga 1: view toggle + ricerca (a tutta larghezza) + geo */}
+        <div className="w-full flex flex-wrap items-center gap-3 mb-4">
           <div className="flex brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
@@ -297,7 +297,7 @@ const Mappatura = () => {
               <List size={14} aria-hidden="true" /> <span>{t("map.view.list")}</span>
             </button>
           </div>
-          <label className="w-full sm:w-auto sm:max-w-xs sm:flex-1">
+          <label className="flex-1 min-w-[180px]">
             <span className="sr-only">{t("map.search")}</span>
             <input
               type="search"
@@ -319,41 +319,47 @@ const Mappatura = () => {
           </button>
         </div>
 
-        {/* Riga 2: chip bucket con pallino colore integrato (fanno anche da legenda) */}
-        <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+        {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
+        <div className="w-full mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
           {([
-            { val: "all", label: t("common.all"), swatch: null as null | { color: string; outline: boolean } },
-            { val: "spazi", label: t("map.buckets.spazi"), swatch: { color: "hsl(var(--primary))", outline: false } },
-            { val: "spazi-senza-spazi", label: t("map.buckets.spazi-senza-spazi"), swatch: { color: "hsl(var(--secondary))", outline: false } },
-            { val: "spazi-che-furono", label: t("map.buckets.spazi-che-furono"), swatch: { color: "hsl(var(--primary))", outline: true } },
+            { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
+            { val: "spazio-senza-spazio", label: "Spazi senza spazi", color: "hsl(var(--secondary))", outline: false },
+            { val: "spazio-fu-spazio", label: "Spazi che furono", color: "hsl(var(--primary))", outline: true },
+            { val: "spazio-fu-senza", label: "Spazi che furono itineranti", color: "hsl(var(--secondary))", outline: true },
           ] as const).map((b) => {
-            const active = bucketFilter === b.val;
+            const active = selectedCategories.has(b.val);
             return (
               <button
                 key={b.val}
                 type="button"
-                onClick={() => setBucketFilter(b.val as "all" | Bucket)}
+                onClick={() => {
+                  setSelectedCategories((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(b.val)) next.delete(b.val);
+                    else next.add(b.val);
+                    return next;
+                  });
+                }}
                 aria-pressed={active}
                 className={`inline-flex items-center gap-2 px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                   active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
                 }`}
               >
-                {b.swatch && (
-                  <span
-                    aria-hidden="true"
-                    className="inline-block w-3 h-3 rounded-full"
-                    style={
-                      b.swatch.outline
-                        ? { background: "transparent", border: `2px solid ${b.swatch.color}` }
-                        : { background: b.swatch.color, border: `2px solid ${b.swatch.color}` }
-                    }
-                  />
-                )}
+                <span
+                  aria-hidden="true"
+                  className="inline-block w-3 h-3 rounded-full"
+                  style={
+                    b.outline
+                      ? { background: "transparent", border: `2px solid ${b.color}` }
+                      : { background: b.color, border: `2px solid ${b.color}` }
+                  }
+                />
                 {b.label}
               </button>
             );
           })}
         </div>
+
 
 
 
