@@ -424,7 +424,7 @@ const Mappatura = () => {
             />
           </div>
           {hasFilters && (
-            <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
+            <button onClick={clearFilters} className="ml-auto inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
