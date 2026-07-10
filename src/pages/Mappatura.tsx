@@ -10,8 +10,7 @@ import BookmarkButton from "@/components/BookmarkButton";
 import {
   type DbRealityType,
   type RealityStatus,
-  type Bucket,
-  matchesBucket,
+  type Category,
   getCategory,
   categoryConfig,
 } from "@/lib/realityCategory";
