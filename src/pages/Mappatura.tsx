@@ -320,7 +320,7 @@ const Mappatura = () => {
         </div>
 
         {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
-        <div className="w-full mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+        <div className="w-full mb-4 grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
           {([
             { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
             { val: "spazio-senza-spazio", label: "Spazi senza spazi", color: "hsl(var(--secondary))", outline: false },
@@ -341,7 +341,7 @@ const Mappatura = () => {
                   });
                 }}
                 aria-pressed={active}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                   active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
                 }`}
               >
@@ -368,7 +368,7 @@ const Mappatura = () => {
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
@@ -378,7 +378,7 @@ const Mappatura = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             aria-label="Filtra per disciplina"
           >
             <option value="all">{t("map.filterCategory")}</option>
@@ -390,7 +390,7 @@ const Mappatura = () => {
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+              className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
               aria-label={t("magazine.sortBy")}
             >
               <option value="default">{t("map.sortDefault")}</option>
@@ -399,7 +399,7 @@ const Mappatura = () => {
               <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
-          <div className="inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
+          <div className="flex-1 min-w-[200px] inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
             <span className="micro-label mr-1">{t("map.year")}</span>
             <input
               type="number"
