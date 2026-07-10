@@ -98,7 +98,8 @@ const Mappatura = () => {
         if (val && val !== defaultVal) next.set(key, val);
         else next.delete(key);
       };
-      setOrDel("sezione", bucketFilter, "all");
+      const tipoStr = [...selectedCategories].join(",");
+      setOrDel("tipo", tipoStr, "");
       setOrDel("regione", regionFilter, "all");
       setOrDel("categoria", categoryFilter, "all");
       setOrDel("disciplina", disciplineFilter, "all");
