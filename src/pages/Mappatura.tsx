@@ -399,7 +399,7 @@ const Mappatura = () => {
               <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
-          <div className="inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
+          <div className="flex-1 min-w-[200px] inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
             <span className="micro-label mr-1">{t("map.year")}</span>
             <input
               type="number"
