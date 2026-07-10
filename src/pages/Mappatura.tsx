@@ -113,7 +113,7 @@ const Mappatura = () => {
     }, 250);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bucketFilter, regionFilter, categoryFilter, disciplineFilter, search, view, yearMin, yearMax]);
+  }, [selectedCategories, regionFilter, categoryFilter, disciplineFilter, search, view, yearMin, yearMax]);
 
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
