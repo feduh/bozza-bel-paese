@@ -364,7 +364,12 @@ const Mappatura = () => {
 
 
         {/* Region + Discipline + Year + Geo filters */}
-        <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <div className="w-full flex flex-wrap gap-3 mb-6 items-center">
+          {hasFilters && (
+            <button onClick={clearFilters} className="ml-auto order-last inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
+              <X size={14} /> {t("map.clearFilters")}
+            </button>
+          )}
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
