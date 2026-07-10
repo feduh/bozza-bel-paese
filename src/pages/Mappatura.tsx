@@ -341,7 +341,7 @@ const Mappatura = () => {
                   });
                 }}
                 aria-pressed={active}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+                className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                   active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
                 }`}
               >
