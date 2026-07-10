@@ -10,8 +10,7 @@ import BookmarkButton from "@/components/BookmarkButton";
 import {
   type DbRealityType,
   type RealityStatus,
-  type Bucket,
-  matchesBucket,
+  type Category,
   getCategory,
   categoryConfig,
 } from "@/lib/realityCategory";
@@ -53,9 +52,12 @@ const Mappatura = () => {
     const v = searchParams.get("vista");
     return v === "list" ? v : "map";
   });
-  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
-    (searchParams.get("sezione") as Bucket | null) ?? "all"
-  );
+  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(() => {
+    const raw = searchParams.get("tipo");
+    if (!raw) return new Set();
+    const valid: Category[] = ["spazio", "spazio-senza-spazio", "spazio-fu-spazio", "spazio-fu-senza"];
+    return new Set(raw.split(",").filter((v): v is Category => (valid as string[]).includes(v)));
+  });
   const [regionFilter, setRegionFilter] = useState<string>(searchParams.get("regione") ?? "all");
   const [disciplineFilter, setDisciplineFilter] = useState<string>(searchParams.get("disciplina") ?? "all");
   const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
@@ -96,7 +98,8 @@ const Mappatura = () => {
         if (val && val !== defaultVal) next.set(key, val);
         else next.delete(key);
       };
-      setOrDel("sezione", bucketFilter, "all");
+      const tipoStr = [...selectedCategories].join(",");
+      setOrDel("tipo", tipoStr, "");
       setOrDel("regione", regionFilter, "all");
       setOrDel("categoria", categoryFilter, "all");
       setOrDel("disciplina", disciplineFilter, "all");
@@ -110,7 +113,7 @@ const Mappatura = () => {
     }, 250);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bucketFilter, regionFilter, categoryFilter, disciplineFilter, search, view, yearMin, yearMax]);
+  }, [selectedCategories, regionFilter, categoryFilter, disciplineFilter, search, view, yearMin, yearMax]);
 
   const regions = useMemo(() => [...new Set(realities.map((r) => r.region))].sort(), [realities]);
   const allDisciplines = useMemo(() => [...new Set(realities.flatMap((r) => r.tags))].sort(), [realities]);
@@ -136,7 +139,7 @@ const Mappatura = () => {
     const yMin = yearMin ? parseInt(yearMin, 10) : null;
     const yMax = yearMax ? parseInt(yearMax, 10) : null;
     const list = realities.filter((r) => {
-      if (bucketFilter !== "all" && !matchesBucket(bucketFilter, r.type, r.status)) return false;
+      if (selectedCategories.size > 0 && !selectedCategories.has(getCategory(r.type, r.status))) return false;
       if (regionFilter !== "all" && r.region !== regionFilter) return false;
       if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
       const cats = r.categories && r.categories.length > 0
@@ -172,10 +175,10 @@ const Mappatura = () => {
       );
     }
     return list;
-  }, [realities, bucketFilter, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
+  }, [realities, selectedCategories, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
 
   const hasFilters =
-    bucketFilter !== "all" ||
+    selectedCategories.size > 0 ||
     regionFilter !== "all" ||
     disciplineFilter !== "all" ||
     categoryFilter !== "all" ||
@@ -186,7 +189,7 @@ const Mappatura = () => {
     sortMode !== "default";
 
   const clearFilters = () => {
-    setBucketFilter("all");
+    setSelectedCategories(new Set());
     setRegionFilter("all");
     setDisciplineFilter("all");
     setCategoryFilter("all");
@@ -272,8 +275,8 @@ const Mappatura = () => {
 
         <h2 className="sr-only">Filtri di ricerca</h2>
 
-        {/* Riga 1: view toggle + ricerca (compatta) + geo */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
+        {/* Riga 1: view toggle + ricerca (a tutta larghezza) + geo */}
+        <div className="w-full flex flex-wrap items-center gap-3 mb-4">
           <div className="flex brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
@@ -294,7 +297,7 @@ const Mappatura = () => {
               <List size={14} aria-hidden="true" /> <span>{t("map.view.list")}</span>
             </button>
           </div>
-          <label className="w-full sm:w-auto sm:max-w-xs sm:flex-1">
+          <label className="flex-1 min-w-[180px]">
             <span className="sr-only">{t("map.search")}</span>
             <input
               type="search"
@@ -316,36 +319,41 @@ const Mappatura = () => {
           </button>
         </div>
 
-        {/* Riga 2: chip bucket con pallino colore integrato (fanno anche da legenda) */}
-        <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
+        {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
+        <div className="w-full mb-4 flex flex-wrap gap-2" role="group" aria-label="Tipologia di realtà">
           {([
-            { val: "all", label: t("common.all"), swatch: null as null | { color: string; outline: boolean } },
-            { val: "spazi", label: t("map.buckets.spazi"), swatch: { color: "hsl(var(--primary))", outline: false } },
-            { val: "spazi-senza-spazi", label: t("map.buckets.spazi-senza-spazi"), swatch: { color: "hsl(var(--secondary))", outline: false } },
-            { val: "spazi-che-furono", label: t("map.buckets.spazi-che-furono"), swatch: { color: "hsl(var(--primary))", outline: true } },
+            { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
+            { val: "spazio-senza-spazio", label: "Spazi senza spazi", color: "hsl(var(--secondary))", outline: false },
+            { val: "spazio-fu-spazio", label: "Spazi che furono", color: "hsl(var(--primary))", outline: true },
+            { val: "spazio-fu-senza", label: "Spazi che furono itineranti", color: "hsl(var(--secondary))", outline: true },
           ] as const).map((b) => {
-            const active = bucketFilter === b.val;
+            const active = selectedCategories.has(b.val);
             return (
               <button
                 key={b.val}
                 type="button"
-                onClick={() => setBucketFilter(b.val as "all" | Bucket)}
+                onClick={() => {
+                  setSelectedCategories((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(b.val)) next.delete(b.val);
+                    else next.add(b.val);
+                    return next;
+                  });
+                }}
                 aria-pressed={active}
                 className={`inline-flex items-center gap-2 px-3 py-1.5 brutalist-border text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                   active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
                 }`}
               >
-                {b.swatch && (
-                  <span
-                    aria-hidden="true"
-                    className="inline-block w-3 h-3 rounded-full"
-                    style={
-                      b.swatch.outline
-                        ? { background: "transparent", border: `2px solid ${b.swatch.color}` }
-                        : { background: b.swatch.color, border: `2px solid ${b.swatch.color}` }
-                    }
-                  />
-                )}
+                <span
+                  aria-hidden="true"
+                  className="inline-block w-3 h-3 rounded-full"
+                  style={
+                    b.outline
+                      ? { background: "transparent", border: `2px solid ${b.color}` }
+                      : { background: b.color, border: `2px solid ${b.color}` }
+                  }
+                />
                 {b.label}
               </button>
             );
@@ -354,8 +362,9 @@ const Mappatura = () => {
 
 
 
+
         {/* Region + Discipline + Year + Geo filters */}
-        <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <div className="w-full flex flex-wrap gap-3 mb-6 items-center">
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
@@ -415,7 +424,7 @@ const Mappatura = () => {
             />
           </div>
           {hasFilters && (
-            <button onClick={clearFilters} className="inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
+            <button onClick={clearFilters} className="ml-auto inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
           )}
