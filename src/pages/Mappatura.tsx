@@ -52,9 +52,12 @@ const Mappatura = () => {
     const v = searchParams.get("vista");
     return v === "list" ? v : "map";
   });
-  const [bucketFilter, setBucketFilter] = useState<"all" | Bucket>(
-    (searchParams.get("sezione") as Bucket | null) ?? "all"
-  );
+  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(() => {
+    const raw = searchParams.get("tipo");
+    if (!raw) return new Set();
+    const valid: Category[] = ["spazio", "spazio-senza-spazio", "spazio-fu-spazio", "spazio-fu-senza"];
+    return new Set(raw.split(",").filter((v): v is Category => (valid as string[]).includes(v)));
+  });
   const [regionFilter, setRegionFilter] = useState<string>(searchParams.get("regione") ?? "all");
   const [disciplineFilter, setDisciplineFilter] = useState<string>(searchParams.get("disciplina") ?? "all");
   const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
