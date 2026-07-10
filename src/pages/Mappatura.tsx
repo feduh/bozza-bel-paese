@@ -175,7 +175,7 @@ const Mappatura = () => {
       );
     }
     return list;
-  }, [realities, bucketFilter, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
+  }, [realities, selectedCategories, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
 
   const hasFilters =
     bucketFilter !== "all" ||
