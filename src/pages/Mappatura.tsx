@@ -368,7 +368,7 @@ const Mappatura = () => {
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
