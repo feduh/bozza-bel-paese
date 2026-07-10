@@ -378,7 +378,7 @@ const Mappatura = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             aria-label="Filtra per disciplina"
           >
             <option value="all">{t("map.filterCategory")}</option>
