@@ -189,7 +189,7 @@ const Mappatura = () => {
     sortMode !== "default";
 
   const clearFilters = () => {
-    setBucketFilter("all");
+    setSelectedCategories(new Set());
     setRegionFilter("all");
     setDisciplineFilter("all");
     setCategoryFilter("all");
