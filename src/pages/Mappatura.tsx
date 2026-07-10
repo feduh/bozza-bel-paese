@@ -178,7 +178,7 @@ const Mappatura = () => {
   }, [realities, selectedCategories, regionFilter, disciplineFilter, categoryFilter, search, yearMin, yearMax, userPos, sortMode, view]);
 
   const hasFilters =
-    bucketFilter !== "all" ||
+    selectedCategories.size > 0 ||
     regionFilter !== "all" ||
     disciplineFilter !== "all" ||
     categoryFilter !== "all" ||
