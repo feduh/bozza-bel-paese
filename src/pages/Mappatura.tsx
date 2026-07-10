@@ -390,7 +390,7 @@ const Mappatura = () => {
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className="px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+              className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
               aria-label={t("magazine.sortBy")}
             >
               <option value="default">{t("map.sortDefault")}</option>
