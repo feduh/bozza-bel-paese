@@ -295,18 +295,38 @@ const UsersManagementPanel = () => {
                           />
                         </label>
                       </div>
+                      <label className="block mt-2">
+                        <span className="text-[11px] font-body text-muted-foreground">Affiliazione (realtà o organizzazione)</span>
+                        <input
+                          type="text"
+                          value={editAffiliation}
+                          onChange={(e) => setEditAffiliation(e.target.value)}
+                          placeholder="es. MAXXI, Università di Bologna…"
+                          disabled={!!u.profile?.reality_id}
+                          className="mt-1 w-full px-3 py-2 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+                        />
+                        {u.profile?.reality_id && (
+                          <span className="block mt-1 text-[11px] font-body text-muted-foreground italic">
+                            L'utente è già collegato a una realtà mappata: l'affiliazione libera è disattivata.
+                          </span>
+                        )}
+                      </label>
                       <div className="mt-2 flex justify-end">
                         <button
                           type="button"
                           disabled={
                             busyId === u.id ||
                             (editEmail.trim() === (u.email ?? "") &&
-                              editName.trim() === (u.profile?.display_name ?? ""))
+                              editName.trim() === (u.profile?.display_name ?? "") &&
+                              editAffiliation.trim() === (u.profile?.affiliation ?? ""))
                           }
                           onClick={async () => {
                             const payload: Record<string, unknown> = { op: "update_user", user_id: u.id };
                             if (editEmail.trim() && editEmail.trim() !== (u.email ?? "")) payload.email = editEmail.trim();
                             if (editName.trim() && editName.trim() !== (u.profile?.display_name ?? "")) payload.display_name = editName.trim();
+                            if (editAffiliation.trim() !== (u.profile?.affiliation ?? "")) {
+                              payload.affiliation = editAffiliation.trim();
+                            }
                             await call(payload, "Dati account aggiornati");
                           }}
                           className="px-4 py-2 rounded-md bg-primary text-primary-foreground font-body text-sm hover:opacity-90 disabled:opacity-50"
@@ -315,6 +335,8 @@ const UsersManagementPanel = () => {
                         </button>
                       </div>
                     </div>
+
+
 
                     {/* Ordine in evidenza (solo coordinatori) */}
                     {u.profile?.member_type === "coordinatore" && (
