@@ -370,7 +370,7 @@ const Mappatura = () => {
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
@@ -380,7 +380,7 @@ const Mappatura = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             aria-label="Filtra per disciplina"
           >
             <option value="all">{t("map.filterCategory")}</option>
@@ -392,7 +392,7 @@ const Mappatura = () => {
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+              className="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
               aria-label={t("magazine.sortBy")}
             >
               <option value="default">{t("map.sortDefault")}</option>
@@ -401,7 +401,7 @@ const Mappatura = () => {
               <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
-          <div className="flex-1 min-w-[200px] inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
+          <div className="w-full sm:flex-1 sm:min-w-[200px] inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
             <span className="micro-label mr-1">{t("map.year")}</span>
             <input
               type="number"
@@ -410,7 +410,7 @@ const Mappatura = () => {
               placeholder={String(yearRange.min)}
               min={1800}
               max={yearRange.max}
-              className="w-20 bg-transparent focus:outline-none text-sm"
+              className="w-full min-w-0 bg-transparent focus:outline-none text-sm"
               aria-label="Anno fondazione minimo"
             />
             <span className="text-foreground/60">–</span>
@@ -421,14 +421,15 @@ const Mappatura = () => {
               placeholder={String(yearRange.max)}
               min={1800}
               max={yearRange.max}
-              className="w-20 bg-transparent focus:outline-none text-sm"
+              className="w-full min-w-0 bg-transparent focus:outline-none text-sm"
               aria-label="Anno fondazione massimo"
             />
           </div>
           {hasFilters && (
-            <button onClick={clearFilters} className="ml-auto inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
+            <button onClick={clearFilters} className="w-full sm:w-auto sm:ml-auto inline-flex items-center justify-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
+
           )}
         </div>
         {geoStatus === "denied" && (
