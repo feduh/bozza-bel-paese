@@ -276,12 +276,12 @@ const Mappatura = () => {
         <h2 className="sr-only">Filtri di ricerca</h2>
 
         {/* Riga 1: view toggle + ricerca (a tutta larghezza) + geo */}
-        <div className="w-full flex flex-wrap items-center gap-3 mb-4">
-          <div className="flex brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
+        <div className="w-full flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 mb-4">
+          <div className="flex w-full sm:w-auto brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
@@ -290,14 +290,14 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors border-l-2 border-foreground ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors border-l-2 border-foreground ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <List size={14} aria-hidden="true" /> <span>{t("map.view.list")}</span>
             </button>
           </div>
-          <label className="flex-1 min-w-[180px]">
+          <label className="w-full sm:flex-1 sm:min-w-[180px]">
             <span className="sr-only">{t("map.search")}</span>
             <input
               type="search"
@@ -310,7 +310,7 @@ const Mappatura = () => {
           <button
             onClick={requestGeo}
             disabled={geoStatus === "loading"}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
+            className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
               userPos ? "bg-secondary text-foreground" : "bg-background hover:bg-foreground hover:text-background"
             } disabled:opacity-50`}
           >
@@ -320,7 +320,8 @@ const Mappatura = () => {
         </div>
 
         {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
-        <div className="w-full mb-4 grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+        <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+
           {([
             { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
             { val: "spazio-senza-spazio", label: "Spazi senza spazi", color: "hsl(var(--secondary))", outline: false },
