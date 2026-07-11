@@ -43,8 +43,10 @@ const opSchema = z.discriminatedUnion("op", [
     user_id: z.string().uuid(),
     email: z.string().trim().email("Email non valida").max(255).optional(),
     display_name: z.string().trim().min(1, "Nome obbligatorio").max(120).optional(),
+    affiliation: z.string().trim().max(255).nullable().optional(),
   }),
 ]);
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
