@@ -11,7 +11,9 @@ import {
   Clock,
   Bookmark,
   UserPlus,
+  Mic,
 } from "lucide-react";
+
 import SEO from "@/components/SEO";
 import { useTranslation } from "react-i18next";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
