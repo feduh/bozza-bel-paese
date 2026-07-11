@@ -16,7 +16,9 @@ export const ARTICLE_CATEGORIES = [
   "Pratiche",
   "Eventi",
   "Conversazioni",
+  "Podcast",
 ] as const;
+
 
 export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
 
