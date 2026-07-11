@@ -214,7 +214,7 @@ const LazyMap = ({
   autoFit = true,
 }: LazyMapProps & { autoFit?: boolean }) => {
   return (
-    <div className="ibp-map-frame relative" style={{ height, width: "100%" }}>
+    <div className="ibp-map-frame relative isolate z-0" style={{ height, width: "100%" }}>
       <MapContainer
         center={center}
         zoom={zoom}
