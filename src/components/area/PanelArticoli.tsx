@@ -166,7 +166,7 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
 
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground font-body italic">
-          {posts.length === 0 ? "Non hai ancora scritto articoli." : "Nessun articolo corrisponde ai filtri."}
+          {scopedPosts.length === 0 ? (presetCategory ? `Non hai ancora contenuti in "${presetCategory}".` : "Non hai ancora scritto articoli.") : "Nessun articolo corrisponde ai filtri."}
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
