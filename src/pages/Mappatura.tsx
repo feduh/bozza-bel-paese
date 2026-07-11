@@ -365,7 +365,8 @@ const Mappatura = () => {
 
 
         {/* Region + Discipline + Year + Geo filters */}
-        <div className="w-full flex flex-wrap gap-3 mb-6 items-center">
+        <div className="w-full flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-6 items-stretch sm:items-center">
+
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
