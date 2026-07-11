@@ -11,7 +11,9 @@ import {
   Clock,
   Bookmark,
   UserPlus,
+  Mic,
 } from "lucide-react";
+
 import SEO from "@/components/SEO";
 import { useTranslation } from "react-i18next";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
@@ -182,6 +184,9 @@ const AreaPersonale = () => {
       { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: posts.length || undefined },
       { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
     ];
+    if (isStaff) {
+      tabList.push({ value: "podcast", label: "Podcast", icon: Mic });
+    }
     if (canProposeRealities) {
       tabList.push({ value: "realta", label: t("area.tabs.realities"), icon: MapPin, badge: myPendingRealities.length || undefined });
     }
@@ -195,6 +200,7 @@ const AreaPersonale = () => {
       tabList.push({ value: "admin", label: t("area.tabs.admin"), icon: ShieldCheck });
     }
     return tabList;
+
   }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, posts.length, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
 
   const tabFromUrl = searchParams.get("tab");
@@ -274,6 +280,22 @@ const AreaPersonale = () => {
             <TabsContent value="preferiti" className="mt-0">
               <PanelPreferiti userId={user.id} />
             </TabsContent>
+
+            {isStaff && (
+              <TabsContent value="podcast" className="mt-0">
+                <PanelArticoli
+                  posts={posts}
+                  isStaff={isStaff}
+                  onChanged={loadAll}
+                  presetCategory="Podcast"
+                  title="I miei podcast"
+                  icon={Mic}
+                  newLabel="Nuovo podcast"
+                />
+              </TabsContent>
+            )}
+
+
 
             {canProposeRealities && (
               <TabsContent value="realta" className="mt-0">

@@ -34,6 +34,8 @@ const ArticoloEditor = () => {
   const { id } = useParams<{ id: string }>();
   const [params] = useSearchParams();
   const replyToParam = params.get("reply_to");
+  const categoryParam = params.get("category");
+
 
   const isEdit = !!id;
 
@@ -78,11 +80,12 @@ const ArticoloEditor = () => {
 
   const [form, setForm] = useState({
     title: "",
-    category: "",
+    category: !isEdit && categoryParam ? categoryParam : "",
     excerpt: "",
     content: "",
     coverImageUrl: "",
   });
+
 
   const isStaff = useMemo(
     () => myRoles.includes("admin") || myRoles.includes("moderator"),

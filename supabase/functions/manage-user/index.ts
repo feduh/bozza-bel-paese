@@ -43,8 +43,10 @@ const opSchema = z.discriminatedUnion("op", [
     user_id: z.string().uuid(),
     email: z.string().trim().email("Email non valida").max(255).optional(),
     display_name: z.string().trim().min(1, "Nome obbligatorio").max(120).optional(),
+    affiliation: z.string().trim().max(255).nullable().optional(),
   }),
 ]);
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -213,9 +215,10 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
-    // ---------- UPDATE USER (email / display name) ----------
+    // ---------- UPDATE USER (email / display name / affiliation) ----------
     if (data.op === "update_user") {
-      if (!data.email && !data.display_name) {
+      const hasAffiliation = data.affiliation !== undefined;
+      if (!data.email && !data.display_name && !hasAffiliation) {
         return json({ error: "Nessuna modifica indicata." }, 400);
       }
       if (data.email) {
@@ -225,15 +228,21 @@ Deno.serve(async (req) => {
         });
         if (error) return json({ error: error.message }, 400);
       }
-      if (data.display_name) {
+      const profileUpdate: Record<string, unknown> = {};
+      if (data.display_name) profileUpdate.display_name = data.display_name;
+      if (hasAffiliation) {
+        profileUpdate.affiliation = data.affiliation && data.affiliation.length > 0 ? data.affiliation : null;
+      }
+      if (Object.keys(profileUpdate).length > 0) {
         const { error } = await admin
           .from("profiles")
-          .update({ display_name: data.display_name })
+          .update(profileUpdate)
           .eq("user_id", data.user_id);
         if (error) return json({ error: error.message }, 500);
       }
       return json({ ok: true });
     }
+
 
     return json({ error: "Operazione sconosciuta" }, 400);
   } catch (e) {

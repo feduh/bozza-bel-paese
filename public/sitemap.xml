@@ -21,9 +21,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://il-bel-paese.lovable.app/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://il-bel-paese.lovable.app/cosa-facciamo</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/la-vostra-voce</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/segnala-realta</loc>
@@ -41,56 +51,78 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000005</loc>
-    <lastmod>2026-06-15</lastmod>
+    <loc>https://il-bel-paese.lovable.app/cookie-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/termini</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000003</loc>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/realta/e66892c8-e457-466b-8761-aa18e8ff1956</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000007</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000008</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000003</loc>
-    <lastmod>2026-06-15</lastmod>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000005</loc>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000004</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000007</loc>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000002</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000006</loc>
-    <lastmod>2026-06-22</lastmod>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000008</loc>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000001</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/a1000000-0000-0000-0000-000000000006</loc>
+    <lastmod>2026-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/64355cad-991f-4011-8851-924144d030fa</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/realta/aa55cf71-90fa-4be5-83b3-842479fd6ab1</loc>
+    <lastmod>2026-07-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -115,12 +147,6 @@
   <url>
     <loc>https://il-bel-paese.lovable.app/magazine/spazi-fragili-borghi</loc>
     <lastmod>2026-05-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/prova-1wo1xg</loc>
-    <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -159,5 +185,41 @@
     <lastmod>2026-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/autori/5ec3b19f-1adb-4ecd-986b-04e06dd315db</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/autori/6f839509-69e8-4458-929f-81153386da49</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/autori/d2bc6d9e-3727-41e2-a9de-9e76c1543357</loc>
+    <lastmod>2026-06-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/autori/c6ecdbae-beea-4821-9f9b-b4e0a1619de7</loc>
+    <lastmod>2026-06-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/autori/32cd0252-79d4-4210-b877-57da26665aa9</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://il-bel-paese.lovable.app/autori/68d882d2-cf03-4607-bf46-d3233c4c528c</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>

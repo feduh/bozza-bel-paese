@@ -276,12 +276,12 @@ const Mappatura = () => {
         <h2 className="sr-only">Filtri di ricerca</h2>
 
         {/* Riga 1: view toggle + ricerca (a tutta larghezza) + geo */}
-        <div className="w-full flex flex-wrap items-center gap-3 mb-4">
-          <div className="flex brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
+        <div className="w-full flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 mb-4">
+          <div className="flex w-full sm:w-auto brutalist-border overflow-hidden" role="group" aria-label="Modalità di visualizzazione">
             <button
               onClick={() => setView("map")}
               aria-pressed={view === "map"}
-              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors ${
                 view === "map" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
@@ -290,14 +290,14 @@ const Mappatura = () => {
             <button
               onClick={() => setView("list")}
               aria-pressed={view === "list"}
-              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors border-l-2 border-foreground ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 text-[10px] sm:text-xs uppercase tracking-[0.12em] font-bold transition-colors border-l-2 border-foreground ${
                 view === "list" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-foreground/5"
               }`}
             >
               <List size={14} aria-hidden="true" /> <span>{t("map.view.list")}</span>
             </button>
           </div>
-          <label className="flex-1 min-w-[180px]">
+          <label className="w-full sm:flex-1 sm:min-w-[180px]">
             <span className="sr-only">{t("map.search")}</span>
             <input
               type="search"
@@ -310,7 +310,7 @@ const Mappatura = () => {
           <button
             onClick={requestGeo}
             disabled={geoStatus === "loading"}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
+            className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors ${
               userPos ? "bg-secondary text-foreground" : "bg-background hover:bg-foreground hover:text-background"
             } disabled:opacity-50`}
           >
@@ -320,7 +320,8 @@ const Mappatura = () => {
         </div>
 
         {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
-        <div className="w-full mb-4 grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+        <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+
           {([
             { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
             { val: "spazio-senza-spazio", label: "Spazi senza spazi", color: "hsl(var(--secondary))", outline: false },
@@ -364,11 +365,12 @@ const Mappatura = () => {
 
 
         {/* Region + Discipline + Year + Geo filters */}
-        <div className="w-full flex flex-wrap gap-3 mb-6 items-center">
+        <div className="w-full flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-6 items-stretch sm:items-center">
+
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
           >
             <option value="all">{t("map.filterRegion")}</option>
             {regions.map((r) => (
@@ -378,7 +380,7 @@ const Mappatura = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+            className="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
             aria-label="Filtra per disciplina"
           >
             <option value="all">{t("map.filterCategory")}</option>
@@ -390,7 +392,7 @@ const Mappatura = () => {
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
-              className="flex-1 min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
+              className="w-full sm:flex-1 sm:min-w-[160px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
               aria-label={t("magazine.sortBy")}
             >
               <option value="default">{t("map.sortDefault")}</option>
@@ -399,7 +401,7 @@ const Mappatura = () => {
               <option value="latest">{t("map.sortLatest")}</option>
             </select>
           )}
-          <div className="flex-1 min-w-[200px] inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
+          <div className="w-full sm:flex-1 sm:min-w-[200px] inline-flex items-center gap-1 px-3 py-2 brutalist-border bg-background text-sm">
             <span className="micro-label mr-1">{t("map.year")}</span>
             <input
               type="number"
@@ -408,7 +410,7 @@ const Mappatura = () => {
               placeholder={String(yearRange.min)}
               min={1800}
               max={yearRange.max}
-              className="w-20 bg-transparent focus:outline-none text-sm"
+              className="w-full min-w-0 bg-transparent focus:outline-none text-sm"
               aria-label="Anno fondazione minimo"
             />
             <span className="text-foreground/60">–</span>
@@ -419,14 +421,15 @@ const Mappatura = () => {
               placeholder={String(yearRange.max)}
               min={1800}
               max={yearRange.max}
-              className="w-20 bg-transparent focus:outline-none text-sm"
+              className="w-full min-w-0 bg-transparent focus:outline-none text-sm"
               aria-label="Anno fondazione massimo"
             />
           </div>
           {hasFilters && (
-            <button onClick={clearFilters} className="ml-auto inline-flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
+            <button onClick={clearFilters} className="w-full sm:w-auto sm:ml-auto inline-flex items-center justify-center gap-1 px-3 py-2 text-xs uppercase tracking-[0.15em] font-bold text-destructive hover:underline">
               <X size={14} /> {t("map.clearFilters")}
             </button>
+
           )}
         </div>
         {geoStatus === "denied" && (
