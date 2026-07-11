@@ -184,6 +184,9 @@ const AreaPersonale = () => {
       { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: posts.length || undefined },
       { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
     ];
+    if (isStaff) {
+      tabList.push({ value: "podcast", label: "Podcast", icon: Mic });
+    }
     if (canProposeRealities) {
       tabList.push({ value: "realta", label: t("area.tabs.realities"), icon: MapPin, badge: myPendingRealities.length || undefined });
     }
@@ -197,6 +200,7 @@ const AreaPersonale = () => {
       tabList.push({ value: "admin", label: t("area.tabs.admin"), icon: ShieldCheck });
     }
     return tabList;
+
   }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, posts.length, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
 
   const tabFromUrl = searchParams.get("tab");
