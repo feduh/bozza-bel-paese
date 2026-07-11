@@ -246,7 +246,9 @@ const UsersManagementPanel = () => {
                       setPwd("");
                       setEditEmail(u.email ?? "");
                       setEditName(u.profile?.display_name ?? "");
+                      setEditAffiliation(u.profile?.affiliation ?? "");
                       setEditPriority("");
+
                       if (next && u.profile?.member_type === "coordinatore") {
                         const { data } = await supabase
                           .from("profiles")
