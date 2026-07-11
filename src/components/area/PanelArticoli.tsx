@@ -32,9 +32,13 @@ type Props = {
   posts: AreaPost[];
   isStaff: boolean;
   onChanged: () => void;
+  presetCategory?: string;
+  title?: string;
+  icon?: typeof FileText;
+  newLabel?: string;
 };
 
-const PanelArticoli = ({ posts, isStaff, onChanged }: Props) => {
+const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon: TitleIcon = FileText, newLabel }: Props) => {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | AreaPostStatus>("all");
   const [sort, setSort] = useState<SortKey>("recent");
@@ -46,9 +50,21 @@ const PanelArticoli = ({ posts, isStaff, onChanged }: Props) => {
     else onChanged();
   };
 
+  const scopedPosts = useMemo(() => {
+    if (!presetCategory) return posts;
+    const target = presetCategory.toLowerCase();
+    return posts.filter((p) =>
+      p.category
+        .toLowerCase()
+        .split(",")
+        .map((c) => c.trim())
+        .includes(target),
+    );
+  }, [posts, presetCategory]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = posts.filter((p) => {
+    let list = scopedPosts.filter((p) => {
       if (statusFilter !== "all" && p.status !== statusFilter) return false;
       if (!q) return true;
       return (
@@ -67,22 +83,29 @@ const PanelArticoli = ({ posts, isStaff, onChanged }: Props) => {
       }
     });
     return list;
-  }, [posts, query, statusFilter, sort]);
+  }, [scopedPosts, query, statusFilter, sort]);
+
+  const newHref = presetCategory
+    ? `/area-personale/articolo/nuovo?category=${encodeURIComponent(presetCategory)}`
+    : "/area-personale/articolo/nuovo";
+  const displayTitle = title ?? "I miei articoli";
+  const displayNewLabel = newLabel ?? "Nuovo articolo";
 
   return (
     <section className="p-8 rounded-lg bg-card border border-border">
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <h2 className="font-display text-xl font-semibold flex items-center gap-2">
-          <FileText size={20} /> I miei articoli
-          <span className="text-base font-body text-muted-foreground">({posts.length})</span>
+          <TitleIcon size={20} /> {displayTitle}
+          <span className="text-base font-body text-muted-foreground">({scopedPosts.length})</span>
         </h2>
         <Link
-          to="/area-personale/articolo/nuovo"
+          to={newHref}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
         >
-          <Plus size={14} /> Nuovo articolo
+          <Plus size={14} /> {displayNewLabel}
         </Link>
       </div>
+
 
       {/* Filtri */}
       <div className="flex flex-col md:flex-row gap-3 mb-6">
