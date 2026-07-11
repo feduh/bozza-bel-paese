@@ -80,11 +80,12 @@ const ArticoloEditor = () => {
 
   const [form, setForm] = useState({
     title: "",
-    category: "",
+    category: !isEdit && categoryParam ? categoryParam : "",
     excerpt: "",
     content: "",
     coverImageUrl: "",
   });
+
 
   const isStaff = useMemo(
     () => myRoles.includes("admin") || myRoles.includes("moderator"),
