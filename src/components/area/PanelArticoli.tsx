@@ -51,15 +51,15 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
   };
 
   const scopedPosts = useMemo(() => {
-    if (!presetCategory) return posts;
-    const target = presetCategory.toLowerCase();
-    return posts.filter((p) =>
-      p.category
+    const inCategory = (p: AreaPost, cat: string) =>
+      (p.category ?? "")
         .toLowerCase()
         .split(",")
         .map((c) => c.trim())
-        .includes(target),
-    );
+        .includes(cat.toLowerCase());
+    if (presetCategory) return posts.filter((p) => inCategory(p, presetCategory));
+    // Default "Articoli" view: esclude i podcast (hanno tab dedicata)
+    return posts.filter((p) => !inCategory(p, "Podcast"));
   }, [posts, presetCategory]);
 
   const filtered = useMemo(() => {
