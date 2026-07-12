@@ -176,16 +176,25 @@ const AreaPersonale = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Tab definitions based on role
+  const { articleCount, podcastCount } = useMemo(() => {
+    let art = 0, pod = 0;
+    for (const p of posts) {
+      const cats = (p.category ?? "").toLowerCase().split(",").map((c) => c.trim());
+      if (cats.includes("podcast")) pod += 1;
+      else art += 1;
+    }
+    return { articleCount: art, podcastCount: pod };
+  }, [posts]);
+
   const tabs = useMemo(() => {
     const tabList: Array<{ value: string; label: string; icon: typeof UserIcon; badge?: number }> = [
       { value: "profilo", label: t("area.tabs.profile"), icon: UserIcon },
       { value: "calendario", label: t("area.tabs.calendar"), icon: CalendarClock, badge: scheduledItems.length || undefined },
-      { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: posts.length || undefined },
+      { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: articleCount || undefined },
       { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
     ];
     if (isStaff) {
-      tabList.push({ value: "podcast", label: "Podcast", icon: Mic });
+      tabList.push({ value: "podcast", label: "Podcast", icon: Mic, badge: podcastCount || undefined });
     }
     if (canProposeRealities) {
       tabList.push({ value: "realta", label: t("area.tabs.realities"), icon: MapPin, badge: myPendingRealities.length || undefined });
@@ -201,7 +210,7 @@ const AreaPersonale = () => {
     }
     return tabList;
 
-  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, posts.length, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
+  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, articleCount, podcastCount, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
 
   const tabFromUrl = searchParams.get("tab");
   const activeTab = tabs.some((t) => t.value === tabFromUrl) ? (tabFromUrl as string) : "profilo";
