@@ -113,7 +113,7 @@ const Navbar = () => {
             >
               Racconti <ChevronDown size={14} aria-hidden="true" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" sideOffset={16} className="min-w-[220px]">
+            <DropdownMenuContent align="start" className="min-w-[220px]">
               {raccontoLinks.map((l) => (
                 <DropdownMenuItem key={l.to} asChild>
                   <Link to={l.to} className="cursor-pointer">{l.label}</Link>
