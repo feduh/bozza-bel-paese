@@ -296,7 +296,7 @@ const RealityForm = ({
         .eq("id", editingId!);
       opError = updError;
     } else {
-      const autoConfirmAt = isCollaborator
+      const autoConfirmAt = effectiveStatus === "pendente"
         ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         : null;
       const { error: insertError } = await supabase.from("realities").insert({
