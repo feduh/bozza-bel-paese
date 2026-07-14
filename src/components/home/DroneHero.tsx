@@ -59,6 +59,7 @@ const DroneHero = () => {
   const cursor = useRef({ x: 0, y: 0, svx: 0, svy: 0, lastX: 0, lastY: 0, angle: -45 });
   const lastTarget = useRef({ x: PIEMONTE.x, y: PIEMONTE.y });
   const panelSize = useRef({ w: 1200, h: 700 });
+  const phaseRef = useRef<"travel" | "dwell">("travel");
 
   const [panel, setPanel] = useState({ w: 1200, h: 700 });
   const [hovering, setHovering] = useState(false);
