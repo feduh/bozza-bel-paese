@@ -324,6 +324,7 @@ const AreaPersonale = () => {
                   </p>
                   <InviteMemberForm allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]} />
                 </section>
+                <AuthorsAffiliationPanel />
               </TabsContent>
             )}
 
