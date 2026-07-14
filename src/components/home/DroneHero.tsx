@@ -107,7 +107,7 @@ const DroneHero = () => {
     const cx = w / 2;
     const cy = h / 2;
     const fit = Math.min(h / VB_H, w / VB_W);
-    const scale = fit * ZOOM;
+    const scale = fit * (isTouchDevice ? ZOOM_MOBILE : ZOOM);
     const fx = current.current.x * VB_W;
     const fy = current.current.y * VB_H;
     const tiltDeg = (current.current.x - 0.5) * 3;
