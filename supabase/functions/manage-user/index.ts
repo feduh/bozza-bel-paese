@@ -106,6 +106,42 @@ Deno.serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
+    // ---------- Ops open to admin + coordinatore ----------
+    if (data.op === "list_authors") {
+      if (!isAdmin && !isCoord) {
+        return json({ error: "Non autorizzato" }, 403);
+      }
+      const { data: profs, error: profErr } = await admin
+        .from("profiles")
+        .select("user_id, display_name, affiliation, reality_id, member_type")
+        .in("member_type", ["autore", "coordinatore"])
+        .order("display_name", { ascending: true });
+      if (profErr) return json({ error: profErr.message }, 500);
+      return json({ authors: profs ?? [] });
+    }
+
+    if (data.op === "set_affiliation") {
+      if (!isAdmin && !isCoord) {
+        return json({ error: "Non autorizzato" }, 403);
+      }
+      const value =
+        data.affiliation && data.affiliation.trim().length > 0
+          ? data.affiliation.trim()
+          : null;
+      const { error } = await admin
+        .from("profiles")
+        .update({ affiliation: value })
+        .eq("user_id", data.user_id);
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true });
+    }
+
+    // ---------- Ops restricted to admin ----------
+    if (!isAdmin) {
+      return json({ error: "Solo gli admin possono gestire gli utenti" }, 403);
+    }
+
+
     // ---------- LIST USERS ----------
     if (data.op === "list_users") {
       const { data: usersResp, error: usersErr } = await admin.auth.admin.listUsers({
