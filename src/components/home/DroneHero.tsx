@@ -25,6 +25,7 @@ const ROTATING_WORDS = [
 
 const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
+const ZOOM_MOBILE = 6.6;
 
 type Waypoint = { x: number; y: number; dwell: number; name: string };
 const AUTOPLAY_ROUTE: Waypoint[] = [
