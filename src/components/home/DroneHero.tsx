@@ -28,22 +28,20 @@ const ZOOM = 4.2;
 const ZOOM_MOBILE = 6.6;
 
 type Waypoint = { x: number; y: number; dwell: number; name: string };
+// Rotta autoplay per mobile: solo tappe italiane, così la mappa può restare
+// zoomata sull'Italia senza mai perdere il razzo di vista.
 const AUTOPLAY_ROUTE: Waypoint[] = [
   { x: 0.475, y: 0.655, dwell: 900, name: "Torino" },
   { x: 0.495, y: 0.650, dwell: 700, name: "Milano" },
   { x: 0.525, y: 0.660, dwell: 600, name: "Venezia" },
+  { x: 0.545, y: 0.660, dwell: 500, name: "Trieste" },
   { x: 0.515, y: 0.685, dwell: 500, name: "Bologna" },
   { x: 0.520, y: 0.710, dwell: 700, name: "Firenze" },
   { x: 0.540, y: 0.750, dwell: 1100, name: "Roma" },
   { x: 0.560, y: 0.780, dwell: 700, name: "Napoli" },
   { x: 0.555, y: 0.840, dwell: 800, name: "Palermo" },
   { x: 0.500, y: 0.830, dwell: 600, name: "Cagliari" },
-  { x: 0.435, y: 0.680, dwell: 500, name: "Marsiglia" },
-  { x: 0.410, y: 0.560, dwell: 700, name: "Parigi" },
   { x: 0.485, y: 0.680, dwell: 500, name: "Genova" },
-  { x: 0.560, y: 0.500, dwell: 800, name: "Berlino" },
-  { x: 0.590, y: 0.580, dwell: 600, name: "Vienna" },
-  { x: 0.545, y: 0.660, dwell: 500, name: "Trieste" },
 ];
 
 const easeInOutCubic = (t: number) =>
