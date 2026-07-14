@@ -10,7 +10,7 @@ const Privacy = () => {
       />
       <article className="editorial-container max-w-3xl">
         <header className="mb-12">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Aggiornata: Giugno 2026</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Aggiornata: Luglio 2026</p>
           <h1 className="editorial-heading mb-4"><span className="italic text-primary">Privacy</span> Policy</h1>
           <p className="editorial-body text-muted-foreground">
             Questa informativa descrive come Il Bel Paese tratta i dati personali raccolti tramite il sito,

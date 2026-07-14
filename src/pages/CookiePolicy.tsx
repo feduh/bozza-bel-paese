@@ -9,7 +9,7 @@ const CookiePolicy = () => {
         canonicalPath="/cookie-policy"
       />
       <article className="editorial-container py-12 prose prose-neutral max-w-3xl font-body">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Aggiornata: Giugno 2026</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Aggiornata: Luglio 2026</p>
         <h1 className="font-display">Cookie Policy</h1>
         <p>La presente informativa illustra l'utilizzo di cookie e tecnologie analoghe (di seguito complessivamente "cookie") sul sito <strong>Il Bel Paese</strong>, ai sensi del Provvedimento del Garante per la protezione dei dati personali del 10 giugno 2021 e degli artt. 13 GDPR e 122 del Codice Privacy.</p>
 

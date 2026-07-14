@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 const It = () => (
   <article className="editorial-container py-12 prose prose-neutral dark:prose-invert max-w-3xl font-body">
-    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Aggiornata: Giugno 2026</p>
+    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Aggiornata: Luglio 2026</p>
     <h1 className="font-display">Termini e Condizioni</h1>
     <p>I presenti termini regolano l'accesso e l'utilizzo del sito <strong>Il Bel Paese</strong> (di seguito "la Piattaforma"), gestito dall'omonimo collettivo editoriale con sede operativa in Italia. L'accesso alla Piattaforma implica l'integrale accettazione delle clausole che seguono.</p>
     <h2>1. Oggetto</h2>
