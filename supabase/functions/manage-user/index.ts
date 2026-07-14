@@ -90,7 +90,10 @@ Deno.serve(async (req) => {
       _user_id: caller.id,
       _role: "admin",
     });
-    if (!isAdmin) return json({ error: "Solo gli admin possono gestire gli utenti" }, 403);
+    const { data: isCoord } = await callerClient.rpc("has_role", {
+      _user_id: caller.id,
+      _role: "coordinatore",
+    });
 
     const raw = await req.json();
     const parsed = opSchema.safeParse(raw);
