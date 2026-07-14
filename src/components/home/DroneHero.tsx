@@ -254,6 +254,7 @@ const DroneHero = () => {
     let intersecting = true;
     let idx = 0;
     let phase: "travel" | "dwell" = "travel";
+    phaseRef.current = "travel";
     let phaseStart = performance.now();
     let from = { x: target.current.x, y: target.current.y };
     let to = AUTOPLAY_ROUTE[0];
@@ -269,6 +270,7 @@ const DroneHero = () => {
       const jitter = 0.85 + Math.random() * 0.3;
       travelDur = (1400 + dist * 4200) * jitter;
       phase = "travel";
+      phaseRef.current = "travel";
       phaseStart = now;
     };
 
@@ -282,17 +284,20 @@ const DroneHero = () => {
         target.current.y = from.y + (to.y - from.y) * e;
         if (t >= 1) {
           phase = "dwell";
+          phaseRef.current = "dwell";
           phaseStart = now;
+          // Blocca il target esattamente sulla tappa: niente oscillazioni
+          // che facciano ruotare il razzo su se stesso durante la sosta.
+          target.current.x = to.x;
+          target.current.y = to.y;
         }
       } else {
-        const osc = (now - phaseStart) / 1000;
-        target.current.x = to.x + Math.sin(osc * 1.7) * 0.0025;
-        target.current.y = to.y + Math.cos(osc * 1.3) * 0.0018;
         if (now - phaseStart >= to.dwell) {
           nextLeg(now);
         }
       }
     };
+
 
     const start = () => {
       if (running) return;
