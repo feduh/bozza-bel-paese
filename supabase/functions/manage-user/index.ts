@@ -12,6 +12,7 @@ const ALL_ROLES: AppRole[] = ["admin", "moderator", "coordinatore", "author"];
 
 const opSchema = z.discriminatedUnion("op", [
   z.object({ op: z.literal("list_users") }),
+  z.object({ op: z.literal("list_authors") }),
   z.object({
     op: z.literal("update_roles"),
     user_id: z.string().uuid(),
@@ -44,6 +45,11 @@ const opSchema = z.discriminatedUnion("op", [
     email: z.string().trim().email("Email non valida").max(255).optional(),
     display_name: z.string().trim().min(1, "Nome obbligatorio").max(120).optional(),
     affiliation: z.string().trim().max(255).nullable().optional(),
+  }),
+  z.object({
+    op: z.literal("set_affiliation"),
+    user_id: z.string().uuid(),
+    affiliation: z.string().trim().max(255).nullable(),
   }),
 ]);
 
