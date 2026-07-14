@@ -172,15 +172,16 @@ const DroneHero = () => {
         lastTarget.current.y = target.current.y;
         c.svx += (dtx - c.svx) * 0.28;
         c.svy += (dty - c.svy) * 0.28;
-        const speed = Math.hypot(c.svx, c.svy);
-        if (speed > 0.6) {
-          const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
-          const diff = ((targetAngle - c.angle + 540) % 360) - 180;
-          const ease = Math.min(0.28, 0.08 + speed * 0.012);
-          c.angle += diff * ease;
-        } else {
-          const idle = Math.sin(t * 1.4) * 0.6;
-          c.angle += idle * 0.02;
+        // Il razzo aggiorna l'angolo SOLO durante il viaggio.
+        // Durante il dwell (sosta su una città) resta fermo, senza ruotare.
+        if (phaseRef.current === "travel") {
+          const speed = Math.hypot(c.svx, c.svy);
+          if (speed > 0.6) {
+            const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
+            const diff = ((targetAngle - c.angle + 540) % 360) - 180;
+            const ease = Math.min(0.28, 0.08 + speed * 0.012);
+            c.angle += diff * ease;
+          }
         }
       } else {
         const dx = c.x - c.lastX;
