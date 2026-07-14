@@ -26,6 +26,7 @@ import PanelModerazione from "@/components/area/PanelModerazione";
 import PanelRealta from "@/components/area/PanelRealta";
 import PanelPreferiti from "@/components/area/PanelPreferiti";
 import InviteMemberForm from "@/components/InviteMemberForm";
+import AuthorsAffiliationPanel from "@/components/AuthorsAffiliationPanel";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
