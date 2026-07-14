@@ -12,6 +12,7 @@ const ALL_ROLES: AppRole[] = ["admin", "moderator", "coordinatore", "author"];
 
 const opSchema = z.discriminatedUnion("op", [
   z.object({ op: z.literal("list_users") }),
+  z.object({ op: z.literal("list_authors") }),
   z.object({
     op: z.literal("update_roles"),
     user_id: z.string().uuid(),
@@ -44,6 +45,11 @@ const opSchema = z.discriminatedUnion("op", [
     email: z.string().trim().email("Email non valida").max(255).optional(),
     display_name: z.string().trim().min(1, "Nome obbligatorio").max(120).optional(),
     affiliation: z.string().trim().max(255).nullable().optional(),
+  }),
+  z.object({
+    op: z.literal("set_affiliation"),
+    user_id: z.string().uuid(),
+    affiliation: z.string().trim().max(255).nullable(),
   }),
 ]);
 
@@ -84,7 +90,10 @@ Deno.serve(async (req) => {
       _user_id: caller.id,
       _role: "admin",
     });
-    if (!isAdmin) return json({ error: "Solo gli admin possono gestire gli utenti" }, 403);
+    const { data: isCoord } = await callerClient.rpc("has_role", {
+      _user_id: caller.id,
+      _role: "coordinatore",
+    });
 
     const raw = await req.json();
     const parsed = opSchema.safeParse(raw);
@@ -96,6 +105,42 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
+
+    // ---------- Ops open to admin + coordinatore ----------
+    if (data.op === "list_authors") {
+      if (!isAdmin && !isCoord) {
+        return json({ error: "Non autorizzato" }, 403);
+      }
+      const { data: profs, error: profErr } = await admin
+        .from("profiles")
+        .select("user_id, display_name, affiliation, reality_id, member_type")
+        .in("member_type", ["autore", "coordinatore"])
+        .order("display_name", { ascending: true });
+      if (profErr) return json({ error: profErr.message }, 500);
+      return json({ authors: profs ?? [] });
+    }
+
+    if (data.op === "set_affiliation") {
+      if (!isAdmin && !isCoord) {
+        return json({ error: "Non autorizzato" }, 403);
+      }
+      const value =
+        data.affiliation && data.affiliation.trim().length > 0
+          ? data.affiliation.trim()
+          : null;
+      const { error } = await admin
+        .from("profiles")
+        .update({ affiliation: value })
+        .eq("user_id", data.user_id);
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true });
+    }
+
+    // ---------- Ops restricted to admin ----------
+    if (!isAdmin) {
+      return json({ error: "Solo gli admin possono gestire gli utenti" }, 403);
+    }
+
 
     // ---------- LIST USERS ----------
     if (data.op === "list_users") {
