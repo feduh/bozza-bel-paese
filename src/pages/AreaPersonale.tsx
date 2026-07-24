@@ -59,6 +59,7 @@ const AreaPersonale = () => {
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
+  const [showInvite, setShowInvite] = useState(false);
 
   const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
   const isAdmin = myRoles.includes("admin");
