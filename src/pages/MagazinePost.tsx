@@ -40,10 +40,11 @@ type ReplyMeta = {
 type AuthorBio = {
   user_id: string;
   display_name: string;
-  bio: string | null;
+  author_bio: string | null;
   avatar_url: string | null;
   affiliation: string | null;
 };
+
 
 const MagazinePost = () => {
   const { t } = useTranslation();
