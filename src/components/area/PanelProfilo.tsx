@@ -63,6 +63,8 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
       .update({
         display_name: profile.display_name,
         bio: profile.bio,
+        author_bio: profile.author_bio || null,
+
         avatar_url: profile.avatar_url || null,
         website: profile.website || null,
         social_instagram: profile.social_instagram || null,
