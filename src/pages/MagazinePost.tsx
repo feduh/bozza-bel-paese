@@ -246,7 +246,7 @@ const MagazinePost = () => {
         </div>
 
         {/* Author bio card */}
-        {authorBio && (authorBio.bio || authorBio.affiliation) && (
+        {authorBio && authorBio.author_bio && (
           <aside className="mt-14 pt-8 border-t border-border">
             <div className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-4">
               L'autore
