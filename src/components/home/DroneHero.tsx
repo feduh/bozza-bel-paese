@@ -428,7 +428,7 @@ const DroneHero = () => {
       document.removeEventListener("visibilitychange", onVis);
       io?.disconnect();
     };
-  }, [isTouchDevice, reducedMotion]);
+  }, [isTouchDevice, reducedMotion, route]);
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isTouchDevice) return;
