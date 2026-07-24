@@ -156,6 +156,9 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
 
         <div>
           <label className="block text-sm font-body font-medium mb-2">Bio</label>
+          <p className="text-xs text-muted-foreground font-body mb-2">
+            Mostrata sulla tua pagina bio pubblica (/autori) e nella sezione "La Rete".
+          </p>
           <textarea
             value={profile.bio}
             onChange={(e) => setProfile({ ...profile, bio: e.target.value.slice(0, 1500) })}
@@ -167,6 +170,25 @@ const PanelProfilo = ({ profile, setProfile, reality, myRoles, userId, saving, s
             {(profile.bio ?? "").length} / 1500
           </p>
         </div>
+
+        <div>
+          <label className="block text-sm font-body font-medium mb-2">Bio autore</label>
+          <p className="text-xs text-muted-foreground font-body mb-2">
+            Breve nota biografica dedicata al ruolo di autore/autrice: viene mostrata <strong>esclusivamente in fondo agli articoli</strong> che pubblichi sul magazine. Se lasciata vuota, il box in calce non appare.
+          </p>
+          <textarea
+            value={profile.author_bio ?? ""}
+            onChange={(e) => setProfile({ ...profile, author_bio: e.target.value.slice(0, 800) })}
+            rows={4}
+            maxLength={800}
+            placeholder="es. Curatrice indipendente, scrive di arti visive e nuovi media. Collabora con…"
+            className="w-full px-4 py-3 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+          />
+          <p className="text-xs text-muted-foreground font-body mt-1 text-right">
+            {(profile.author_bio ?? "").length} / 800
+          </p>
+        </div>
+
 
         <div className="grid md:grid-cols-2 gap-4">
           <Field label="Ruolo Lavorativo" value={profile.role_real_life ?? ""} onChange={(v) => setProfile({ ...profile, role_real_life: v })} placeholder="es. curatrice indipendente" />
