@@ -12,6 +12,7 @@ import {
   Bookmark,
   UserPlus,
   Mic,
+  Plus,
 } from "lucide-react";
 
 import SEO from "@/components/SEO";
