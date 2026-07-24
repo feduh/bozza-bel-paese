@@ -1,18 +1,20 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { EUROPE_PATH, EUROPE_VB } from "./europePath";
+import { useQuery } from "@tanstack/react-query";
+import { EUROPE_PATH, EUROPE_VB, projectLatLng } from "./europePath";
+import { supabase } from "@/integrations/supabase/client";
 import LogoPittogramma from "@/components/LogoPittogramma";
 
 /**
  * DroneHero — hero editoriale con mappa vettoriale dell'Europa.
  * Desktop: il razzo segue il cursore, la mappa fa parallax.
- * Mobile/touch: il razzo vola in autoplay tra città italiane ed europee.
+ * Mobile/touch: il razzo vola in autoplay tra le realtà mappate (fetch dal DB),
+ * rallenta e si ferma un istante su ciascuna mostrando il nome.
  *
- * Performance: tutti gli update per-frame passano da ref imperativi
- * (setAttribute/style.transform). React ri-renderizza solo per resize,
- * rotating word, hovering, isTouchDevice. Il rAF viene messo in pausa
- * quando l'hero è fuori dalla viewport o il tab è nascosto.
+ * Performance: tutti gli update per-frame passano da ref imperativi.
+ * React ri-renderizza solo per resize, rotating word, hovering,
+ * isTouchDevice e activeIdx (cambio waypoint ~ogni 4s, non per frame).
  */
 
 const { W: VB_W, H: VB_H } = EUROPE_VB;
@@ -34,30 +36,65 @@ const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
 const ZOOM_MOBILE = 9.5;
 
-type Waypoint = { x: number; y: number; name: string };
-// Rotta autoplay mobile: solo tappe italiane in ordine NON lineare
-// (zig-zag nord/sud/isole/centro) per un volo esplorativo continuo,
-// senza mai fermarsi su una città.
-const AUTOPLAY_ROUTE: Waypoint[] = [
-  { x: 0.475, y: 0.655, name: "Torino" },
-  { x: 0.555, y: 0.840, name: "Palermo" },
-  { x: 0.520, y: 0.710, name: "Firenze" },
-  { x: 0.560, y: 0.780, name: "Bari" },
-  { x: 0.495, y: 0.650, name: "Milano" },
-  { x: 0.500, y: 0.830, name: "Cagliari" },
-  { x: 0.540, y: 0.750, name: "Roma" },
-  { x: 0.525, y: 0.660, name: "Venezia" },
-  { x: 0.560, y: 0.860, name: "Catania" },
-  { x: 0.515, y: 0.685, name: "Bologna" },
-  { x: 0.485, y: 0.680, name: "Genova" },
-  { x: 0.540, y: 0.735, name: "Perugia" },
-  { x: 0.555, y: 0.780, name: "Napoli" },
-  { x: 0.545, y: 0.660, name: "Trieste" },
-  { x: 0.535, y: 0.720, name: "Ancona" },
+type Waypoint = { id: string; x: number; y: number; name: string; city?: string };
+
+// Fallback curato: usato se il fetch fallisce o non ci sono ancora realtà.
+const FALLBACK_ROUTE: Waypoint[] = [
+  { id: "f-torino", x: 0.475, y: 0.655, name: "Torino" },
+  { id: "f-milano", x: 0.495, y: 0.650, name: "Milano" },
+  { id: "f-venezia", x: 0.525, y: 0.660, name: "Venezia" },
+  { id: "f-bologna", x: 0.515, y: 0.685, name: "Bologna" },
+  { id: "f-firenze", x: 0.520, y: 0.710, name: "Firenze" },
+  { id: "f-roma", x: 0.540, y: 0.750, name: "Roma" },
+  { id: "f-napoli", x: 0.555, y: 0.780, name: "Napoli" },
+  { id: "f-bari", x: 0.560, y: 0.780, name: "Bari" },
+  { id: "f-palermo", x: 0.555, y: 0.840, name: "Palermo" },
+  { id: "f-cagliari", x: 0.500, y: 0.830, name: "Cagliari" },
 ];
+
+/**
+ * Ordina i waypoint con nearest-neighbor + randomizzazione leggera:
+ * parte da un punto casuale, ad ogni passo sceglie uno dei 3 più vicini
+ * non ancora visitati. Percorso coerente ma diverso ogni sessione.
+ */
+function orderNearestNeighbor(points: Waypoint[]): Waypoint[] {
+  if (points.length <= 1) return points.slice();
+  const remaining = points.slice();
+  const startIdx = Math.floor(Math.random() * remaining.length);
+  const ordered: Waypoint[] = [remaining.splice(startIdx, 1)[0]];
+  while (remaining.length > 0) {
+    const last = ordered[ordered.length - 1];
+    const withDist = remaining
+      .map((p, i) => ({ i, d: Math.hypot(p.x - last.x, p.y - last.y) }))
+      .sort((a, b) => a.d - b.d);
+    const pool = withDist.slice(0, Math.min(3, withDist.length));
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    ordered.push(remaining.splice(pick.i, 1)[0]);
+  }
+  return ordered;
+}
+
+/**
+ * Deduplica realtà molto vicine (< ~10km in coordinate normalizzate):
+ * tiene la prima e concatena i nomi separati da " · ".
+ */
+function dedupeNearby(points: Waypoint[]): Waypoint[] {
+  const EPS = 0.005;
+  const out: Waypoint[] = [];
+  for (const p of points) {
+    const near = out.find((q) => Math.hypot(q.x - p.x, q.y - p.y) < EPS);
+    if (near) {
+      near.name = `${near.name} · ${p.name}`;
+    } else {
+      out.push({ ...p });
+    }
+  }
+  return out;
+}
 
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
 
 const DroneHero = () => {
   const panelRef = useRef<HTMLDivElement>(null);
