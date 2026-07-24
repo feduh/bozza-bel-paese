@@ -201,7 +201,7 @@ const UsersManagementPanel = () => {
       ) : filtered.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground font-body">Nessun utente.</div>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3 grid-cols-[minmax(0,1fr)]">
           {filtered.map((u) => {
             const banned = isBanned(u);
             const self = u.id === meId;
