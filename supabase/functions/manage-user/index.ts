@@ -51,6 +51,12 @@ const opSchema = z.discriminatedUnion("op", [
     user_id: z.string().uuid(),
     affiliation: z.string().trim().max(255).nullable(),
   }),
+  z.object({
+    op: z.literal("set_reality"),
+    user_id: z.string().uuid(),
+    reality_id: z.string().uuid().nullable(),
+  }),
+  z.object({ op: z.literal("list_realities_lite") }),
 ]);
 
 
@@ -134,6 +140,30 @@ Deno.serve(async (req) => {
         .eq("user_id", data.user_id);
       if (error) return json({ error: error.message }, 500);
       return json({ ok: true });
+    }
+
+    if (data.op === "set_reality") {
+      if (!isAdmin && !isCoord) {
+        return json({ error: "Non autorizzato" }, 403);
+      }
+      const { error } = await admin
+        .from("profiles")
+        .update({ reality_id: data.reality_id })
+        .eq("user_id", data.user_id);
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true });
+    }
+
+    if (data.op === "list_realities_lite") {
+      if (!isAdmin && !isCoord) {
+        return json({ error: "Non autorizzato" }, 403);
+      }
+      const { data: rows, error } = await admin
+        .from("realities")
+        .select("id, name, city, confirmed_status")
+        .order("name", { ascending: true });
+      if (error) return json({ error: error.message }, 500);
+      return json({ realities: rows ?? [] });
     }
 
     // ---------- Ops restricted to admin ----------

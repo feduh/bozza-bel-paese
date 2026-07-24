@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pencil, Search, Building2, Check, X } from "lucide-react";
+import { Pencil, Search, Building2, Check, X, MapPin } from "lucide-react";
 import { invokeFunction } from "@/lib/invokeFunction";
 
 type AuthorRow = {
@@ -10,70 +10,119 @@ type AuthorRow = {
   member_type: string | null;
 };
 
+type RealityLite = {
+  id: string;
+  name: string;
+  city: string | null;
+  confirmed_status: string | null;
+};
+
 const AuthorsAffiliationPanel = () => {
   const [authors, setAuthors] = useState<AuthorRow[]>([]);
+  const [realities, setRealities] = useState<RealityLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
+  const [draftAff, setDraftAff] = useState("");
+  const [draftReality, setDraftReality] = useState<string>("");
   const [savingId, setSavingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await invokeFunction<{ authors?: AuthorRow[] }>(
-      "manage-user",
-      { op: "list_authors" },
-    );
+    const [authorsRes, realitiesRes] = await Promise.all([
+      invokeFunction<{ authors?: AuthorRow[] }>("manage-user", { op: "list_authors" }),
+      invokeFunction<{ realities?: RealityLite[] }>("manage-user", { op: "list_realities_lite" }),
+    ]);
     setLoading(false);
-    if (error) {
-      setFeedback({ kind: "err", text: error });
+    if (authorsRes.error) {
+      setFeedback({ kind: "err", text: authorsRes.error });
       return;
     }
-    setAuthors(data?.authors ?? []);
+    setAuthors(authorsRes.data?.authors ?? []);
+    setRealities(realitiesRes.data?.realities ?? []);
   };
 
   useEffect(() => {
     void load();
   }, []);
 
+  const realityMap = useMemo(() => {
+    const m = new Map<string, RealityLite>();
+    for (const r of realities) m.set(r.id, r);
+    return m;
+  }, [realities]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return authors;
-    return authors.filter(
-      (a) =>
+    return authors.filter((a) => {
+      const realityName = a.reality_id ? realityMap.get(a.reality_id)?.name ?? "" : "";
+      return (
         a.display_name?.toLowerCase().includes(q) ||
-        (a.affiliation ?? "").toLowerCase().includes(q),
-    );
-  }, [authors, query]);
+        (a.affiliation ?? "").toLowerCase().includes(q) ||
+        realityName.toLowerCase().includes(q)
+      );
+    });
+  }, [authors, query, realityMap]);
 
   const startEdit = (a: AuthorRow) => {
     setEditingId(a.user_id);
-    setDraft(a.affiliation ?? "");
+    setDraftAff(a.affiliation ?? "");
+    setDraftReality(a.reality_id ?? "");
     setFeedback(null);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setDraft("");
+    setDraftAff("");
+    setDraftReality("");
   };
 
   const save = async (a: AuthorRow) => {
     setSavingId(a.user_id);
     setFeedback(null);
-    const { error } = await invokeFunction("manage-user", {
-      op: "set_affiliation",
-      user_id: a.user_id,
-      affiliation: draft.trim() || null,
-    });
-    setSavingId(null);
-    if (error) {
-      setFeedback({ kind: "err", text: error });
+
+    const nextAff = draftAff.trim() || null;
+    const nextReality = draftReality || null;
+
+    const ops: Promise<{ error: string | null }>[] = [];
+    if (nextAff !== (a.affiliation ?? null)) {
+      ops.push(
+        invokeFunction("manage-user", {
+          op: "set_affiliation",
+          user_id: a.user_id,
+          affiliation: nextAff,
+        }),
+      );
+    }
+    if (nextReality !== (a.reality_id ?? null)) {
+      ops.push(
+        invokeFunction("manage-user", {
+          op: "set_reality",
+          user_id: a.user_id,
+          reality_id: nextReality,
+        }),
+      );
+    }
+
+    if (ops.length === 0) {
+      setSavingId(null);
+      setEditingId(null);
       return;
     }
-    setFeedback({ kind: "ok", text: "Affiliazione aggiornata." });
+
+    const results = await Promise.all(ops);
+    setSavingId(null);
+    const firstError = results.find((r) => r.error)?.error;
+    if (firstError) {
+      setFeedback({ kind: "err", text: firstError });
+      return;
+    }
+    setFeedback({ kind: "ok", text: "Modifiche salvate." });
     setEditingId(null);
-    setDraft("");
+    setDraftAff("");
+    setDraftReality("");
     await load();
   };
 
@@ -83,8 +132,8 @@ const AuthorsAffiliationPanel = () => {
         <Building2 size={20} /> Affiliazioni degli autori
       </h2>
       <p className="font-body text-sm text-muted-foreground mb-6">
-        Aggiorna la realtà o l'affiliazione di riferimento degli autori del collettivo.
-        Le modifiche sono visibili immediatamente nel loro profilo pubblico.
+        Aggiorna la realtà collegata e/o l'affiliazione libera degli autori del collettivo.
+        La realtà collegata (dal menù a tendina) ha la priorità sull'affiliazione libera nel profilo pubblico.
       </p>
 
       <div className="relative mb-4">
@@ -92,7 +141,7 @@ const AuthorsAffiliationPanel = () => {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cerca per nome o affiliazione…"
+          placeholder="Cerca per nome, affiliazione o realtà…"
           className="w-full pl-9 pr-4 py-2.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
@@ -118,30 +167,81 @@ const AuthorsAffiliationPanel = () => {
           {filtered.map((a) => {
             const isEditing = editingId === a.user_id;
             const isSaving = savingId === a.user_id;
-            const hasReality = !!a.reality_id;
+            const linkedReality = a.reality_id ? realityMap.get(a.reality_id) : null;
             return (
               <div
                 key={a.user_id}
-                className="p-3 rounded-md border border-border bg-background flex items-start justify-between gap-3 flex-wrap"
+                className="p-3 rounded-md border border-border bg-background flex flex-col gap-2"
               >
-                <div className="min-w-0 flex-1">
-                  <p className="font-body font-medium text-sm">
-                    {a.display_name || "Autore"}
-                    {a.member_type === "coordinatore" && (
-                      <span className="ml-2 text-[10px] uppercase tracking-wider text-primary">
-                        Coordinatore
-                      </span>
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-body font-medium text-sm">
+                      {a.display_name || "Autore"}
+                      {a.member_type === "coordinatore" && (
+                        <span className="ml-2 text-[10px] uppercase tracking-wider text-primary">
+                          Coordinatore
+                        </span>
+                      )}
+                    </p>
+                    {!isEditing && (
+                      <div className="mt-1 space-y-0.5">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <MapPin size={11} className="shrink-0" />
+                          {linkedReality
+                            ? `${linkedReality.name}${linkedReality.city ? ` · ${linkedReality.city}` : ""}`
+                            : "— nessuna realtà collegata —"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          <span className="opacity-70">Affiliazione libera:</span>{" "}
+                          {a.affiliation || "—"}
+                        </p>
+                      </div>
                     )}
-                  </p>
-                  {isEditing ? (
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                  </div>
+                  {!isEditing && (
+                    <button
+                      onClick={() => startEdit(a)}
+                      className="inline-flex items-center gap-1 text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors"
+                    >
+                      <Pencil size={12} /> Modifica
+                    </button>
+                  )}
+                </div>
+
+                {isEditing && (
+                  <div className="mt-1 space-y-2">
+                    <label className="block">
+                      <span className="text-xs font-body text-muted-foreground">
+                        Realtà collegata
+                      </span>
+                      <select
+                        value={draftReality}
+                        onChange={(e) => setDraftReality(e.target.value)}
+                        className="mt-1 w-full px-3 py-1.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <option value="">— Nessuna —</option>
+                        {realities.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
+                            {r.city ? ` · ${r.city}` : ""}
+                            {r.confirmed_status !== "confermato" ? " (pendente)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-body text-muted-foreground">
+                        Affiliazione libera (opzionale)
+                      </span>
                       <input
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        placeholder={hasReality ? "(sovrascrive la realtà collegata)" : "Es. Collettivo XYZ"}
+                        value={draftAff}
+                        onChange={(e) => setDraftAff(e.target.value)}
+                        placeholder="Es. Collettivo XYZ"
                         maxLength={255}
-                        className="flex-1 min-w-[220px] px-3 py-1.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        className="mt-1 w-full px-3 py-1.5 rounded-md border border-input bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                       />
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => save(a)}
                         disabled={isSaving}
@@ -157,23 +257,7 @@ const AuthorsAffiliationPanel = () => {
                         <X size={12} /> Annulla
                       </button>
                     </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {a.affiliation
-                        ? a.affiliation
-                        : hasReality
-                          ? "Nessuna affiliazione libera (usa la realtà collegata)"
-                          : "— nessuna affiliazione —"}
-                    </p>
-                  )}
-                </div>
-                {!isEditing && (
-                  <button
-                    onClick={() => startEdit(a)}
-                    className="inline-flex items-center gap-1 text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors"
-                  >
-                    <Pencil size={12} /> Modifica
-                  </button>
+                  </div>
                 )}
               </div>
             );
