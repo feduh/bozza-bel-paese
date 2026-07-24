@@ -25,6 +25,7 @@ const Login = lazy(() => import("./pages/Login"));
 
 const AreaPersonale = lazy(() => import("./pages/AreaPersonale"));
 const ArticoloEditor = lazy(() => import("./pages/ArticoloEditor"));
+const PodcastEditor = lazy(() => import("./pages/PodcastEditor"));
 const RealityGalleryAdmin = lazy(() => import("./pages/RealityGalleryAdmin"));
 const LaRete = lazy(() => import("./pages/LaRete"));
 const AutoreProfilo = lazy(() => import("./pages/AutoreProfilo"));
