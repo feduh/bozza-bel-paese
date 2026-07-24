@@ -87,9 +87,11 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
     return list;
   }, [scopedPosts, query, statusFilter, sort]);
 
-  const newHref = presetCategory
+  const defaultNewHref = presetCategory
     ? `/area-personale/articolo/nuovo?category=${encodeURIComponent(presetCategory)}`
     : "/area-personale/articolo/nuovo";
+  const newHref = newHrefProp ?? defaultNewHref;
+  const buildEditHref = editHrefBuilder ?? ((pid: string) => `/area-personale/articolo/${pid}/modifica`);
   const displayTitle = title ?? "I miei articoli";
   const displayNewLabel = newLabel ?? "Nuovo articolo";
 
