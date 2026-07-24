@@ -182,8 +182,9 @@ const MagazinePost = () => {
               {parent.title}
             </p>
             <p className="font-body text-xs text-muted-foreground mt-1">
-              di {resolveAuthorName(nameMap, parent.user_id, parent.author_name)}
+              di <span className="underline decoration-dotted underline-offset-2">{resolveAuthorName(nameMap, parent.user_id, parent.author_name)}</span>
             </p>
+
           </Link>
         )}
 
