@@ -123,7 +123,18 @@ Deno.serve(async (req) => {
         .in("member_type", ["autore", "coordinatore"])
         .order("display_name", { ascending: true });
       if (profErr) return json({ error: profErr.message }, 500);
-      return json({ authors: profs ?? [] });
+      // Filter out deleted users (delete_user removes all user_roles entries)
+      const ids = (profs ?? []).map((p) => p.user_id);
+      let activeIds = new Set<string>(ids);
+      if (ids.length > 0) {
+        const { data: roles } = await admin
+          .from("user_roles")
+          .select("user_id")
+          .in("user_id", ids);
+        activeIds = new Set((roles ?? []).map((r: { user_id: string }) => r.user_id));
+      }
+      const filtered = (profs ?? []).filter((p) => activeIds.has(p.user_id));
+      return json({ authors: filtered });
     }
 
     if (data.op === "set_affiliation") {
