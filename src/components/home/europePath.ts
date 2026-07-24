@@ -15,15 +15,14 @@ const EUROPE_IDS = new Set([
   "724","752","756","762","792","804","807","826","831","832","833",
 ]);
 
+const projection = geoMercator()
+  .center([10, 52])
+  .scale(620)
+  .translate([EUROPE_VB.W / 2, EUROPE_VB.H / 2]);
+
 function buildPath(): string {
   const fc = feature(topo as any, (topo as any).objects.countries) as unknown as FeatureCollection<Geometry>;
   const europe: Feature<Geometry>[] = fc.features.filter((f) => EUROPE_IDS.has(String(f.id).padStart(3, "0")));
-
-  const projection = geoMercator()
-    .center([10, 52])
-    .scale(620)
-    .translate([EUROPE_VB.W / 2, EUROPE_VB.H / 2]);
-
   const path = geoPath(projection);
   return europe
     .map((f) => path(f))
@@ -32,3 +31,13 @@ function buildPath(): string {
 }
 
 export const EUROPE_PATH = buildPath();
+
+/**
+ * Proietta lat/lng reali nelle stesse coordinate del viewBox europeo,
+ * normalizzate a 0-1. Usa la stessa proiezione Mercator del path.
+ */
+export function projectLatLng(lat: number, lng: number): { x: number; y: number } {
+  const p = projection([lng, lat]);
+  if (!p) return { x: 0.5, y: 0.5 };
+  return { x: p[0] / EUROPE_VB.W, y: p[1] / EUROPE_VB.H };
+}

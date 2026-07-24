@@ -1,18 +1,20 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { EUROPE_PATH, EUROPE_VB } from "./europePath";
+import { useQuery } from "@tanstack/react-query";
+import { EUROPE_PATH, EUROPE_VB, projectLatLng } from "./europePath";
+import { supabase } from "@/integrations/supabase/client";
 import LogoPittogramma from "@/components/LogoPittogramma";
 
 /**
  * DroneHero — hero editoriale con mappa vettoriale dell'Europa.
  * Desktop: il razzo segue il cursore, la mappa fa parallax.
- * Mobile/touch: il razzo vola in autoplay tra città italiane ed europee.
+ * Mobile/touch: il razzo vola in autoplay tra le realtà mappate (fetch dal DB),
+ * rallenta e si ferma un istante su ciascuna mostrando il nome.
  *
- * Performance: tutti gli update per-frame passano da ref imperativi
- * (setAttribute/style.transform). React ri-renderizza solo per resize,
- * rotating word, hovering, isTouchDevice. Il rAF viene messo in pausa
- * quando l'hero è fuori dalla viewport o il tab è nascosto.
+ * Performance: tutti gli update per-frame passano da ref imperativi.
+ * React ri-renderizza solo per resize, rotating word, hovering,
+ * isTouchDevice e activeIdx (cambio waypoint ~ogni 4s, non per frame).
  */
 
 const { W: VB_W, H: VB_H } = EUROPE_VB;
@@ -34,30 +36,65 @@ const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
 const ZOOM_MOBILE = 9.5;
 
-type Waypoint = { x: number; y: number; name: string };
-// Rotta autoplay mobile: solo tappe italiane in ordine NON lineare
-// (zig-zag nord/sud/isole/centro) per un volo esplorativo continuo,
-// senza mai fermarsi su una città.
-const AUTOPLAY_ROUTE: Waypoint[] = [
-  { x: 0.475, y: 0.655, name: "Torino" },
-  { x: 0.555, y: 0.840, name: "Palermo" },
-  { x: 0.520, y: 0.710, name: "Firenze" },
-  { x: 0.560, y: 0.780, name: "Bari" },
-  { x: 0.495, y: 0.650, name: "Milano" },
-  { x: 0.500, y: 0.830, name: "Cagliari" },
-  { x: 0.540, y: 0.750, name: "Roma" },
-  { x: 0.525, y: 0.660, name: "Venezia" },
-  { x: 0.560, y: 0.860, name: "Catania" },
-  { x: 0.515, y: 0.685, name: "Bologna" },
-  { x: 0.485, y: 0.680, name: "Genova" },
-  { x: 0.540, y: 0.735, name: "Perugia" },
-  { x: 0.555, y: 0.780, name: "Napoli" },
-  { x: 0.545, y: 0.660, name: "Trieste" },
-  { x: 0.535, y: 0.720, name: "Ancona" },
+type Waypoint = { id: string; x: number; y: number; name: string; city?: string };
+
+// Fallback curato: usato se il fetch fallisce o non ci sono ancora realtà.
+const FALLBACK_ROUTE: Waypoint[] = [
+  { id: "f-torino", x: 0.475, y: 0.655, name: "Torino" },
+  { id: "f-milano", x: 0.495, y: 0.650, name: "Milano" },
+  { id: "f-venezia", x: 0.525, y: 0.660, name: "Venezia" },
+  { id: "f-bologna", x: 0.515, y: 0.685, name: "Bologna" },
+  { id: "f-firenze", x: 0.520, y: 0.710, name: "Firenze" },
+  { id: "f-roma", x: 0.540, y: 0.750, name: "Roma" },
+  { id: "f-napoli", x: 0.555, y: 0.780, name: "Napoli" },
+  { id: "f-bari", x: 0.560, y: 0.780, name: "Bari" },
+  { id: "f-palermo", x: 0.555, y: 0.840, name: "Palermo" },
+  { id: "f-cagliari", x: 0.500, y: 0.830, name: "Cagliari" },
 ];
+
+/**
+ * Ordina i waypoint con nearest-neighbor + randomizzazione leggera:
+ * parte da un punto casuale, ad ogni passo sceglie uno dei 3 più vicini
+ * non ancora visitati. Percorso coerente ma diverso ogni sessione.
+ */
+function orderNearestNeighbor(points: Waypoint[]): Waypoint[] {
+  if (points.length <= 1) return points.slice();
+  const remaining = points.slice();
+  const startIdx = Math.floor(Math.random() * remaining.length);
+  const ordered: Waypoint[] = [remaining.splice(startIdx, 1)[0]];
+  while (remaining.length > 0) {
+    const last = ordered[ordered.length - 1];
+    const withDist = remaining
+      .map((p, i) => ({ i, d: Math.hypot(p.x - last.x, p.y - last.y) }))
+      .sort((a, b) => a.d - b.d);
+    const pool = withDist.slice(0, Math.min(3, withDist.length));
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    ordered.push(remaining.splice(pick.i, 1)[0]);
+  }
+  return ordered;
+}
+
+/**
+ * Deduplica realtà molto vicine (< ~10km in coordinate normalizzate):
+ * tiene la prima e concatena i nomi separati da " · ".
+ */
+function dedupeNearby(points: Waypoint[]): Waypoint[] {
+  const EPS = 0.005;
+  const out: Waypoint[] = [];
+  for (const p of points) {
+    const near = out.find((q) => Math.hypot(q.x - p.x, q.y - p.y) < EPS);
+    if (near) {
+      near.name = `${near.name} · ${p.name}`;
+    } else {
+      out.push({ ...p });
+    }
+  }
+  return out;
+}
 
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
 
 const DroneHero = () => {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -75,6 +112,35 @@ const DroneHero = () => {
   const [hovering, setHovering] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+
+  // Fetch delle realtà confermate per costruire la rotta reale.
+  const { data: realities } = useQuery({
+    queryKey: ["drone-waypoints"],
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("realities")
+        .select("id, name, lat, lng, city")
+        .eq("confirmed_status", "confermato");
+      if (error || !data) return [] as { id: string; name: string; lat: number; lng: number; city: string | null }[];
+      return data;
+    },
+  });
+
+  // Ordinamento nearest-neighbor + dedup, memoizzato: cambia solo quando
+  // arrivano dati nuovi. La randomizzazione è fissata per la sessione.
+  const route = useMemo<Waypoint[]>(() => {
+    const raw: Waypoint[] = (realities ?? [])
+      .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng))
+      .map((r) => {
+        const { x, y } = projectLatLng(r.lat, r.lng);
+        return { id: r.id, x, y, name: r.name, city: r.city ?? undefined };
+      });
+    const source = raw.length >= 3 ? raw : FALLBACK_ROUTE;
+    return orderNearestNeighbor(dedupeNearby(source));
+  }, [realities]);
+
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -182,14 +248,16 @@ const DroneHero = () => {
         lastTarget.current.y = target.current.y;
         c.svx += (dtx - c.svx) * 0.28;
         c.svy += (dty - c.svy) * 0.28;
-        // Il razzo è sempre in viaggio (nessuna sosta): la rotazione
-        // segue costantemente il vettore di velocità.
-        const speed = Math.hypot(c.svx, c.svy);
-        if (speed > 0.6) {
-          const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
-          const diff = ((targetAngle - c.angle + 540) % 360) - 180;
-          const ease = Math.min(0.28, 0.08 + speed * 0.012);
-          c.angle += diff * ease;
+        // Ruota SOLO durante il viaggio. In sosta (dwell) resta fermo,
+        // con la sola micro-oscillazione: sembra che stia osservando la tappa.
+        if (phaseRef.current === "travel") {
+          const speed = Math.hypot(c.svx, c.svy);
+          if (speed > 0.6) {
+            const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
+            const diff = ((targetAngle - c.angle + 540) % 360) - 180;
+            const ease = Math.min(0.28, 0.08 + speed * 0.012);
+            c.angle += diff * ease;
+          }
         }
       } else {
         const dx = c.x - c.lastX;
@@ -255,52 +323,74 @@ const DroneHero = () => {
     };
   }, [isTouchDevice, reducedMotion]);
 
-  // Autoplay dei waypoint (touch device only) — volo continuo, mai fermo
+  // Autoplay dei waypoint (touch device only) — volo con micro-pause su ogni realtà
   useEffect(() => {
     if (!isTouchDevice || reducedMotion) return;
+    if (!route.length) return;
+
     let raf = 0;
     let running = false;
     let visible = true;
     let intersecting = true;
     let idx = 0;
+    let phase: "travel" | "dwell" = "travel";
     phaseRef.current = "travel";
-    let legStart = performance.now();
+    let phaseStart = performance.now();
     let from = { x: target.current.x, y: target.current.y };
-    let to = AUTOPLAY_ROUTE[0];
-    let travelDur = 2000;
+    let to = route[0];
+    let travelDur = 3000;
+    let dwellDur = 1100;
+
+    setActiveIdx(-1);
 
     const nextLeg = (now: number) => {
       from = { x: to.x, y: to.y };
-      idx = (idx + 1) % AUTOPLAY_ROUTE.length;
-      to = AUTOPLAY_ROUTE[idx];
+      idx = (idx + 1) % route.length;
+      to = route[idx];
       const dx = to.x - from.x;
       const dy = to.y - from.y;
       const dist = Math.hypot(dx, dy);
-      const jitter = 0.8 + Math.random() * 0.4;
-      // Durata proporzionale alla distanza, ma sempre in movimento.
-      travelDur = (1200 + dist * 4600) * jitter;
-      legStart = now;
+      const jitter = 0.85 + Math.random() * 0.3;
+      // Volo lento e curato: 2.5-5s a leg su distanze italiane tipiche.
+      travelDur = (2200 + dist * 6800) * jitter;
+      dwellDur = 900 + Math.random() * 500;
+      phase = "travel";
+      phaseRef.current = "travel";
+      phaseStart = now;
+      setActiveIdx(-1);
     };
 
     const step = () => {
       raf = requestAnimationFrame(step);
       const now = performance.now();
-      const t = (now - legStart) / travelDur;
-      if (t >= 1) {
-        // Passaggio immediato al prossimo leg: nessuna sosta.
-        nextLeg(now);
-        return;
+      if (phase === "travel") {
+        const t = Math.min(1, (now - phaseStart) / travelDur);
+        const e = easeInOutCubic(t);
+        target.current.x = from.x + (to.x - from.x) * e;
+        target.current.y = from.y + (to.y - from.y) * e;
+        if (t >= 1) {
+          phase = "dwell";
+          phaseRef.current = "dwell";
+          phaseStart = now;
+          // Blocca esattamente sulla tappa per stabilizzare la mappa.
+          target.current.x = to.x;
+          target.current.y = to.y;
+          setActiveIdx(idx);
+        }
+      } else {
+        if (now - phaseStart >= dwellDur) {
+          nextLeg(now);
+        }
       }
-      const e = easeInOutCubic(t);
-      target.current.x = from.x + (to.x - from.x) * e;
-      target.current.y = from.y + (to.y - from.y) * e;
     };
+
+
 
 
     const start = () => {
       if (running) return;
       running = true;
-      legStart = performance.now();
+      phaseStart = performance.now();
       raf = requestAnimationFrame(step);
     };
     const stop = () => {
@@ -338,7 +428,7 @@ const DroneHero = () => {
       document.removeEventListener("visibilitychange", onVis);
       io?.disconnect();
     };
-  }, [isTouchDevice, reducedMotion]);
+  }, [isTouchDevice, reducedMotion, route]);
 
   const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isTouchDevice) return;
@@ -362,6 +452,7 @@ const DroneHero = () => {
 
   const fit0 = Math.min(panel.h / VB_H, panel.w / VB_W);
   const scale0 = fit0 * ZOOM;
+  const effectiveScale = fit0 * (isTouchDevice ? ZOOM_MOBILE : ZOOM);
   const showRocket = hovering && !(reducedMotion && isTouchDevice);
 
   return (
@@ -414,7 +505,48 @@ const DroneHero = () => {
             vectorEffect="non-scaling-stroke"
             style={{ filter: "drop-shadow(0 0 6px hsl(var(--secondary) / 0.45))" }}
           />
+
+          {/* Marker realtà: pallini sempre presenti, label solo sulla tappa attiva */}
+          {route.map((w, i) => {
+            const active = i === activeIdx;
+            const cx = w.x * VB_W;
+            const cy = w.y * VB_H;
+            const r = active ? 2.6 / effectiveScale : 1.6 / effectiveScale;
+            const labelSize = 7 / effectiveScale;
+            const labelDx = 4 / effectiveScale;
+            const labelDy = -4 / effectiveScale;
+            return (
+              <g key={w.id} transform={`translate(${cx} ${cy})`} style={{ pointerEvents: "none" }}>
+                <circle
+                  r={r}
+                  fill="hsl(var(--secondary))"
+                  opacity={active ? 1 : isTouchDevice ? 0.45 : 0.2}
+                  style={{ transition: "opacity 400ms, r 400ms" }}
+                />
+                {active && (
+                  <text
+                    x={labelDx}
+                    y={labelDy}
+                    fontSize={labelSize}
+                    fill="hsl(var(--background))"
+                    stroke="hsl(var(--foreground))"
+                    strokeWidth={labelSize * 0.25}
+                    paintOrder="stroke"
+                    style={{
+                      fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                      opacity: 1,
+                    }}
+                  >
+                    {w.name}
+                  </text>
+                )}
+              </g>
+            );
+          })}
         </g>
+
 
         <rect x="0" y="0" width={panel.w} height={panel.h} fill="url(#dh-vignette)" pointerEvents="none" />
       </svg>
