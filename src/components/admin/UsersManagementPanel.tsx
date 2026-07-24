@@ -138,7 +138,7 @@ const UsersManagementPanel = () => {
   };
 
   return (
-    <div className="p-8 rounded-lg bg-card border border-border mb-12">
+    <div className="p-4 sm:p-8 rounded-lg bg-card border border-border mb-12">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h2 className="font-display text-xl font-semibold flex items-center gap-2">
           <Users size={20} /> Gestione utenti
@@ -201,15 +201,15 @@ const UsersManagementPanel = () => {
       ) : filtered.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground font-body">Nessun utente.</div>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3 grid-cols-[minmax(0,1fr)]">
           {filtered.map((u) => {
             const banned = isBanned(u);
             const self = u.id === meId;
             const open = openId === u.id;
             return (
               <div key={u.id} className="rounded-lg border border-border bg-background">
-                <div className="flex items-center gap-4 p-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-sm overflow-hidden">
+                <div className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
+                  <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-sm overflow-hidden">
                     {u.profile?.avatar_url ? (
                       <img src={u.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -260,7 +260,7 @@ const UsersManagementPanel = () => {
                         );
                       }
                     }}
-                    className="text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
+                    className="shrink-0 text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
                   >
                     {open ? "Chiudi" : "Gestisci"}
                   </button>
