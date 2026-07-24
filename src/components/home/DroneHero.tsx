@@ -36,7 +36,7 @@ const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
 const ZOOM_MOBILE = 9.5;
 
-type Waypoint = { id: string; x: number; y: number; name: string; city?: string };
+type Waypoint = { id: string; x: number; y: number; name: string; city?: string; region?: string };
 
 // Fallback curato: usato se il fetch fallisce o non ci sono ancora realtà.
 const FALLBACK_ROUTE: Waypoint[] = [
