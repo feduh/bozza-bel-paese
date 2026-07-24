@@ -504,7 +504,48 @@ const DroneHero = () => {
             vectorEffect="non-scaling-stroke"
             style={{ filter: "drop-shadow(0 0 6px hsl(var(--secondary) / 0.45))" }}
           />
+
+          {/* Marker realtà: pallini sempre presenti, label solo sulla tappa attiva */}
+          {route.map((w, i) => {
+            const active = i === activeIdx;
+            const cx = w.x * VB_W;
+            const cy = w.y * VB_H;
+            const r = active ? 2.6 / effectiveScale : 1.6 / effectiveScale;
+            const labelSize = 7 / effectiveScale;
+            const labelDx = 4 / effectiveScale;
+            const labelDy = -4 / effectiveScale;
+            return (
+              <g key={w.id} transform={`translate(${cx} ${cy})`} style={{ pointerEvents: "none" }}>
+                <circle
+                  r={r}
+                  fill="hsl(var(--secondary))"
+                  opacity={active ? 1 : isTouchDevice ? 0.45 : 0.2}
+                  style={{ transition: "opacity 400ms, r 400ms" }}
+                />
+                {active && (
+                  <text
+                    x={labelDx}
+                    y={labelDy}
+                    fontSize={labelSize}
+                    fill="hsl(var(--background))"
+                    stroke="hsl(var(--foreground))"
+                    strokeWidth={labelSize * 0.25}
+                    paintOrder="stroke"
+                    style={{
+                      fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                      opacity: 1,
+                    }}
+                  >
+                    {w.name}
+                  </text>
+                )}
+              </g>
+            );
+          })}
         </g>
+
 
         <rect x="0" y="0" width={panel.w} height={panel.h} fill="url(#dh-vignette)" pointerEvents="none" />
       </svg>
