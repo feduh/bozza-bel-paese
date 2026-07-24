@@ -109,6 +109,22 @@ const App = () => (
                     }
                   />
                   <Route
+                    path="/area-personale/podcast/nuovo"
+                    element={
+                      <RequireAuth>
+                        <PodcastEditor />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/area-personale/podcast/:id/modifica"
+                    element={
+                      <RequireAuth>
+                        <PodcastEditor />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
                     path="/admin/realta/:id/galleria"
                     element={
                       <RequireAuth>
