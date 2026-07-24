@@ -135,7 +135,7 @@ const DroneHero = () => {
       .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng))
       .map((r) => {
         const { x, y } = projectLatLng(r.lat, r.lng);
-        return { id: r.id, x, y, name: r.name, city: r.city ?? undefined };
+        return { id: r.id, x, y, name: r.name, city: r.city ?? undefined, region: (r as any).region ?? undefined };
       });
     const source = raw.length >= 3 ? raw : FALLBACK_ROUTE;
     return orderNearestNeighbor(dedupeNearby(source));
