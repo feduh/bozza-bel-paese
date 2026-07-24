@@ -37,6 +37,14 @@ type ReplyMeta = {
   published_at: string;
 };
 
+type AuthorBio = {
+  user_id: string;
+  display_name: string;
+  bio: string | null;
+  avatar_url: string | null;
+  affiliation: string | null;
+};
+
 const MagazinePost = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -45,7 +53,9 @@ const MagazinePost = () => {
   const [parent, setParent] = useState<ReplyMeta | null>(null);
   const [replies, setReplies] = useState<ReplyMeta[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
+  const [authorBio, setAuthorBio] = useState<AuthorBio | null>(null);
   const [loading, setLoading] = useState(true);
+
 
   const readingTime = useMemo(() => {
     if (!post?.content) return 1;
@@ -98,8 +108,20 @@ const MagazinePost = () => {
       const names = await fetchAuthorNames(allIds);
       if (!cancelled) setNameMap(names);
 
+      if (p?.user_id) {
+        const { data: bioData } = await supabase
+          .from("profiles")
+          .select("user_id, display_name, bio, avatar_url, affiliation")
+          .eq("user_id", p.user_id)
+          .maybeSingle();
+        if (!cancelled) setAuthorBio((bioData as AuthorBio | null) ?? null);
+      } else {
+        setAuthorBio(null);
+      }
+
       setLoading(false);
     };
+
     load();
     return () => {
       cancelled = true;
@@ -160,8 +182,9 @@ const MagazinePost = () => {
               {parent.title}
             </p>
             <p className="font-body text-xs text-muted-foreground mt-1">
-              di {resolveAuthorName(nameMap, parent.user_id, parent.author_name)}
+              di <span className="underline decoration-dotted underline-offset-2">{resolveAuthorName(nameMap, parent.user_id, parent.author_name)}</span>
             </p>
+
           </Link>
         )}
 
@@ -181,9 +204,13 @@ const MagazinePost = () => {
         <h1 className="font-display uppercase tracking-tight leading-[0.95] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>{post.title}</h1>
 
         <div className="flex items-center gap-5 text-sm text-muted-foreground font-body mb-10 pb-10 border-b border-border flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <User size={14} /> {resolveAuthorName(nameMap, post.user_id, post.author_name)}
-          </span>
+          <Link
+            to={`/autori/${post.user_id}`}
+            className="flex items-center gap-1.5 hover:text-primary transition-colors"
+          >
+            <User size={14} /> <span className="underline decoration-dotted underline-offset-2">{resolveAuthorName(nameMap, post.user_id, post.author_name)}</span>
+          </Link>
+
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
             {new Date(post.published_at).toLocaleDateString("it-IT", {
@@ -216,10 +243,55 @@ const MagazinePost = () => {
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
         </div>
 
+        {/* Author bio card */}
+        {authorBio && (authorBio.bio || authorBio.affiliation) && (
+          <aside className="mt-14 pt-8 border-t border-border">
+            <div className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-4">
+              L'autore
+            </div>
+            <Link
+              to={`/autori/${authorBio.user_id}`}
+              className="flex items-start gap-4 group"
+            >
+              {authorBio.avatar_url ? (
+                <img
+                  src={authorBio.avatar_url}
+                  alt={authorBio.display_name}
+                  loading="lazy"
+                  className="w-16 h-16 rounded-full object-cover border border-border shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border border-border shrink-0">
+                  <User size={22} className="text-muted-foreground" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                  {authorBio.display_name}
+                </p>
+                {authorBio.affiliation && (
+                  <p className="font-body text-xs text-muted-foreground italic mb-2">
+                    {authorBio.affiliation}
+                  </p>
+                )}
+                {authorBio.bio && (
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-4 text-justify">
+                    {authorBio.bio}
+                  </p>
+                )}
+                <span className="inline-block mt-2 text-xs font-body text-primary group-hover:underline">
+                  Leggi la bio completa →
+                </span>
+              </div>
+            </Link>
+          </aside>
+        )}
+
         {/* Reply section */}
         <div className="mt-16 pt-10 border-t border-border">
           <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
             <h2 className="font-display text-2xl font-semibold flex items-center gap-2">
+
               <Reply size={20} className="text-primary" />
               Risposte {replies.length > 0 && (
                 <span className="text-muted-foreground text-base font-body">({replies.length})</span>
