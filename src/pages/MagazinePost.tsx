@@ -243,10 +243,55 @@ const MagazinePost = () => {
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
         </div>
 
+        {/* Author bio card */}
+        {authorBio && (authorBio.bio || authorBio.affiliation) && (
+          <aside className="mt-14 pt-8 border-t border-border">
+            <div className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-4">
+              L'autore
+            </div>
+            <Link
+              to={`/autori/${authorBio.user_id}`}
+              className="flex items-start gap-4 group"
+            >
+              {authorBio.avatar_url ? (
+                <img
+                  src={authorBio.avatar_url}
+                  alt={authorBio.display_name}
+                  loading="lazy"
+                  className="w-16 h-16 rounded-full object-cover border border-border shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border border-border shrink-0">
+                  <User size={22} className="text-muted-foreground" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                  {authorBio.display_name}
+                </p>
+                {authorBio.affiliation && (
+                  <p className="font-body text-xs text-muted-foreground italic mb-2">
+                    {authorBio.affiliation}
+                  </p>
+                )}
+                {authorBio.bio && (
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-4 text-justify">
+                    {authorBio.bio}
+                  </p>
+                )}
+                <span className="inline-block mt-2 text-xs font-body text-primary group-hover:underline">
+                  Leggi la bio completa →
+                </span>
+              </div>
+            </Link>
+          </aside>
+        )}
+
         {/* Reply section */}
         <div className="mt-16 pt-10 border-t border-border">
           <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
             <h2 className="font-display text-2xl font-semibold flex items-center gap-2">
+
               <Reply size={20} className="text-primary" />
               Risposte {replies.length > 0 && (
                 <span className="text-muted-foreground text-base font-body">({replies.length})</span>
