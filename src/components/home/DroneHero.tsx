@@ -25,6 +25,8 @@ const ROTATING_WORDS = [
   "realtà autogestite",
   "siti non-profit",
   "luoghi di ricerca",
+  "reti locali",
+  "residenze",
   
 ];
 
