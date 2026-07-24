@@ -317,15 +317,29 @@ const AreaPersonale = () => {
             )}
 
             {canInviteMembers && (
-              <TabsContent value="membri" className="mt-0">
+              <TabsContent value="membri" className="mt-0 space-y-8">
                 <section className="p-8 rounded-lg bg-card border border-border">
-                  <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
-                    <UserPlus size={20} /> {isAdmin ? t("area.inviteMember") : t("area.inviteAuthor")}
-                  </h2>
-                  <p className="font-body text-sm text-muted-foreground mb-6">
-                    {isAdmin ? t("area.inviteDescAdmin") : t("area.inviteDescCoord")}
-                  </p>
-                  <InviteMemberForm allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]} />
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                      <h2 className="font-display text-xl font-semibold flex items-center gap-2">
+                        <UserPlus size={20} /> {isAdmin ? t("area.inviteMember") : t("area.inviteAuthor")}
+                      </h2>
+                      <p className="font-body text-sm text-muted-foreground mt-1">
+                        {isAdmin ? t("area.inviteDescAdmin") : t("area.inviteDescCoord")}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowInvite((s) => !s)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
+                    >
+                      <Plus size={14} /> {showInvite ? "Chiudi form" : "Nuovo membro"}
+                    </button>
+                  </div>
+                  {showInvite && (
+                    <div className="mt-6">
+                      <InviteMemberForm allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]} />
+                    </div>
+                  )}
                 </section>
                 <AuthorsAffiliationPanel />
               </TabsContent>
