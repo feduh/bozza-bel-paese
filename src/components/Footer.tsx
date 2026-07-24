@@ -81,7 +81,7 @@ const Footer = () => {
         <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-1">
           <p>© {new Date().getFullYear()} Il Bel Paese. {t("footer.rights")}</p>
           <p>
-            Sito realizzato da{" "}
+            Sito e Infrastruttura realizzati da{" "}
             <span className="font-medium text-foreground">Federica Gaglianone</span>.
           </p>
         </div>
