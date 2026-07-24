@@ -112,6 +112,35 @@ const DroneHero = () => {
   const [hovering, setHovering] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+
+  // Fetch delle realtà confermate per costruire la rotta reale.
+  const { data: realities } = useQuery({
+    queryKey: ["drone-waypoints"],
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("realities")
+        .select("id, name, lat, lng, city")
+        .eq("confirmed_status", "confermato");
+      if (error || !data) return [] as { id: string; name: string; lat: number; lng: number; city: string | null }[];
+      return data;
+    },
+  });
+
+  // Ordinamento nearest-neighbor + dedup, memoizzato: cambia solo quando
+  // arrivano dati nuovi. La randomizzazione è fissata per la sessione.
+  const route = useMemo<Waypoint[]>(() => {
+    const raw: Waypoint[] = (realities ?? [])
+      .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng))
+      .map((r) => {
+        const { x, y } = projectLatLng(r.lat, r.lng);
+        return { id: r.id, x, y, name: r.name, city: r.city ?? undefined };
+      });
+    const source = raw.length >= 3 ? raw : FALLBACK_ROUTE;
+    return orderNearestNeighbor(dedupeNearby(source));
+  }, [realities]);
+
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
