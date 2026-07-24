@@ -1,32 +1,77 @@
 ## Obiettivo
-Rendere il volo mobile del razzo un viaggio continuo e naturale sull'Italia, senza soste rigide, più immersivo grazie a uno zoom maggiore.
+Il razzo mobile diventa un vero "sopralluogo" della mappatura: visita le realtà confermate reali (12 attualmente), rallenta su ognuna, mostra un label discreto col nome della realtà quando la sorvola.
 
-## Modifiche a `src/components/home/DroneHero.tsx`
+## 1. Proiezione lat/lng → viewBox (nuovo helper)
 
-### 1. Zoom mobile più stretto sull'Italia
-- `ZOOM_MOBILE` da `6.6` → `~9.5` per dare la sensazione di sorvolo ravvicinato.
-- Nessuna modifica al desktop.
+In `src/components/home/europePath.ts` esportare la stessa proiezione Mercator già usata per disegnare i confini, così `DroneHero` può convertire coordinate geografiche reali negli stessi coord del viewBox (e poi normalizzarle a 0–1).
 
-### 2. Nuova rotta italiana non-lineare
-Sostituire `AUTOPLAY_ROUTE` con ~14 tappe che coprono tutta la penisola in ordine **non geografico** (salti nord/sud/isole/centro), così il viaggio sembra esplorativo e non un percorso lineare da nord a sud.
+```ts
+export function projectLatLng(lat: number, lng: number): { x: number; y: number } {
+  const [px, py] = projection([lng, lat]) ?? [EUROPE_VB.W / 2, EUROPE_VB.H / 2];
+  return { x: px / EUROPE_VB.W, y: py / EUROPE_VB.H };
+}
+```
 
-Esempi di città da includere (coordinate normalizzate sul viewBox Europa): Torino, Bari, Milano, Palermo, Firenze, Cagliari, Venezia, Napoli, Bologna, Roma, Trieste, Catania, Genova, Perugia, Ancona. Ordine mescolato per creare zig-zag.
+Estraendo `projection` come `const` module-level. Zero cambi al path esistente.
 
-### 3. Movimento continuo senza soste
-- Rimuovere il concetto di fase `dwell`: il razzo non si ferma mai su una tappa.
-- Il loop autoplay diventa una **spline continua**: appena raggiunta (o quasi raggiunta) una tappa, si passa immediatamente alla successiva, senza `dwell` timer.
-- Per evitare "scatti" sui waypoint, usare un target che avanza costantemente lungo la rotta: durata di ogni leg proporzionale alla distanza, easing `easeInOutCubic` mantenuto ma il passaggio da leg a leg avviene senza pausa (t=1 → immediatamente nextLeg).
-- Rimuovere il campo `dwell` dal tipo `Waypoint` e dai dati.
-- `phaseRef` non serve più: il razzo è sempre in "travel", quindi la rotazione segue sempre la velocità (naturale). Semplificare il ramo touch del rAF loop rimuovendo il check `phaseRef.current === "travel"`.
+## 2. Fetch delle realtà nell'hero
 
-### 4. Velocità variabile per naturalezza
-Mantenere il jitter già presente (`0.85 + Math.random() * 0.3`) sulla durata del leg, così alcune tratte sono più veloci e altre più lente, dando ritmo al viaggio.
+In `DroneHero.tsx`:
+- `useQuery(['drone-waypoints'])` che chiama `supabase.from('realities').select('id, name, lat, lng, city').eq('confirmed_status', 'confermato')`, `staleTime: 10min`.
+- Se `data` è vuoto o `loading`, fallback alla lista curata attuale (Torino, Milano, Roma, ecc.) così l'hero non è mai muto.
+- Mappare ciascuna realtà con `projectLatLng` → `Waypoint { x, y, name, city }`.
+- Deduplicare per città vicine (< 0.005 in normalizzato ≈ ~10 km): se due realtà cadono quasi sullo stesso punto, tenere la prima ma unire i nomi in un unico label ("Nome A · Nome B") per non far sovrapporre marker.
 
-## Non toccare
-- `ROTATING_WORDS` (già gestito dall'utente su GitHub).
-- Comportamento desktop (cursore-driven).
-- Footer e altre pagine.
+## 3. Ordinamento non-lineare
 
-## Note tecniche
-- Le coordinate x/y sono normalizzate sul viewBox europeo (`EUROPE_VB`); l'Italia occupa circa `x: 0.47–0.57`, `y: 0.63–0.86`. Le nuove tappe restano dentro questo range.
-- Con `ZOOM_MOBILE ~9.5` e `PIEMONTE` come centro iniziale, verificare che la mappa non mostri bordi vuoti; se accade, alzare/abbassare leggermente lo zoom.
+Invece di visitare in ordine casuale (sfarfallio) o alfabetico (noioso), usare **nearest-neighbor con randomizzazione leggera** partendo da un waypoint casuale: parti da un punto qualsiasi, poi ogni prossimo waypoint = uno dei 3 più vicini non ancora visitati, scelto random. Quando tutti visitati, ricomincia da capo con nuovo random start. Risultato: percorso che ha senso spaziale (evita salti Torino→Palermo→Milano) ma non è mai identico tra sessioni.
+
+## 4. Ritmo: micro-pausa senza rotazione
+
+Reintrodurre una fase `dwell` breve, ma corretta:
+- `travel` easing cubic, durata proporzionale alla distanza + jitter (attuale ok, ma **rallentato**: base `2200 + dist * 6800` invece di `1200 + dist * 4600`, così ogni leg dura 2.5–5 sec circa).
+- `dwell` di 900–1400ms (jitter) su ogni waypoint: il target resta bloccato esattamente sulla realtà, la mappa si stabilizza.
+- Durante `dwell` la rotazione del razzo è **congelata** (bug precedente risolto): riusare `phaseRef.current` come nel primo tentativo, il ramo touch aggiorna l'angolo solo se `phaseRef.current === "travel"`.
+- Durante `dwell` il razzo mantiene la sua micro-oscillazione (già presente `Math.sin(t*0.9)*6`) → sembra fermo che osserva, non congelato.
+
+## 5. Label realtà sulla mappa
+
+Dentro `<g ref={mapGroupRef}>` renderizzare, dopo il path Europa:
+
+```tsx
+{waypoints.map((w, i) => (
+  <g key={w.id} transform={`translate(${w.x * VB_W} ${w.y * VB_H})`}>
+    <circle r={2 / scale0} fill="hsl(var(--secondary))" opacity={activeIdx === i ? 1 : 0.35} />
+    <text
+      x={4 / scale0} y={-4 / scale0}
+      fontSize={8 / scale0}
+      fill="hsl(var(--background))"
+      opacity={activeIdx === i ? 1 : 0}
+      style={{ fontFamily: 'monospace', letterSpacing: '0.05em', transition: 'opacity 400ms' }}
+    >
+      {w.name.toUpperCase()}
+    </text>
+  </g>
+))}
+```
+
+- `activeIdx` è uno **stato React** aggiornato SOLO al cambio di waypoint (una volta ogni ~4 sec), non per frame → nessuna regressione performance.
+- Con `vectorEffect="non-scaling-stroke"` non applicabile a `text`, i valori sono divisi per `scale0` così il testo resta leggibile a qualunque zoom.
+- Sui pallini non attivi label invisibile (`opacity: 0`), transizione morbida in entrata/uscita.
+- Non attivi hanno pallino tenue (0.35) → si intuisce che ci sono altre tappe senza rumore.
+
+## 6. Non toccare
+
+- Comportamento desktop (cursor-driven) invariato — waypoints e label restano visibili ma senza autoplay: `activeIdx` resta a `-1` su desktop, label sempre nascosti, pallini a `opacity: 0.15` come decorazione discreta. **Da confermare**: preferisci label visibili anche su desktop passando col mouse sopra? Per ora piano prevede solo mobile.
+- `ROTATING_WORDS` intatto (gestito su GitHub).
+- `ZOOM_MOBILE` resta 9.5 come impostato.
+
+## Sequenza implementazione
+1. Aggiornare `europePath.ts` per esportare `projection` e `projectLatLng`.
+2. Modificare `DroneHero.tsx`: fetch waypoints, nearest-neighbor sort, render pallini+label, reintrodurre `dwell` senza rotazione, rallentare `travelDur`, gestire `activeIdx`.
+3. Test manuale: mobile viewport, verificare che (a) il razzo rallenti visibilmente, (b) i nomi appaiano sopra le realtà giuste, (c) il razzo non ruoti su se stesso in sosta.
+
+## Rischi
+- Al momento ci sono solo **12 realtà confermate**: il giro completo dura ~40–60 secondi e poi ricomincia. Va bene, con l'ordinamento randomizzato per sessione sembra diverso ogni volta.
+- Se le realtà crescono a 50+, il ciclo diventerà molto lungo (positivo).
+- Latenza fetch: la query gira in parallelo alle stats già presenti in `Index.tsx`, cache 10min. Nel frattempo fallback curato.
