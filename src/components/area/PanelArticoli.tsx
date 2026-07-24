@@ -36,9 +36,11 @@ type Props = {
   title?: string;
   icon?: typeof FileText;
   newLabel?: string;
+  newHref?: string;
+  editHrefBuilder?: (postId: string) => string;
 };
 
-const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon: TitleIcon = FileText, newLabel }: Props) => {
+const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon: TitleIcon = FileText, newLabel, newHref: newHrefProp, editHrefBuilder }: Props) => {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | AreaPostStatus>("all");
   const [sort, setSort] = useState<SortKey>("recent");
