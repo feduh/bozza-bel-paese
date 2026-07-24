@@ -229,7 +229,7 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
                     )}
                     {canEdit && (
                       <Link
-                        to={`/area-personale/articolo/${p.id}/modifica`}
+                        to={buildEditHref(p.id)}
                         className="p-2 rounded-md border border-border hover:border-primary/40 transition-colors"
                         title="Modifica"
                       >
