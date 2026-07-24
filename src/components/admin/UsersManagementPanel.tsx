@@ -138,7 +138,7 @@ const UsersManagementPanel = () => {
   };
 
   return (
-    <div className="p-8 rounded-lg bg-card border border-border mb-12">
+    <div className="p-4 sm:p-8 rounded-lg bg-card border border-border mb-12">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h2 className="font-display text-xl font-semibold flex items-center gap-2">
           <Users size={20} /> Gestione utenti
