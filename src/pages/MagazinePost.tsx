@@ -37,6 +37,14 @@ type ReplyMeta = {
   published_at: string;
 };
 
+type AuthorBio = {
+  user_id: string;
+  display_name: string;
+  bio: string | null;
+  avatar_url: string | null;
+  affiliation: string | null;
+};
+
 const MagazinePost = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -45,7 +53,9 @@ const MagazinePost = () => {
   const [parent, setParent] = useState<ReplyMeta | null>(null);
   const [replies, setReplies] = useState<ReplyMeta[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
+  const [authorBio, setAuthorBio] = useState<AuthorBio | null>(null);
   const [loading, setLoading] = useState(true);
+
 
   const readingTime = useMemo(() => {
     if (!post?.content) return 1;
