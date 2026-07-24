@@ -36,9 +36,11 @@ type Props = {
   title?: string;
   icon?: typeof FileText;
   newLabel?: string;
+  newHref?: string;
+  editHrefBuilder?: (postId: string) => string;
 };
 
-const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon: TitleIcon = FileText, newLabel }: Props) => {
+const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon: TitleIcon = FileText, newLabel, newHref: newHrefProp, editHrefBuilder }: Props) => {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | AreaPostStatus>("all");
   const [sort, setSort] = useState<SortKey>("recent");
@@ -85,9 +87,11 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
     return list;
   }, [scopedPosts, query, statusFilter, sort]);
 
-  const newHref = presetCategory
+  const defaultNewHref = presetCategory
     ? `/area-personale/articolo/nuovo?category=${encodeURIComponent(presetCategory)}`
     : "/area-personale/articolo/nuovo";
+  const newHref = newHrefProp ?? defaultNewHref;
+  const buildEditHref = editHrefBuilder ?? ((pid: string) => `/area-personale/articolo/${pid}/modifica`);
   const displayTitle = title ?? "I miei articoli";
   const displayNewLabel = newLabel ?? "Nuovo articolo";
 
@@ -225,7 +229,7 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
                     )}
                     {canEdit && (
                       <Link
-                        to={`/area-personale/articolo/${p.id}/modifica`}
+                        to={buildEditHref(p.id)}
                         className="p-2 rounded-md border border-border hover:border-primary/40 transition-colors"
                         title="Modifica"
                       >

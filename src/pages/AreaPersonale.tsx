@@ -301,6 +301,8 @@ const AreaPersonale = () => {
                   title="I miei podcast"
                   icon={Mic}
                   newLabel="Nuovo podcast"
+                  newHref="/area-personale/podcast/nuovo"
+                  editHrefBuilder={(pid) => `/area-personale/podcast/${pid}/modifica`}
                 />
               </TabsContent>
             )}

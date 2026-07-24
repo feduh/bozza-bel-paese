@@ -63,6 +63,9 @@ export type Database = {
           created_at: string
           excerpt: string
           id: string
+          podcast_duration: string | null
+          podcast_kind: string | null
+          podcast_url: string | null
           published_at: string
           reply_to_id: string | null
           scheduled_for: string | null
@@ -84,6 +87,9 @@ export type Database = {
           created_at?: string
           excerpt: string
           id?: string
+          podcast_duration?: string | null
+          podcast_kind?: string | null
+          podcast_url?: string | null
           published_at?: string
           reply_to_id?: string | null
           scheduled_for?: string | null
@@ -105,6 +111,9 @@ export type Database = {
           created_at?: string
           excerpt?: string
           id?: string
+          podcast_duration?: string | null
+          podcast_kind?: string | null
+          podcast_url?: string | null
           published_at?: string
           reply_to_id?: string | null
           scheduled_for?: string | null
