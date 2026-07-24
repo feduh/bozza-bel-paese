@@ -208,8 +208,8 @@ const UsersManagementPanel = () => {
             const open = openId === u.id;
             return (
               <div key={u.id} className="rounded-lg border border-border bg-background">
-                <div className="flex items-center gap-4 p-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-sm overflow-hidden">
+                <div className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
+                  <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display font-bold text-sm overflow-hidden">
                     {u.profile?.avatar_url ? (
                       <img src={u.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
