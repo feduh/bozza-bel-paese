@@ -523,7 +523,7 @@ const DroneHero = () => {
                   opacity={active ? 1 : isTouchDevice ? 0.45 : 0.2}
                   style={{ transition: "opacity 400ms, r 400ms" }}
                 />
-                {active && (
+                {active && !isTouchDevice && (
                   <text
                     x={labelDx}
                     y={labelDy}
