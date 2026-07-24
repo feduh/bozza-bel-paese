@@ -3,6 +3,8 @@ export type AreaProfile = {
   user_id: string;
   display_name: string;
   bio: string;
+  author_bio: string;
+
   avatar_url: string | null;
   website: string | null;
   social_instagram: string | null;

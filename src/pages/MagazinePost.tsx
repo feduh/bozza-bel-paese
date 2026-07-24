@@ -40,10 +40,11 @@ type ReplyMeta = {
 type AuthorBio = {
   user_id: string;
   display_name: string;
-  bio: string | null;
+  author_bio: string | null;
   avatar_url: string | null;
   affiliation: string | null;
 };
+
 
 const MagazinePost = () => {
   const { t } = useTranslation();
@@ -111,10 +112,11 @@ const MagazinePost = () => {
       if (p?.user_id) {
         const { data: bioData } = await supabase
           .from("profiles")
-          .select("user_id, display_name, bio, avatar_url, affiliation")
+          .select("user_id, display_name, author_bio, avatar_url, affiliation")
           .eq("user_id", p.user_id)
           .maybeSingle();
-        if (!cancelled) setAuthorBio((bioData as AuthorBio | null) ?? null);
+        if (!cancelled) setAuthorBio((bioData as unknown as AuthorBio | null) ?? null);
+
       } else {
         setAuthorBio(null);
       }
@@ -244,7 +246,7 @@ const MagazinePost = () => {
         </div>
 
         {/* Author bio card */}
-        {authorBio && (authorBio.bio || authorBio.affiliation) && (
+        {authorBio && authorBio.author_bio && (
           <aside className="mt-14 pt-8 border-t border-border">
             <div className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-4">
               L'autore
@@ -274,11 +276,12 @@ const MagazinePost = () => {
                     {authorBio.affiliation}
                   </p>
                 )}
-                {authorBio.bio && (
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-4 text-justify">
-                    {authorBio.bio}
+                {authorBio.author_bio && (
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
+                    {authorBio.author_bio}
                   </p>
                 )}
+
                 <span className="inline-block mt-2 text-xs font-body text-primary group-hover:underline">
                   Leggi la bio completa →
                 </span>
