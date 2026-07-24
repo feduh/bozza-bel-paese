@@ -361,6 +361,7 @@ export type Database = {
       profiles: {
         Row: {
           affiliation: string | null
+          author_bio: string | null
           avatar_url: string | null
           bio: string
           consent_public: boolean
@@ -383,6 +384,7 @@ export type Database = {
         }
         Insert: {
           affiliation?: string | null
+          author_bio?: string | null
           avatar_url?: string | null
           bio?: string
           consent_public?: boolean
@@ -405,6 +407,7 @@ export type Database = {
         }
         Update: {
           affiliation?: string | null
+          author_bio?: string | null
           avatar_url?: string | null
           bio?: string
           consent_public?: boolean
