@@ -255,7 +255,7 @@ const DroneHero = () => {
     };
   }, [isTouchDevice, reducedMotion]);
 
-  // Autoplay dei waypoint (touch device only)
+  // Autoplay dei waypoint (touch device only) — volo continuo, mai fermo
   useEffect(() => {
     if (!isTouchDevice || reducedMotion) return;
     let raf = 0;
@@ -263,9 +263,8 @@ const DroneHero = () => {
     let visible = true;
     let intersecting = true;
     let idx = 0;
-    let phase: "travel" | "dwell" = "travel";
     phaseRef.current = "travel";
-    let phaseStart = performance.now();
+    let legStart = performance.now();
     let from = { x: target.current.x, y: target.current.y };
     let to = AUTOPLAY_ROUTE[0];
     let travelDur = 2000;
@@ -277,35 +276,24 @@ const DroneHero = () => {
       const dx = to.x - from.x;
       const dy = to.y - from.y;
       const dist = Math.hypot(dx, dy);
-      const jitter = 0.85 + Math.random() * 0.3;
-      travelDur = (1400 + dist * 4200) * jitter;
-      phase = "travel";
-      phaseRef.current = "travel";
-      phaseStart = now;
+      const jitter = 0.8 + Math.random() * 0.4;
+      // Durata proporzionale alla distanza, ma sempre in movimento.
+      travelDur = (1200 + dist * 4600) * jitter;
+      legStart = now;
     };
 
     const step = () => {
       raf = requestAnimationFrame(step);
       const now = performance.now();
-      if (phase === "travel") {
-        const t = Math.min(1, (now - phaseStart) / travelDur);
-        const e = easeInOutCubic(t);
-        target.current.x = from.x + (to.x - from.x) * e;
-        target.current.y = from.y + (to.y - from.y) * e;
-        if (t >= 1) {
-          phase = "dwell";
-          phaseRef.current = "dwell";
-          phaseStart = now;
-          // Blocca il target esattamente sulla tappa: niente oscillazioni
-          // che facciano ruotare il razzo su se stesso durante la sosta.
-          target.current.x = to.x;
-          target.current.y = to.y;
-        }
-      } else {
-        if (now - phaseStart >= to.dwell) {
-          nextLeg(now);
-        }
+      const t = (now - legStart) / travelDur;
+      if (t >= 1) {
+        // Passaggio immediato al prossimo leg: nessuna sosta.
+        nextLeg(now);
+        return;
       }
+      const e = easeInOutCubic(t);
+      target.current.x = from.x + (to.x - from.x) * e;
+      target.current.y = from.y + (to.y - from.y) * e;
     };
 
 
