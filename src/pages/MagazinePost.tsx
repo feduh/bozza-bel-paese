@@ -276,11 +276,12 @@ const MagazinePost = () => {
                     {authorBio.affiliation}
                   </p>
                 )}
-                {authorBio.bio && (
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-4 text-justify">
-                    {authorBio.bio}
+                {authorBio.author_bio && (
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
+                    {authorBio.author_bio}
                   </p>
                 )}
+
                 <span className="inline-block mt-2 text-xs font-body text-primary group-hover:underline">
                   Leggi la bio completa →
                 </span>
