@@ -51,6 +51,12 @@ const opSchema = z.discriminatedUnion("op", [
     user_id: z.string().uuid(),
     affiliation: z.string().trim().max(255).nullable(),
   }),
+  z.object({
+    op: z.literal("set_reality"),
+    user_id: z.string().uuid(),
+    reality_id: z.string().uuid().nullable(),
+  }),
+  z.object({ op: z.literal("list_realities_lite") }),
 ]);
 
 
