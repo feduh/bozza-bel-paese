@@ -260,7 +260,7 @@ const UsersManagementPanel = () => {
                         );
                       }
                     }}
-                    className="text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
+                    className="shrink-0 text-sm font-body px-3 py-2 rounded-md border border-input hover:bg-muted"
                   >
                     {open ? "Chiudi" : "Gestisci"}
                   </button>
