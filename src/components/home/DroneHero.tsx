@@ -121,9 +121,9 @@ const DroneHero = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("realities")
-        .select("id, name, lat, lng, city")
+        .select("id, name, lat, lng, city, region")
         .eq("confirmed_status", "confermato");
-      if (error || !data) return [] as { id: string; name: string; lat: number; lng: number; city: string | null }[];
+      if (error || !data) return [] as { id: string; name: string; lat: number; lng: number; city: string | null; region: string | null }[];
       return data;
     },
   });
