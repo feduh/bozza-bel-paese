@@ -32,23 +32,28 @@ const ROTATING_WORDS = [
 
 const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
-const ZOOM_MOBILE = 6.6;
+const ZOOM_MOBILE = 9.5;
 
-type Waypoint = { x: number; y: number; dwell: number; name: string };
-// Rotta autoplay per mobile: solo tappe italiane, così la mappa può restare
-// zoomata sull'Italia senza mai perdere il razzo di vista.
+type Waypoint = { x: number; y: number; name: string };
+// Rotta autoplay mobile: solo tappe italiane in ordine NON lineare
+// (zig-zag nord/sud/isole/centro) per un volo esplorativo continuo,
+// senza mai fermarsi su una città.
 const AUTOPLAY_ROUTE: Waypoint[] = [
-  { x: 0.475, y: 0.655, dwell: 900, name: "Torino" },
-  { x: 0.495, y: 0.650, dwell: 700, name: "Milano" },
-  { x: 0.525, y: 0.660, dwell: 600, name: "Venezia" },
-  { x: 0.545, y: 0.660, dwell: 500, name: "Trieste" },
-  { x: 0.515, y: 0.685, dwell: 500, name: "Bologna" },
-  { x: 0.520, y: 0.710, dwell: 700, name: "Firenze" },
-  { x: 0.540, y: 0.750, dwell: 1100, name: "Roma" },
-  { x: 0.560, y: 0.780, dwell: 700, name: "Napoli" },
-  { x: 0.555, y: 0.840, dwell: 800, name: "Palermo" },
-  { x: 0.500, y: 0.830, dwell: 600, name: "Cagliari" },
-  { x: 0.485, y: 0.680, dwell: 500, name: "Genova" },
+  { x: 0.475, y: 0.655, name: "Torino" },
+  { x: 0.555, y: 0.840, name: "Palermo" },
+  { x: 0.520, y: 0.710, name: "Firenze" },
+  { x: 0.560, y: 0.780, name: "Bari" },
+  { x: 0.495, y: 0.650, name: "Milano" },
+  { x: 0.500, y: 0.830, name: "Cagliari" },
+  { x: 0.540, y: 0.750, name: "Roma" },
+  { x: 0.525, y: 0.660, name: "Venezia" },
+  { x: 0.560, y: 0.860, name: "Catania" },
+  { x: 0.515, y: 0.685, name: "Bologna" },
+  { x: 0.485, y: 0.680, name: "Genova" },
+  { x: 0.540, y: 0.735, name: "Perugia" },
+  { x: 0.555, y: 0.780, name: "Napoli" },
+  { x: 0.545, y: 0.660, name: "Trieste" },
+  { x: 0.535, y: 0.720, name: "Ancona" },
 ];
 
 const easeInOutCubic = (t: number) =>
@@ -177,16 +182,14 @@ const DroneHero = () => {
         lastTarget.current.y = target.current.y;
         c.svx += (dtx - c.svx) * 0.28;
         c.svy += (dty - c.svy) * 0.28;
-        // Il razzo aggiorna l'angolo SOLO durante il viaggio.
-        // Durante il dwell (sosta su una città) resta fermo, senza ruotare.
-        if (phaseRef.current === "travel") {
-          const speed = Math.hypot(c.svx, c.svy);
-          if (speed > 0.6) {
-            const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
-            const diff = ((targetAngle - c.angle + 540) % 360) - 180;
-            const ease = Math.min(0.28, 0.08 + speed * 0.012);
-            c.angle += diff * ease;
-          }
+        // Il razzo è sempre in viaggio (nessuna sosta): la rotazione
+        // segue costantemente il vettore di velocità.
+        const speed = Math.hypot(c.svx, c.svy);
+        if (speed > 0.6) {
+          const targetAngle = (Math.atan2(c.svy, c.svx) * 180) / Math.PI + 45;
+          const diff = ((targetAngle - c.angle + 540) % 360) - 180;
+          const ease = Math.min(0.28, 0.08 + speed * 0.012);
+          c.angle += diff * ease;
         }
       } else {
         const dx = c.x - c.lastX;
@@ -252,7 +255,7 @@ const DroneHero = () => {
     };
   }, [isTouchDevice, reducedMotion]);
 
-  // Autoplay dei waypoint (touch device only)
+  // Autoplay dei waypoint (touch device only) — volo continuo, mai fermo
   useEffect(() => {
     if (!isTouchDevice || reducedMotion) return;
     let raf = 0;
@@ -260,9 +263,8 @@ const DroneHero = () => {
     let visible = true;
     let intersecting = true;
     let idx = 0;
-    let phase: "travel" | "dwell" = "travel";
     phaseRef.current = "travel";
-    let phaseStart = performance.now();
+    let legStart = performance.now();
     let from = { x: target.current.x, y: target.current.y };
     let to = AUTOPLAY_ROUTE[0];
     let travelDur = 2000;
@@ -274,42 +276,31 @@ const DroneHero = () => {
       const dx = to.x - from.x;
       const dy = to.y - from.y;
       const dist = Math.hypot(dx, dy);
-      const jitter = 0.85 + Math.random() * 0.3;
-      travelDur = (1400 + dist * 4200) * jitter;
-      phase = "travel";
-      phaseRef.current = "travel";
-      phaseStart = now;
+      const jitter = 0.8 + Math.random() * 0.4;
+      // Durata proporzionale alla distanza, ma sempre in movimento.
+      travelDur = (1200 + dist * 4600) * jitter;
+      legStart = now;
     };
 
     const step = () => {
       raf = requestAnimationFrame(step);
       const now = performance.now();
-      if (phase === "travel") {
-        const t = Math.min(1, (now - phaseStart) / travelDur);
-        const e = easeInOutCubic(t);
-        target.current.x = from.x + (to.x - from.x) * e;
-        target.current.y = from.y + (to.y - from.y) * e;
-        if (t >= 1) {
-          phase = "dwell";
-          phaseRef.current = "dwell";
-          phaseStart = now;
-          // Blocca il target esattamente sulla tappa: niente oscillazioni
-          // che facciano ruotare il razzo su se stesso durante la sosta.
-          target.current.x = to.x;
-          target.current.y = to.y;
-        }
-      } else {
-        if (now - phaseStart >= to.dwell) {
-          nextLeg(now);
-        }
+      const t = (now - legStart) / travelDur;
+      if (t >= 1) {
+        // Passaggio immediato al prossimo leg: nessuna sosta.
+        nextLeg(now);
+        return;
       }
+      const e = easeInOutCubic(t);
+      target.current.x = from.x + (to.x - from.x) * e;
+      target.current.y = from.y + (to.y - from.y) * e;
     };
 
 
     const start = () => {
       if (running) return;
       running = true;
-      phaseStart = performance.now();
+      legStart = performance.now();
       raf = requestAnimationFrame(step);
     };
     const stop = () => {
