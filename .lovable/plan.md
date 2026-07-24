@@ -1,78 +1,32 @@
-# Editor dedicato per i podcast
+## Obiettivo
+Rendere il volo mobile del razzo un viaggio continuo e naturale sull'Italia, senza soste rigide, più immersivo grazie a uno zoom maggiore.
 
-Attualmente il pulsante "Nuovo podcast" nel tab Podcast dell'area personale apre lo stesso editor degli articoli (`/area-personale/articolo/nuovo?category=Podcast`), con tutti i campi copyright obbligatori. Serve un editor più snello, riservato a coordinatori/admin, che permetta di collegare un episodio ospitato da un partner (Spotify, YouTube, Spreaker, ecc.) ed estrarre automaticamente la copertina dall'URL.
+## Modifiche a `src/components/home/DroneHero.tsx`
 
-## Cosa costruire
+### 1. Zoom mobile più stretto sull'Italia
+- `ZOOM_MOBILE` da `6.6` → `~9.5` per dare la sensazione di sorvolo ravvicinato.
+- Nessuna modifica al desktop.
 
-### 1. Nuova pagina `/area-personale/podcast/nuovo` e `/area-personale/podcast/:id/modifica`
-Componente `src/pages/PodcastEditor.tsx`, ispirato ad `ArticoloEditor` ma ridotto ai campi utili:
+### 2. Nuova rotta italiana non-lineare
+Sostituire `AUTOPLAY_ROUTE` con ~14 tappe che coprono tutta la penisola in ordine **non geografico** (salti nord/sud/isole/centro), così il viaggio sembra esplorativo e non un percorso lineare da nord a sud.
 
-- **Titolo** (obbligatorio)
-- **Estratto / descrizione breve** (obbligatorio, max ~300 caratteri)
-- **URL dell'episodio host** (obbligatorio) — Spotify, YouTube, Spreaker, Apple Podcasts, SoundCloud…
-- **Tipo** (podcast audio / video) — dedotto dall'URL, override manuale
-- **Copertina** — pulsante "Estrai da URL" che chiama l'edge function (vedi §3) + fallback upload manuale con `CoverImageUpload`
-- **Ospite / autore mostrato** (testo libero, default = display name del coordinatore)
-- **Durata** opzionale (es. `34'12"`)
-- **Contenuto lungo** opzionale in Markdown (note episodio / trascrizione) — `MarkdownEditor` senza obbligo
-- **Programmazione** identica all'editor articoli: pulsante "Programma" con date+time picker su slot da 30 minuti, integrata nel calendario di `PanelCalendario`
-- **Pulsanti**: Salva bozza · Pubblica ora · Programma · Anteprima
+Esempi di città da includere (coordinate normalizzate sul viewBox Europa): Torino, Bari, Milano, Palermo, Firenze, Cagliari, Venezia, Napoli, Bologna, Roma, Trieste, Catania, Genova, Perugia, Ancona. Ordine mescolato per creare zig-zag.
 
-Niente sezione copyright, niente flusso "invia a revisione": i coordinatori pubblicano direttamente (o programmano). Autorizzazione: pagina accessibile solo a `admin` / `coordinatore`, altrimenti redirect.
+### 3. Movimento continuo senza soste
+- Rimuovere il concetto di fase `dwell`: il razzo non si ferma mai su una tappa.
+- Il loop autoplay diventa una **spline continua**: appena raggiunta (o quasi raggiunta) una tappa, si passa immediatamente alla successiva, senza `dwell` timer.
+- Per evitare "scatti" sui waypoint, usare un target che avanza costantemente lungo la rotta: durata di ogni leg proporzionale alla distanza, easing `easeInOutCubic` mantenuto ma il passaggio da leg a leg avviene senza pausa (t=1 → immediatamente nextLeg).
+- Rimuovere il campo `dwell` dal tipo `Waypoint` e dai dati.
+- `phaseRef` non serve più: il razzo è sempre in "travel", quindi la rotazione segue sempre la velocità (naturale). Semplificare il ramo touch del rAF loop rimuovendo il check `phaseRef.current === "travel"`.
 
-### 2. Storage: continuiamo su `blog_posts`
-Riusiamo la tabella `blog_posts` con `category = "Podcast"` per non spezzare il calendario, i feed e il conteggio esistente. Aggiungiamo tre colonne opzionali (migrazione):
+### 4. Velocità variabile per naturalezza
+Mantenere il jitter già presente (`0.85 + Math.random() * 0.3`) sulla durata del leg, così alcune tratte sono più veloci e altre più lente, dando ritmo al viaggio.
 
-- `podcast_url text` — URL host
-- `podcast_kind text` — `"audio" | "video"`
-- `podcast_duration text`
+## Non toccare
+- `ROTATING_WORDS` (già gestito dall'utente su GitHub).
+- Comportamento desktop (cursore-driven).
+- Footer e altre pagine.
 
-Il trigger `validate_blog_post_copyright` va aggiornato per **saltare la verifica quando `category` contiene `Podcast`** (già scritto in italiano nella funzione), così un podcast può essere `published`/`scheduled` senza `copyright_declaration`. Il trigger `validate_blog_post_schedule` resta invariato (stesso flusso di slot da 30 min).
-
-### 3. Edge function `extract-podcast-cover`
-Nuova edge function che riceve `{ url }` e restituisce `{ cover_url, kind, title?, duration? }`:
-
-- YouTube → `https://i.ytimg.com/vi/{id}/maxresdefault.jpg`, `kind = "video"` (id estratto da watch/shorts/youtu.be)
-- Spotify → oEmbed `https://open.spotify.com/oembed?url=…` → `thumbnail_url`
-- Spreaker → oEmbed `https://api.spreaker.com/oembed?url=…`
-- SoundCloud → oEmbed `https://soundcloud.com/oembed?format=json&url=…`
-- Apple Podcasts → HTML scrape del meta `og:image`
-- Fallback generico: fetch della pagina e lettura di `og:image` / `twitter:image`
-
-Nessuna dipendenza esterna, solo `fetch`. Errori restituiscono `{ error }` e il form ripiega sull'upload manuale.
-
-### 4. Aggancio nel pannello
-`PanelArticoli` con `presetCategory="Podcast"` passa `newHref="/area-personale/podcast/nuovo"` e il link "Modifica" delle card podcast punta a `/area-personale/podcast/:id/modifica` (aggiungo una prop `editHrefBuilder`). La lista, i badge di stato e i filtri restano identici.
-
-### 5. Rendering pubblico
-`PodcastEpisodio.tsx` (attualmente placeholder statico) viene collegato al DB: cerca in `blog_posts` per slug con `category ILIKE '%Podcast%'` e mostra copertina, embed dell'host quando riconosciuto (iframe YouTube/Spotify/Spreaker) e le note in Markdown. Questa parte è opzionale ma la includo per chiudere il flusso.
-
-## Dettagli tecnici
-
-- **Route**: aggiunte in `src/App.tsx` accanto a quelle di `ArticoloEditor`.
-- **Guardia ruoli**: check client-side `has_role admin || coordinatore`; la sicurezza reale resta sulle policy `blog_posts` esistenti.
-- **Migrazione SQL** (structure only):
-
-```text
-ALTER TABLE public.blog_posts
-  ADD COLUMN podcast_url text,
-  ADD COLUMN podcast_kind text,
-  ADD COLUMN podcast_duration text;
-
--- update validate_blog_post_copyright: bypass quando category contiene 'Podcast'
-```
-
-- **Edge function**: `supabase/functions/extract-podcast-cover/index.ts` con CORS e `Deno.env` per un eventuale `LOVABLE_API_KEY` (non richiesto qui).
-- **Calendario**: `PanelCalendario` legge già tutti i post `scheduled` dell'utente, quindi i podcast programmati compaiono automaticamente. Aggiungo un badge "Podcast" quando la categoria coincide.
-- **Anteprima**: dialog analogo a quello dell'ArticoloEditor, con player embed se URL riconosciuto.
-
-## File toccati / creati
-
-- `src/pages/PodcastEditor.tsx` (nuovo)
-- `src/App.tsx` (rotte)
-- `src/components/area/PanelArticoli.tsx` (prop opzionale per editHref/newHref custom)
-- `src/pages/AreaPersonale.tsx` (passa le nuove props per il tab Podcast)
-- `src/pages/PodcastEpisodio.tsx` (lettura reale da DB)
-- `src/components/ScheduledTimeline.tsx` / `PanelCalendario.tsx` (badge tipo)
-- `supabase/functions/extract-podcast-cover/index.ts` (nuova)
-- Migrazione SQL per le 3 colonne + aggiornamento trigger copyright
+## Note tecniche
+- Le coordinate x/y sono normalizzate sul viewBox europeo (`EUROPE_VB`); l'Italia occupa circa `x: 0.47–0.57`, `y: 0.63–0.86`. Le nuove tappe restano dentro questo range.
+- Con `ZOOM_MOBILE ~9.5` e `PIEMONTE` come centro iniziale, verificare che la mappa non mostri bordi vuoti; se accade, alzare/abbassare leggermente lo zoom.
