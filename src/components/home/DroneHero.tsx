@@ -567,6 +567,47 @@ const DroneHero = () => {
         </div>
       </div>
 
+      {/* Etichetta realtà attiva — solo mobile, sfrutta lo spazio in alto della mappa */}
+      {isTouchDevice && (
+        <div
+          className="md:hidden absolute left-1/2 -translate-x-1/2 top-12 max-w-[82%] text-center pointer-events-none z-10"
+          aria-live="polite"
+        >
+          {route.map((w, i) => {
+            const active = i === activeIdx;
+            return (
+              <div
+                key={w.id}
+                className="absolute left-1/2 -translate-x-1/2 top-0 w-max max-w-[85vw] transition-all duration-500"
+                style={{
+                  opacity: active ? 1 : 0,
+                  transform: `translate(-50%, ${active ? "0" : "-6px"})`,
+                }}
+              >
+                <div
+                  className="uppercase text-background text-base leading-tight px-3"
+                  style={{
+                    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                    letterSpacing: "0.08em",
+                    textShadow: "0 1px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  {w.name}
+                </div>
+                {(w.city || w.region) && (
+                  <div
+                    className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-background/60"
+                    style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+                  >
+                    {[w.city, w.region].filter(Boolean).join(" · ")}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="absolute left-5 md:left-8 bottom-6 md:bottom-10 max-w-[640px] space-y-4 pointer-events-none">
         <h1
           className="text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.95] tracking-tight"
