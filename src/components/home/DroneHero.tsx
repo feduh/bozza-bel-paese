@@ -300,7 +300,7 @@ const DroneHero = () => {
     const start = () => {
       if (running) return;
       running = true;
-      phaseStart = performance.now();
+      legStart = performance.now();
       raf = requestAnimationFrame(step);
     };
     const stop = () => {
