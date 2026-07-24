@@ -36,7 +36,7 @@ const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
 const ZOOM_MOBILE = 9.5;
 
-type Waypoint = { id: string; x: number; y: number; name: string; city?: string };
+type Waypoint = { id: string; x: number; y: number; name: string; city?: string; region?: string };
 
 // Fallback curato: usato se il fetch fallisce o non ci sono ancora realtà.
 const FALLBACK_ROUTE: Waypoint[] = [
@@ -121,9 +121,9 @@ const DroneHero = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("realities")
-        .select("id, name, lat, lng, city")
+        .select("id, name, lat, lng, city, region")
         .eq("confirmed_status", "confermato");
-      if (error || !data) return [] as { id: string; name: string; lat: number; lng: number; city: string | null }[];
+      if (error || !data) return [] as { id: string; name: string; lat: number; lng: number; city: string | null; region: string | null }[];
       return data;
     },
   });
@@ -135,7 +135,7 @@ const DroneHero = () => {
       .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng))
       .map((r) => {
         const { x, y } = projectLatLng(r.lat, r.lng);
-        return { id: r.id, x, y, name: r.name, city: r.city ?? undefined };
+        return { id: r.id, x, y, name: r.name, city: r.city ?? undefined, region: (r as any).region ?? undefined };
       });
     const source = raw.length >= 3 ? raw : FALLBACK_ROUTE;
     return orderNearestNeighbor(dedupeNearby(source));
@@ -523,7 +523,7 @@ const DroneHero = () => {
                   opacity={active ? 1 : isTouchDevice ? 0.45 : 0.2}
                   style={{ transition: "opacity 400ms, r 400ms" }}
                 />
-                {active && (
+                {active && !isTouchDevice && (
                   <text
                     x={labelDx}
                     y={labelDy}
@@ -566,6 +566,47 @@ const DroneHero = () => {
           IT · Live
         </div>
       </div>
+
+      {/* Etichetta realtà attiva — solo mobile, sfrutta lo spazio in alto della mappa */}
+      {isTouchDevice && (
+        <div
+          className="md:hidden absolute left-1/2 -translate-x-1/2 top-12 max-w-[82%] text-center pointer-events-none z-10"
+          aria-live="polite"
+        >
+          {route.map((w, i) => {
+            const active = i === activeIdx;
+            return (
+              <div
+                key={w.id}
+                className="absolute left-1/2 -translate-x-1/2 top-0 w-max max-w-[85vw] transition-all duration-500"
+                style={{
+                  opacity: active ? 1 : 0,
+                  transform: `translate(-50%, ${active ? "0" : "-6px"})`,
+                }}
+              >
+                <div
+                  className="uppercase text-background text-base leading-tight px-3"
+                  style={{
+                    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                    letterSpacing: "0.08em",
+                    textShadow: "0 1px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  {w.name}
+                </div>
+                {(w.city || w.region) && (
+                  <div
+                    className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-background/60"
+                    style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+                  >
+                    {[w.city, w.region].filter(Boolean).join(" · ")}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="absolute left-5 md:left-8 bottom-6 md:bottom-10 max-w-[640px] space-y-4 pointer-events-none">
         <h1

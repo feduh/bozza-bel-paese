@@ -77,7 +77,7 @@ const Index = () => {
       <DroneHero />
 
       {/* ============ MARQUEE FULL-WIDTH (fuori dal container, come navbar/footer) ============ */}
-      <section className="w-full border-y-2 border-foreground bg-foreground text-background py-4">
+      <section className="hidden md:block w-full border-y-2 border-foreground bg-foreground text-background py-4">
         <Marquee speedSec={60}>
           {tickerItems.map((r, i) => (
             <span key={i} className="flex items-center gap-4 whitespace-nowrap">
