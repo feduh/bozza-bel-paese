@@ -32,23 +32,28 @@ const ROTATING_WORDS = [
 
 const PIEMONTE = { x: 0.475, y: 0.655 };
 const ZOOM = 4.2;
-const ZOOM_MOBILE = 6.6;
+const ZOOM_MOBILE = 9.5;
 
-type Waypoint = { x: number; y: number; dwell: number; name: string };
-// Rotta autoplay per mobile: solo tappe italiane, così la mappa può restare
-// zoomata sull'Italia senza mai perdere il razzo di vista.
+type Waypoint = { x: number; y: number; name: string };
+// Rotta autoplay mobile: solo tappe italiane in ordine NON lineare
+// (zig-zag nord/sud/isole/centro) per un volo esplorativo continuo,
+// senza mai fermarsi su una città.
 const AUTOPLAY_ROUTE: Waypoint[] = [
-  { x: 0.475, y: 0.655, dwell: 900, name: "Torino" },
-  { x: 0.495, y: 0.650, dwell: 700, name: "Milano" },
-  { x: 0.525, y: 0.660, dwell: 600, name: "Venezia" },
-  { x: 0.545, y: 0.660, dwell: 500, name: "Trieste" },
-  { x: 0.515, y: 0.685, dwell: 500, name: "Bologna" },
-  { x: 0.520, y: 0.710, dwell: 700, name: "Firenze" },
-  { x: 0.540, y: 0.750, dwell: 1100, name: "Roma" },
-  { x: 0.560, y: 0.780, dwell: 700, name: "Napoli" },
-  { x: 0.555, y: 0.840, dwell: 800, name: "Palermo" },
-  { x: 0.500, y: 0.830, dwell: 600, name: "Cagliari" },
-  { x: 0.485, y: 0.680, dwell: 500, name: "Genova" },
+  { x: 0.475, y: 0.655, name: "Torino" },
+  { x: 0.555, y: 0.840, name: "Palermo" },
+  { x: 0.520, y: 0.710, name: "Firenze" },
+  { x: 0.560, y: 0.780, name: "Bari" },
+  { x: 0.495, y: 0.650, name: "Milano" },
+  { x: 0.500, y: 0.830, name: "Cagliari" },
+  { x: 0.540, y: 0.750, name: "Roma" },
+  { x: 0.525, y: 0.660, name: "Venezia" },
+  { x: 0.560, y: 0.860, name: "Catania" },
+  { x: 0.515, y: 0.685, name: "Bologna" },
+  { x: 0.485, y: 0.680, name: "Genova" },
+  { x: 0.540, y: 0.735, name: "Perugia" },
+  { x: 0.555, y: 0.780, name: "Napoli" },
+  { x: 0.545, y: 0.660, name: "Trieste" },
+  { x: 0.535, y: 0.720, name: "Ancona" },
 ];
 
 const easeInOutCubic = (t: number) =>
