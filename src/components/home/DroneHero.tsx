@@ -452,6 +452,7 @@ const DroneHero = () => {
 
   const fit0 = Math.min(panel.h / VB_H, panel.w / VB_W);
   const scale0 = fit0 * ZOOM;
+  const effectiveScale = fit0 * (isTouchDevice ? ZOOM_MOBILE : ZOOM);
   const showRocket = hovering && !(reducedMotion && isTouchDevice);
 
   return (
