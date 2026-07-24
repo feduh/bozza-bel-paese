@@ -112,10 +112,11 @@ const MagazinePost = () => {
       if (p?.user_id) {
         const { data: bioData } = await supabase
           .from("profiles")
-          .select("user_id, display_name, bio, avatar_url, affiliation")
+          .select("user_id, display_name, author_bio, avatar_url, affiliation")
           .eq("user_id", p.user_id)
           .maybeSingle();
-        if (!cancelled) setAuthorBio((bioData as AuthorBio | null) ?? null);
+        if (!cancelled) setAuthorBio((bioData as unknown as AuthorBio | null) ?? null);
+
       } else {
         setAuthorBio(null);
       }
