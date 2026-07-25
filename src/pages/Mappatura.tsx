@@ -68,6 +68,8 @@ const Mappatura = () => {
   const [yearMax, setYearMax] = useState<string>(searchParams.get("annoMax") ?? "");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
 
   const fetchRealities = useCallback(async () => {
     setLoading(true);
