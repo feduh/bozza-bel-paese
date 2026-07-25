@@ -28,7 +28,7 @@ const Privacy = () => {
               <li><strong>Account coordinatori/autori</strong> (su invito): email, nome visualizzato, biografia, foto profilo, ruoli, social, città e dati professionali che decidi di condividere.</li>
               <li><strong>Segnalazione realtà</strong>: dati della realtà segnalata, indirizzo, coordinate, descrizione ed eventuali tuoi recapiti se forniti.</li>
               <li><strong>Contenuti editoriali</strong>: testi, immagini e metadati degli articoli che pubblichi come autore.</li>
-              <li><strong>Newsletter</strong>: indirizzo email e stato di iscrizione (solo se ti iscrivi esplicitamente).</li>
+              
               <li><strong>Dati tecnici minimi</strong>: log di accesso al backend e audit log delle azioni amministrative, strettamente necessari alla sicurezza del servizio.</li>
             </ul>
             <p className="mt-3">Non utilizziamo cookie di profilazione né strumenti di tracciamento pubblicitario di terze parti. Il sito è disponibile esclusivamente in lingua italiana.</p>
@@ -39,12 +39,12 @@ const Privacy = () => {
               <li>Gestire gli account dei membri del collettivo e degli autori delle realtà mappate.</li>
               <li>Pubblicare contenuti editoriali e profili pubblici solo dopo consenso esplicito (campo <em>consent_public</em>).</li>
               <li>Mantenere e migliorare la mappatura pubblica delle realtà artistiche italiane.</li>
-              <li>Inviare la newsletter agli iscritti che hanno confermato l'iscrizione.</li>
+              
               <li>Garantire la sicurezza del servizio e prevenire abusi.</li>
             </ul>
           </section>
           <section><h2 className="font-display text-xl font-semibold mb-3">4. Base giuridica</h2>
-            <p>Il trattamento si fonda su: consenso esplicito (Art. 6.1.a GDPR) per la visibilità pubblica del profilo e per l'iscrizione alla newsletter; esecuzione di un rapporto di collaborazione (Art. 6.1.b GDPR) per la gestione degli account dei membri; legittimo interesse (Art. 6.1.f GDPR) per rispondere alle richieste del modulo contatti e per la sicurezza del servizio.</p>
+            <p>Il trattamento si fonda su: consenso esplicito (Art. 6.1.a GDPR) per la visibilità pubblica del profilo; esecuzione di un rapporto di collaborazione (Art. 6.1.b GDPR) per la gestione degli account dei membri; legittimo interesse (Art. 6.1.f GDPR) per rispondere alle richieste del modulo contatti e per la sicurezza del servizio.</p>
           </section>
           <section><h2 className="font-display text-xl font-semibold mb-3">5. Conservazione dei dati</h2>
             <p>I messaggi del modulo contatti vengono conservati per il tempo necessario a gestire la richiesta e, al massimo, per 24 mesi. I dati degli account vengono conservati finché l'account è attivo; alla cancellazione vengono rimossi entro 30 giorni, salvo obblighi di legge. Gli audit log delle azioni amministrative sono conservati per 12 mesi a fini di sicurezza.</p>
