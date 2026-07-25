@@ -358,8 +358,10 @@ const Mappatura = () => {
         </div>
 
 
-        {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
-        <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+        <div className={filtersOpen ? "block md:block" : "hidden md:block"}>
+          {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
+          <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+
 
           {([
             { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
