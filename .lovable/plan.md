@@ -1,97 +1,32 @@
-# Riorganizzazione Area Personale
+## Obiettivo
+1. Far funzionare l'apertura del menu dell'area personale sui tablet (768–1023px).
+2. Rendere visivamente distinguibile il trigger dell'area personale dall'hamburger globale della navbar.
 
-Obiettivo: rendere l'area personale ampia come il resto del sito, ordinare le tante voci in gruppi logici (non un'unica fila di 12+ tab) e dare a ciascun ruolo un punto di ingresso chiaro con qualche funzione mirata in più.
+## Analisi del bug
+- `useIsMobile` (`src/hooks/use-mobile.tsx`) usa breakpoint `< 768px`. A partire da 768px `isMobile=false`, quindi `toggleSidebar` non apre lo `Sheet` mobile ma agisce sulla sidebar desktop.
+- In `src/pages/AreaPersonale.tsx` il `SidebarTrigger` ha `className="md:hidden"`, quindi da 768px in su il pulsante scompare del tutto. Risultato: su tablet non c'è modo di aprire il menu.
+- Il trigger usa `<PanelLeft />`, un'icona simile all'hamburger globale → nessuna distinzione visiva.
 
-## Problemi attuali (confermati leggendo `src/pages/AreaPersonale.tsx` e `src/index.css`)
+## Modifiche
 
-- Il contenitore forza `max-w-5xl`, mentre `.editorial-container` di default è `max-w-7xl` come il resto del sito: la pagina appare stretta.
-- Fino a 12 tab in fila orizzontale scorrevole, tutti allo stesso livello: profilo, calendario, articoli, preferiti, editoriale, curatela, podcast, realtà, membri, moderazione, admin. Difficile orientarsi, soprattutto per admin.
-- Il tab "Admin" è un unico contenitore con 6 pannelli impilati (system status, analytics, utenti, edizioni editoriali, messaggi, segnalazioni, audit log) — scroll infinito.
-- Nessun colpo d'occhio iniziale: si atterra su "Profilo" invece che su una panoramica con lo stato delle cose che riguardano l'utente (bozze, programmati, pitch, coda moderazione, realtà in attesa).
+### 1. `src/pages/AreaPersonale.tsx`
+- Cambiare la classe del `SidebarTrigger` da `md:hidden` a `lg:hidden` così resta visibile su mobile e tablet.
+- Nascondere `AreaSidebar` (desktop) fino a `lg`: rendere il contenitore `hidden lg:block` (o equivalente). Su tablet il menu verrà mostrato solo tramite `Sheet`.
+- Stilizzare il pulsante trigger come pill riconoscibile: bordo/background `bg-sidebar-accent`, padding aumentato, gap con label testuale "Menu area" accanto all'icona.
 
-## Nuova struttura
+### 2. `src/components/area/AreaSidebar.tsx` (o override locale nel trigger in AreaPersonale)
+- Sostituire l'icona di default del `SidebarTrigger`: passare children personalizzati (es. `<LayoutDashboard />` + testo "Menu area") invece di affidarsi al `PanelLeft` di default. Se `SidebarTrigger` non accetta children, wrappare in un `Button` custom che invoca `useSidebar().toggleSidebar()`.
 
-### Layout
+### 3. Breakpoint sidebar Sheet
+- Approccio scelto: **non** modificare `useIsMobile` globale (usato altrove). In `src/components/ui/sidebar.tsx` la logica `if (isMobile)` renderizza lo `Sheet`. Per estenderla ai tablet nell'area personale senza toccare l'hook globale, opzioni valutate durante l'implementazione:
+  - (a) Portare il breakpoint a 1024 solo se una verifica rapida degli altri usi non evidenzia regressioni;
+  - (b) In alternativa, forzare l'apertura via `openMobile` controllato dal componente di pagina, oppure introdurre un secondo hook `useIsBelowLg` usato dal solo layout area personale.
+- La scelta finale sarà (b) se (a) rischia regressioni; verrà decisa leggendo gli usi di `useIsMobile` prima di scrivere la modifica.
 
-- Rimuovere `max-w-5xl`, tornare al `.editorial-container` standard (`max-w-7xl`) come le altre pagine.
-- Da `md` in su: **sidebar a sinistra** (larghezza fissa ~240px, sticky) con la navigazione raggruppata; contenuto a destra a piena larghezza.
-- Su mobile: la sidebar diventa un `Sheet`/drawer richiamabile da un pulsante in alto; in aggiunta resta una barra tab compatta con solo i gruppi principali.
-- Usiamo il pattern shadcn `Sidebar` già presente nel design system, con `collapsible="icon"` per il mini-collapse su desktop.
+## Cosa NON tocco
+- Navbar globale del sito, `DroneHero.tsx`, `ROTATING_WORDS`, footer.
+- Comportamento desktop (≥1024px): resta invariato con sidebar fissa laterale.
 
-### Raggruppamento voci (coerente per tutti i ruoli, le voci compaiono solo se rilevanti)
-
-- **Panoramica** (nuovo) — dashboard di atterraggio.
-- **Il mio lavoro**
-  - Profilo
-  - Calendario
-  - Articoli
-  - Podcast *(staff)*
-  - Preferiti
-- **Editoriale**
-  - Le mie candidature (attuale "Editoriale")
-  - Curatela *(solo se curatore dell'edizione attiva)*
-- **Community** *(coordinatore/admin)*
-  - Realtà (proposta + pendenti)
-  - Membri (invito + affiliazioni)
-  - Moderazione
-- **Amministrazione** *(admin)*, come sotto-sezioni separate invece di un unico scroll:
-  - Stato & Analytics
-  - Utenti & Ruoli
-  - Edizioni editoriali
-  - Messaggi di contatto
-  - Segnalazioni realtà
-  - Audit log
-
-Ogni sotto-sezione admin diventa la sua "pagina" interna (una alla volta, non tutte impilate).
-
-### Nuova "Panoramica" (per tutti)
-
-Card compatte, contenuto filtrato per ruolo. Nessuna nuova query pesante: riusa i dati già caricati in `loadAll`.
-
-- Saluto + link rapido a "Modifica profilo" e "Nuovo articolo".
-- **Le tue bozze / programmati**: conteggio + lista corta con link a Articoli/Calendario.
-- **Le tue candidature editoriali**: N pending / accepted / rejected, link.
-- **Curatore** *(se curatore)*: N pitch pending sull'edizione, CTA "Vai alla curatela".
-- **Realtà in attesa** *(coordinatore/admin)*: N in `pendente` create da te, tempo residuo prima dell'auto-conferma.
-- **Da moderare** *(staff)*: N articoli `pending`, link diretto.
-- **Sistema** *(admin)*: N messaggi non letti + N segnalazioni nuove.
-
-### Funzioni aggiuntive per ruolo (piccole, coerenti con l'esistente)
-
-- **Autore**
-  - Nella panoramica: "Continua l'ultima bozza" (link diretto all'editor dell'ultimo `draft`).
-  - Filtro rapido su "Articoli" per stato (draft / pending / scheduled / published), oggi assente.
-- **Coordinatore**
-  - Widget "Realtà create da me" con stato di auto-conferma già presente, promosso in panoramica.
-  - Scorciatoia per aprire l'editor podcast direttamente dalla panoramica.
-- **Admin**
-  - Panoramica con conteggi live di messaggi/segnalazioni non lavorati come badge.
-  - Sotto-sezione Amministrazione con menu laterale interno, invece dello scroll unico attuale.
-  - "Attività recenti" (ultimi 5 record da `admin_audit_log`) come mini-widget nella panoramica.
-
-## Cosa NON cambia
-
-- Nessuna modifica ai singoli pannelli (`PanelProfilo`, `PanelArticoli`, `PanelCalendario`, `PanelModerazione`, `PanelRealta`, `PanelPreferiti`, `PanelEditoriale`, `PanelEditorialeCuratela`, `AuthorsAffiliationPanel`, `InviteMemberForm`, e i pannelli admin): li richiamiamo come sono dalle nuove sezioni.
-- Nessuna modifica DB / RLS / edge functions.
-- URL `/area-personale?tab=...` resta valido: manteniamo gli stessi valori di `tab` (`profilo`, `articoli`, `calendario`, `preferiti`, `editoriale`, `editoriale-curatela`, `podcast`, `realta`, `membri`, `moderazione`, `admin`) più il nuovo default `panoramica`, così i link esistenti nelle notifiche continuano a funzionare. Per le sotto-sezioni admin useremo un secondo parametro (es. `?tab=admin&section=utenti`).
-
-## Dettagli tecnici
-
-- File nuovi:
-  - `src/components/area/AreaSidebar.tsx` — sidebar shadcn con gruppi condizionati dai ruoli, `NavLink` che aggiornano il query param `tab`.
-  - `src/components/area/PanelPanoramica.tsx` — dashboard di atterraggio, riceve tutti i dati già in stato dal parent.
-  - `src/components/area/PanelAdmin.tsx` — wrapper che gestisce il sotto-menu (`section=`) e rende un solo pannello admin alla volta.
-- File modificati:
-  - `src/pages/AreaPersonale.tsx` — sostituisce `Tabs` con `SidebarProvider` + routing interno via query param; rimuove `max-w-5xl`; aggiunge query mini-conteggi (`admin_audit_log`, contact_messages/reality_reports non letti) solo per admin, in parallelo agli altri fetch di `loadAll`.
-  - `src/i18n/locales/it.json` — nuove label ("Panoramica", intestazioni gruppi sidebar, sotto-sezioni admin).
-- Nessuna nuova dipendenza (shadcn `Sidebar` e `Sheet` già presenti).
-
-## Ordine di implementazione
-
-1. Sidebar + layout a due colonne, container full-width, mapping dei tab attuali senza cambi funzionali.
-2. `PanelPanoramica` con widget condizionati per ruolo.
-3. `PanelAdmin` con sotto-menu interno.
-4. Piccole aggiunte per ruolo (filtro stato in Articoli, "Continua bozza", conteggi admin).
-5. Verifica su desktop e mobile (drawer sidebar, sticky header, deep link `?tab=...&section=...`).
-
-Va bene procedere così, o vuoi cambiare qualcosa nel raggruppamento (es. tenere Editoriale dentro "Il mio lavoro", o unire Community con Amministrazione)?
+## Verifica
+- Preview a 768px e 1024px: il pulsante "Menu area" è visibile su tablet, apre lo `Sheet` correttamente e si chiude cliccando fuori.
+- Icona + label chiaramente distinta dall'hamburger della navbar globale.
