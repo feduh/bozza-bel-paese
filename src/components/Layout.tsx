@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import SkipLink from "./SkipLink";
+import FloatingBackToTop from "./FloatingBackToTop";
 
 const Layout = () => (
   <div className="min-h-screen flex flex-col">
@@ -11,6 +12,7 @@ const Layout = () => (
       <Outlet />
     </main>
     <Footer />
+    <FloatingBackToTop />
   </div>
 );
 
