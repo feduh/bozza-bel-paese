@@ -113,11 +113,25 @@ const DroneHero = () => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!panelRef.current || isVisible) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(panelRef.current);
+    return () => io.disconnect();
+  }, [isVisible]);
 
   // Fetch delle realtà confermate per costruire la rotta reale.
   const { data: realities } = useQuery({
     queryKey: ["drone-waypoints"],
     staleTime: 10 * 60_000,
+    enabled: isVisible && !reducedMotion,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("realities")
@@ -131,6 +145,9 @@ const DroneHero = () => {
   // Ordinamento nearest-neighbor + dedup, memoizzato: cambia solo quando
   // arrivano dati nuovi. La randomizzazione è fissata per la sessione.
   const route = useMemo<Waypoint[]>(() => {
+    if (reducedMotion) {
+      return [{ id: "static-piemonte", ...PIEMONTE, name: "Piemonte" }];
+    }
     const raw: Waypoint[] = (realities ?? [])
       .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng))
       .map((r) => {
@@ -139,7 +156,7 @@ const DroneHero = () => {
       });
     const source = raw.length >= 3 ? raw : FALLBACK_ROUTE;
     return orderNearestNeighbor(dedupeNearby(source));
-  }, [realities]);
+  }, [realities, reducedMotion]);
 
 
   useEffect(() => {
@@ -175,6 +192,10 @@ const DroneHero = () => {
   useEffect(() => {
     if (isTouchDevice) setHovering(true);
   }, [isTouchDevice]);
+
+  useEffect(() => {
+    if (reducedMotion) setActiveIdx(0);
+  }, [reducedMotion]);
 
   const applyMapTransform = () => {
     const g = mapGroupRef.current;
@@ -453,7 +474,7 @@ const DroneHero = () => {
   const fit0 = Math.min(panel.h / VB_H, panel.w / VB_W);
   const scale0 = fit0 * ZOOM;
   const effectiveScale = fit0 * (isTouchDevice ? ZOOM_MOBILE : ZOOM);
-  const showRocket = hovering && !(reducedMotion && isTouchDevice);
+  const showRocket = hovering && !reducedMotion;
 
   return (
     <div

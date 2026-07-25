@@ -240,19 +240,37 @@ const AreaPersonale = () => {
           {t("area.lead")}
         </p>
 
-        {loading || !profile ? (
+        {loading ? (
           <div className="text-center py-20 text-muted-foreground font-body">{t("area.loading")}</div>
+        ) : !profile ? (
+          <div className="text-center py-20 font-body">
+            <p className="text-muted-foreground mb-6">Profilo non trovato. Non è stato possibile caricare le tue informazioni.</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <button 
+                onClick={() => window.location.reload()} 
+                className="btn-brutalist-outline py-2 px-6"
+              >
+                Ricarica
+              </button>
+              <Link 
+                to="/" 
+                className="btn-brutalist py-2 px-6"
+              >
+                Torna alla Home
+              </Link>
+            </div>
+          </div>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="sticky top-16 z-10 -mx-4 px-4 py-3 bg-background/85 backdrop-blur border-b border-border">
-              <TabsList className="h-auto flex flex-wrap gap-1 bg-muted/60 p-1">
+              <TabsList className="h-auto flex overflow-x-auto scrollbar-hide gap-1 bg-muted/60 p-1 whitespace-nowrap">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   return (
                     <TabsTrigger
                       key={tab.value}
                       value={tab.value}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2 font-body"
+                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2 font-body flex-shrink-0"
                     >
                       <Icon size={14} />
                       <span>{tab.label}</span>

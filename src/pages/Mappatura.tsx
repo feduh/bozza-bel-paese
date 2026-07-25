@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, List, Map, ArrowRight, X, Navigation, Loader2 } from "lucide-react";
+import { MapPin, List, Map, ArrowRight, X, Navigation, Loader2, ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +48,7 @@ const Mappatura = () => {
 
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [view, setView] = useState<ViewMode>(() => {
     const v = searchParams.get("vista");
     return v === "list" ? v : "map";
@@ -67,11 +68,17 @@ const Mappatura = () => {
   const [yearMax, setYearMax] = useState<string>(searchParams.get("annoMax") ?? "");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchRealities = async () => {
-      const { data: realitiesData } = await supabase.from("realities").select("*");
-      const { data: tagsData } = await supabase.from("reality_tags").select("*");
+
+  const fetchRealities = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const { data: realitiesData, error: realitiesError } = await supabase.from("realities").select("*");
+      const { data: tagsData, error: tagsError } = await supabase.from("reality_tags").select("*");
+
+      if (realitiesError || tagsError) throw realitiesError || tagsError;
 
       if (realitiesData) {
         const mapped = realitiesData.map((r) => {
@@ -85,10 +92,17 @@ const Mappatura = () => {
         });
         setRealities(mapped);
       }
+    } catch (err) {
+      console.error("Error fetching realities:", err);
+      setError(true);
+    } finally {
       setLoading(false);
-    };
-    fetchRealities();
+    }
   }, []);
+
+  useEffect(() => {
+    fetchRealities();
+  }, [fetchRealities]);
 
   // Sync state → URL (debounced for search)
   useEffect(() => {
@@ -254,6 +268,21 @@ const Mappatura = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="py-20 editorial-container text-center">
+        <h2 className="editorial-heading mb-4 text-primary">Si è verificato un errore</h2>
+        <p className="editorial-body mb-8">Non è stato possibile caricare le realtà. Per favore, riprova.</p>
+        <button
+          onClick={() => fetchRealities()}
+          className="px-6 py-3 brutalist-border bg-background hover:bg-foreground hover:text-background font-bold uppercase tracking-widest transition-colors text-xs"
+        >
+          Riprova
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background py-16 md:py-20">
       <SEO
@@ -317,10 +346,22 @@ const Mappatura = () => {
             {geoStatus === "loading" ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
             {userPos ? t("map.nearYou") : t("map.nearMe")}
           </button>
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((s) => !s)}
+            aria-expanded={filtersOpen}
+            className="md:hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors bg-background hover:bg-foreground hover:text-background"
+          >
+            <ChevronDown size={14} className={`transition-transform ${filtersOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+            Filtri
+          </button>
         </div>
 
-        {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
-        <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+
+        <div className={filtersOpen ? "block md:block" : "hidden md:block"}>
+          {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
+          <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
+
 
           {([
             { val: "spazio", label: "Spazi", color: "hsl(var(--primary))", outline: false },
@@ -443,8 +484,9 @@ const Mappatura = () => {
           </p>
         )}
 
-
+        </div>
         <h2 className="sr-only">Risultati</h2>
+
         <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Clock, Trash2 } from "lucide-react";
@@ -11,19 +13,49 @@ type Props = {
 };
 
 const PanelModerazione = ({ queue, nameMap, onChanged }: Props) => {
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
   const moderateAction = async (id: string, action: "publish" | "reject" | "delete") => {
+    if (processingId) return;
+
     if (action === "delete") {
       if (!confirm("Eliminare l'articolo?")) return;
-      await supabase.from("blog_posts").delete().eq("id", id);
-    } else if (action === "publish") {
-      await supabase
-        .from("blog_posts")
-        .update({ status: "published", published_at: new Date().toISOString() })
-        .eq("id", id);
-    } else {
-      await supabase.from("blog_posts").update({ status: "draft" }).eq("id", id);
     }
-    onChanged();
+
+    setProcessingId(id);
+    try {
+      let error;
+      if (action === "delete") {
+        const result = await supabase.from("blog_posts").delete().eq("id", id);
+        error = result.error;
+      } else if (action === "publish") {
+        const result = await supabase
+          .from("blog_posts")
+          .update({ status: "published", published_at: new Date().toISOString() })
+          .eq("id", id);
+        error = result.error;
+      } else {
+        const result = await supabase.from("blog_posts").update({ status: "draft" }).eq("id", id);
+        error = result.error;
+      }
+
+      if (error) {
+        toast.error(`Errore: ${error.message}`);
+      } else {
+        const messages = {
+          publish: "Articolo pubblicato",
+          reject: "Articolo rimandato in bozza",
+          delete: "Articolo eliminato"
+        };
+        toast.success(messages[action]);
+        onChanged();
+      }
+    } catch (err) {
+      console.error("Moderation action failed:", err);
+      toast.error("Si è verificato un errore imprevisto");
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   return (
@@ -52,25 +84,30 @@ const PanelModerazione = ({ queue, nameMap, onChanged }: Props) => {
                 <div className="flex items-center gap-2 flex-wrap">
                   <Link
                     to={`/area-personale/articolo/${p.id}/modifica`}
-                    className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors"
+                    className={`text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-primary/40 transition-colors ${
+                      processingId ? "opacity-50 pointer-events-none" : ""
+                    }`}
                   >
                     Apri
                   </Link>
                   <button
                     onClick={() => moderateAction(p.id, "publish")}
-                    className="text-xs font-body px-3 py-1.5 rounded-md bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
+                    disabled={!!processingId}
+                    className="text-xs font-body px-3 py-1.5 rounded-md bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Pubblica
                   </button>
                   <button
                     onClick={() => moderateAction(p.id, "reject")}
-                    className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-amber-500/40 transition-colors"
+                    disabled={!!processingId}
+                    className="text-xs font-body px-3 py-1.5 rounded-md border border-border hover:border-amber-500/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Rimanda in bozza
                   </button>
                   <button
                     onClick={() => moderateAction(p.id, "delete")}
-                    className="text-xs font-body px-3 py-1.5 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                    disabled={!!processingId}
+                    className="text-xs font-body px-3 py-1.5 rounded-md text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Trash2 size={12} />
                   </button>
