@@ -255,7 +255,11 @@ const LazyMap = ({
         maxBounds={maxBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={false}
+        zoomSnap={0}
+        zoomDelta={0.5}
+        wheelPxPerZoomLevel={80}
         zoomControl={false}
+
         style={{ height: "100%", width: "100%" }}
         className="ibp-map"
       >
