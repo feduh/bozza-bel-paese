@@ -200,11 +200,40 @@ const UserLocationLayer = ({ pos }: { pos: { lat: number; lng: number } | null |
   return null;
 };
 
+/**
+ * Abilita lo zoom solo su pinch trackpad (wheel + ctrlKey) o pinch touch.
+ * Lo scroll a due dita verticale/orizzontale scorre la pagina, non zoomma la mappa.
+ */
+const PinchOnlyZoom = () => {
+  const map = useMap();
+  useEffect(() => {
+    const container = map.getContainer();
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        // gesto di pinch sul trackpad → zoom mappa
+        e.preventDefault();
+        const delta = -e.deltaY;
+        const zoomDelta = delta > 0 ? 1 : -1;
+        const rect = container.getBoundingClientRect();
+        const point = map.mouseEventToContainerPoint(e as unknown as MouseEvent);
+        const targetZoom = map.getZoom() + zoomDelta * 0.5;
+        map.setZoomAround(point, targetZoom, { animate: true });
+      }
+      // altrimenti: lascia scorrere la pagina naturalmente
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => container.removeEventListener("wheel", onWheel);
+  }, [map]);
+  return null;
+};
+
 const LazyMap = ({
   center,
   zoom,
   markers,
-  scrollWheelZoom = false,
+  scrollWheelZoom: _scrollWheelZoom = false,
   height = "100%",
   cluster = true,
   minZoom = 5,
@@ -222,7 +251,7 @@ const LazyMap = ({
         maxZoom={maxZoom}
         maxBounds={maxBounds}
         maxBoundsViscosity={1.0}
-        scrollWheelZoom={scrollWheelZoom}
+        scrollWheelZoom={false}
         zoomControl={false}
         style={{ height: "100%", width: "100%" }}
         className="ibp-map"
@@ -235,6 +264,7 @@ const LazyMap = ({
           maxZoom={19}
         />
         <ZoomControl position="bottomright" />
+        <PinchOnlyZoom />
         <ClusterLayer markers={markers} cluster={cluster && markers.length > 1} />
         <AutoFitLayer markers={markers} enabled={autoFit && !userLocation} />
         <UserLocationLayer pos={userLocation} />
@@ -242,5 +272,6 @@ const LazyMap = ({
     </div>
   );
 };
+
 
 export default LazyMap;
