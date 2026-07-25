@@ -1,67 +1,92 @@
-# Piano di miglioramenti — Il Bel Paese
+# Editoriale curato annualmente
 
-## Stato di partenza verificato
-Dall'ultima serie di modifiche il sito ha: hero con razzo autoplay su mobile, mappa con filtri multi-selezione, area personale con tab podcast/affiliazioni, editor podcast dedicato, scroll-to-top fluido, pannello admin responsive e SEO dinamico via componente `SEO.tsx`. Sono però emersi alcuni margini di ottimizzazione in UX, performance, accessibilità, robustezza e SEO che possiamo affrontare in blocchi indipendenti.
+Aggiungiamo un livello editoriale sopra alla categoria "Editoriali" già esistente: ogni anno un'**edizione** con un **curatore in carica** (admin/coordinatore promosso ad hoc), che riceve **pitch dai membri registrati** e decide cosa pubblicare. La pagina `/editoriale` diventa vetrina dell'edizione corrente, con archivio delle passate.
 
-## Proposte di miglioramento, raggruppate per area
+## 1. Modello dati (nuove tabelle)
 
-### 1. Performance e caricamento
-- **Lazy-load delle realtà nella mappa**: oggi `Mappatura.tsx` scarica `select("*")` e poi filtra client-side. Con la crescita del database conviene passare a una query Supabase più snella (solo colonne necessarie) e, se necessario, a paginazione server-side + infinite scroll nella lista.
-- **Posticipare il fetch del DroneHero**: la query delle realtà per il razzo parte subito, anche se l'utente ha `prefers-reduced-motion` o l'hero è fuori viewport. Si può attivare solo quando l'hero è in vista (`IntersectionObserver`) e skippare del tutto per chi preferisce meno movimento.
-- **Ottimizzare asset immagini**: verificare che `SmartImage` applichi lazy loading nativo, blur-up placeholder e dimensioni responsive; estenderlo a tutte le immagini utente (avatar, copertine, gallerie).
-- **Code-splitting più fine**: alcune pagine admin (analytics, audit log, gestione utenti) possono essere isolate in chunk separati invece di essere tutte dentro `AreaPersonale.tsx`.
+`**editorial_editions**`
 
-### 2. Accessibilità (a11y)
-- **Hero ridotto**: per `prefers-reduced-motion: reduce` nascondere il razzo in movimento e mostrare una mappa statica con un marker sulle realtà (già c'è un controllo, ma si può rendere esplicito a livello visivo).
-- **Focus e touch target**: verificare che tutti i chip filtro, icone e pulsanti mobile abbiano almeno 44×44 CSS px e focus visibile.
-- **Menu mobile**: aggiungere `aria-current` e label esplicito al sotto-menu "Racconti".
-- **Conforme colori**: verificare il contrasto del testo viola (`--primary`) su sfondo avorio e del testo acqua su sfondo scuro.
-- **SkipLink**: assicurarsi che il target `#main-content` esista in ogni pagina.
+- `year` (unique), `title` (es. "Edizione 2026 — Geografie minori"), `theme_description`, `curator_user_id` → profiles, `status` (`draft` / `open_submissions` / `closed_submissions` / `published` / `archived`), `submissions_open_at`, `submissions_close_at`, `cover_image_url`
 
-### 3. SEO e condivisione social
-- **Lang HTML**: `index.html` ha `lang="en"`; il sito è in italiano, quindi impostare `lang="it"`.
-- **Meta dinamici lato server**: il componente `SEO.tsx` aggiorna i meta in SPA, ma i crawler sociali (Facebook, LinkedIn, WhatsApp) non eseguono JavaScript. Per articoli, profili autore e schede realtà conviene generare pagine prerenderizzate o usare un edge function che restituisca i meta corretti per i bot.
-- **Sitemap dinamica**: `scripts/generate-sitemap.ts` esiste, ma verificare che includa le pagine dinamiche (`/realta/:id`, `/magazine/:slug`, `/autori/:userId`).
-- **URL canonici**: aggiungere canonical self-referencing anche su pagine con parametri query (filtri mappa, tab area personale) per evitare indicizzazione duplicata.
+`**editorial_submissions**` (pitch dei membri)
 
-### 4. Robustezze e gestione errori
-- **Mappatura**: se il fetch di `realities` fallisce, la pagina resta in loading oppure mostra una lista vuota senza messaggio. Aggiungere stato `error` con retry.
-- **Area personale**: se il profilo non esiste (`loading || !profile`) l'utente vede solo "Caricamento…" all'infinito. Aggiungere un messaggio di errore o un wizard per creare il profilo mancante.
-- **Moderazione**: `PanelModerazione.tsx` non mostra feedback se l'update/delete fallisce (RLS o errore rete). Aggiungere toast/errore e rollback ottimistico.
-- **Inviti e gestione utenti**: `InviteMemberForm` e `UsersManagementPanel` mostrano feedback, ma alcune azioni non gestiscono stati paralleli (doppio click). Aggiungere `disabled` durante le chiamate.
+- `edition_id`, `author_user_id`, `title`, `abstract`, `outline` (opzionale), `references` (opzionale), `status` (`pending` / `accepted` / `rejected` / `withdrawn` / `converted`), `curator_notes`, `converted_post_id` → blog_posts
 
-### 5. UX mobile e interfaccia
-- **Tab area personale**: su schermi stretti i tab vanno a capo e occupano molto spazio verticale. Proporrei una lista a scroll orizzontale con frecce di navigazione.
-- **Filtri mappa**: dopo la recente riorganizzazione in 3 righe, su mobile occupano metà schermo. Aggiungere un pannello collassabile "Filtri" con contatore dei filtri attivi.
-- **Condividi vista mappa**: aggiungere pulsante "Copia link" che genera una URL con i filtri attivi, per facilitare la condivisione.
-- **Back-to-top flottante**: utile dopo scroll lunghi in lista realtà / magazine.
-- **Tema scuro**: il design system lo supporta, ma non c'è un toggle visibile. Valutare se inserirlo in navbar o footer.
+`**blog_posts**`: aggiungere `editorial_edition_id` (nullable). Un articolo appartiene a un'edizione solo se effettivamente pubblicato nell'Editoriale.
 
-### 6. Funzionalità editoriali e social
-- **Sezione "In evidenza" in homepage**: mostrare 3 ultimi articoli del magazine + 1 podcast, per dare più respiro editoriale alla landing.
-- **Box autore negli articoli**: già implementato con `author_bio`; si può migliorare aggiungendo un link "Tutti gli articoli di questo autore" e un'immagine di copertina più grande.
-- **Notifiche**: c'è `NotificationsBell`, ma manca un pannello notifiche con storico e mark-as-read.
-- **Commenti / repliche**: il magazine supporta `reply_to_id`, ma non c'è un'indicazione visiva chiara del thread tra articolo e risposta.
+## 2. Permessi (senza nuovo ruolo)
 
-### 7. Manutenibilità e qualità codice
-- **Ridurre `as any` e `eslint-disable`**: in `Mappatura.tsx` e `DroneHero.tsx` ci sono diversi cast e disable hooks; passare a tipi strutturati e a funzioni helper fuori dal componente.
-- **Centralizzare permessi**: la logica "is admin / coordinatore / author" è duplicata in più componenti. Creare un hook `usePermissions()` che restituisca ruoli e capability (es. `canModerate`, `canInvite`).
-- **Test**: esiste `vitest` con poche pagine di test. Aggiungere test sui filtri mappa, sui permessi e sul parsing della rotta DroneHero.
-- **Cookie banner**: il sito usa Supabase (cookie di autenticazione) e potrebbe usare analytics. Valutare un banner informativo minimale per la cookie policy.
+Il **curatore è un  coordinatore** con `curator_user_id` sull'edizione attiva. Le RLS controllano quel campo, non un ruolo aggiuntivo.
 
-### 8. Esperienza mappa
-- **Clustering marker**: con molte realtà in città vicine (es. Milano, Roma) i marker si sovrappongono. Aggiungere `leaflet.markercluster` con colori per categoria.
-- **Popup accessibili**: i popup Leaflet sono HTML injection; renderli chiudibili con tastiera e con un'icona chiara su touch.
-- **Ricerca con geocoding**: permettere di cercare "Milano" o "Torino" e centrare la mappa sulla città, non solo filtrare per nome realtà.
+- Admin: vede tutto.
+- Coordinatore-curatore (dell'edizione in `open_submissions`/`closed_submissions`): vede tutte le submission dell'edizione, cambia status, promuove una submission a bozza articolo (categoria "Editoriali", `editorial_edition_id` popolato), può programmare/pubblicare quegli articoli.
+- Membri (autori/coordinatori): vedono e gestiscono **solo le proprie** submission.
+- Pubblico: legge solo articoli già `published` con `editorial_edition_id`.
 
-## Priorità suggerita
-- **Alta**: SEO lang, errori mappa, profilo mancante area personale, feedback moderazione, lazy DroneHero.
-- **Media**: filtri mappa collassabili, tab area personale scrollabili, back-to-top, in evidenza homepage, refactor permessi.
-- **Bassa**: tema scuro, notifiche, commenti/thread, clustering avanzato, PWA.
+## 3. Flussi utente
 
-## Prossimi passi
-1. Scegliere quali punti trattare in questa tornata (consiglio: almeno i punti "Alta" + 2-3 "Media").
-2. Confermare se vuoi mantenere il footer e le `ROTATING_WORDS` di DroneHero esattamente come sono (lo farò in ogni caso, ma mi serve la conferma per evitare regressioni).
-3. Confermare se il sito deve rimanere solo in italiano o prevedere un toggle lingua.
+**Membro (Area Personale → nuova tab "Editoriale")**
 
-Approvando questo piano possiamo procedere con l'implementazione in blocchi separati e verificabili.
+- Se c'è un'edizione in `open_submissions`: form di candidatura (titolo, abstract 800 char, outline opzionale, bio-editoriale opzionale che pre-compila da `author_bio`).
+- Lista dei propri pitch con stato e note del curatore. Può ritirare finché è `pending`.
+- Se il pitch è `accepted`: bottone "Sviluppa articolo" → crea bozza in `blog_posts` collegata all'edizione, apre l'editor esistente.
+
+**Curatore (Area Personale → tab "Editoriale — curatela", visibile solo se `curator_user_id = me`)**
+
+- Dashboard edizione: candidature per stato (pending / accepted / rejected), filtri, note interne.
+- Azioni: accetta / rifiuta / rimetti in pending / promuovi a bozza articolo.
+- Programmazione pubblicazioni dell'edizione (riusa `scheduled_for` esistente).
+- Impostazioni edizione: tema, date submission, cover.
+
+**Admin (pannello Admin → "Edizioni editoriali")**
+
+- Crea edizione, assegna curatore, apre/chiude submission, archivia.
+- Storico curatori.
+
+## 4. Pagine pubbliche
+
+- `**/editoriale**` (rifatta): hero con "Curato da [Curatore], Edizione [Anno]", tema, cover, link a pagina bio del curatore. Sotto: articoli dell'edizione corrente (lead + griglia, come già impostato). CTA "Candida un pitch" se `open_submissions` e utente loggato (o login prompt).
+- `**/editoriale/:year**`: pagina di ogni edizione passata (stesso layout, archiviata).
+- `**/editoriale/archivio**`: elenco cronologico edizioni.
+- `**/editoriale/curatore/:userId**`: bio estesa del curatore in carica (riusa profile + `author_bio`, sezione "Edizioni curate").
+
+## 5. Modifiche a pagine esistenti
+
+- `/magazine` continua a escludere gli articoli con categoria "Editoriali" (già fatto).
+- `MagazinePost.tsx`: se l'articolo ha `editorial_edition_id`, mostrare badge "Edizione [Anno] — a cura di [Curatore]" con link.
+- Navbar dropdown "Racconti": nessuna modifica strutturale (Editoriale già presente).
+
+## 6. Notifiche
+
+Riuso della tabella `notifications`:
+
+- Submission ricevuta → notifica curatore.
+- Submission accettata/rifiutata → notifica autore.
+- Apertura call annuale → notifica broadcast a tutti i membri.
+
+## 7. Dettagli tecnici
+
+- Nuova enum `editorial_edition_status` e `editorial_submission_status`.
+- Trigger `updated_at` sulle due nuove tabelle.
+- Funzione security-definer `is_curator_of_edition(_edition_id uuid)` per RLS pulite (evita ricorsione tra `blog_posts` ↔ `editorial_editions`).
+- GRANT `SELECT` a `anon` su `editorial_editions` (per la pagina pubblica) e su `blog_posts` già esistente; tutto il resto solo `authenticated`.
+- Vincolo: massimo un'edizione con `status` diverso da `archived` per anno.
+- Un articolo può appartenere a una sola edizione (`editorial_edition_id` scalar, non array).
+
+## 8. Fuori scope (per ora)
+
+- Peer review pubblica delle candidature.
+- Compensi/contratti autori.
+- Versioning delle bozze durante la revisione (si usa l'editor esistente).
+
+## Ordine di implementazione
+
+1. Migrazione DB (tabelle, enum, RLS, funzione helper, GRANT).
+2. Admin: pannello edizioni + assegnazione curatore.
+3. Membro: form pitch + lista candidature in Area Personale.
+4. Curatore: dashboard curatela.
+5. Promozione submission → `blog_posts` (riuso editor esistente).
+6. Pagine pubbliche `/editoriale` e archivio.
+7. Notifiche + badge sui post.
+
+Ti va di procedere così, o vuoi che qualche passaggio salti/cambi ordine prima di partire?

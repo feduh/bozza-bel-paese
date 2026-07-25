@@ -35,6 +35,10 @@ const ArticoloEditor = () => {
   const [params] = useSearchParams();
   const replyToParam = params.get("reply_to");
   const categoryParam = params.get("category");
+  const editionIdParam = params.get("edition");
+  const submissionIdParam = params.get("submission");
+  const titleParam = params.get("title");
+
 
 
   const isEdit = !!id;
@@ -79,12 +83,13 @@ const ArticoloEditor = () => {
   const [copyrightResult, setCopyrightResult] = useState<{ status: "ok" | "blocked"; notes: string } | null>(null);
 
   const [form, setForm] = useState({
-    title: "",
-    category: !isEdit && categoryParam ? categoryParam : "",
+    title: !isEdit && titleParam ? titleParam : "",
+    category: !isEdit && (editionIdParam ? "Editoriali" : categoryParam ?? ""),
     excerpt: "",
     content: "",
     coverImageUrl: "",
   });
+
 
 
   const isStaff = useMemo(
@@ -359,7 +364,7 @@ const ArticoloEditor = () => {
       }
     } else {
       const slug = `${slugify(parsed.data.title)}-${Math.random().toString(36).slice(2, 8)}`;
-      const payload = {
+      const payload: Record<string, unknown> = {
         title: parsed.data.title,
         category: parsed.data.category,
         excerpt: parsed.data.excerpt,
@@ -374,13 +379,27 @@ const ArticoloEditor = () => {
         published_at: scheduledIso ?? new Date().toISOString(),
         ...copyrightPayloadForDb,
       };
-      const { error } = await supabase.from("blog_posts").insert(payload);
+      if (editionIdParam) payload.editorial_edition_id = editionIdParam;
+      const { data: inserted, error } = await supabase
+        .from("blog_posts")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert(payload as any)
+
+        .select("id")
+        .maybeSingle();
       setSubmitting(false);
       if (error) {
         setGlobalError(error.message);
         return;
       }
+      if (submissionIdParam && inserted?.id) {
+        await supabase
+          .from("editorial_submissions")
+          .update({ status: "converted", converted_post_id: inserted.id })
+          .eq("id", submissionIdParam);
+      }
     }
+
 
     navigate("/area-personale");
   };

@@ -13,7 +13,11 @@ import {
   UserPlus,
   Mic,
   Plus,
+  BookOpen,
 } from "lucide-react";
+
+
+
 
 import SEO from "@/components/SEO";
 import { useTranslation } from "react-i18next";
@@ -28,6 +32,10 @@ import PanelRealta from "@/components/area/PanelRealta";
 import PanelPreferiti from "@/components/area/PanelPreferiti";
 import InviteMemberForm from "@/components/InviteMemberForm";
 import AuthorsAffiliationPanel from "@/components/AuthorsAffiliationPanel";
+import PanelEditoriale from "@/components/area/PanelEditoriale";
+import PanelEditorialeCuratela from "@/components/area/PanelEditorialeCuratela";
+import EditorialEditionsPanel from "@/components/admin/EditorialEditionsPanel";
+
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
@@ -60,6 +68,8 @@ const AreaPersonale = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
   const [showInvite, setShowInvite] = useState(false);
+  const [isCurator, setIsCurator] = useState(false);
+
 
   const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
   const isAdmin = myRoles.includes("admin");
@@ -92,6 +102,13 @@ const AreaPersonale = () => {
       .eq("user_id", user.id);
     const rs = (roles ?? []).map((r: { role: string }) => r.role);
     setMyRoles(rs);
+
+    const { count: curatorCount } = await supabase
+      .from("editorial_editions")
+      .select("id", { count: "exact", head: true })
+      .eq("curator_user_id", user.id);
+    setIsCurator((curatorCount ?? 0) > 0);
+
 
     const { data: mine } = await supabase
       .from("blog_posts")
@@ -195,7 +212,12 @@ const AreaPersonale = () => {
       { value: "calendario", label: t("area.tabs.calendar"), icon: CalendarClock, badge: scheduledItems.length || undefined },
       { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: articleCount || undefined },
       { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
+      { value: "editoriale", label: "Editoriale", icon: BookOpen },
     ];
+    if (isCurator) {
+      tabList.push({ value: "editoriale-curatela", label: "Curatela", icon: BookOpen });
+    }
+
     if (isStaff) {
       tabList.push({ value: "podcast", label: "Podcast", icon: Mic, badge: podcastCount || undefined });
     }
@@ -213,7 +235,7 @@ const AreaPersonale = () => {
     }
     return tabList;
 
-  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, articleCount, podcastCount, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
+  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, isCurator, articleCount, podcastCount, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
 
   const tabFromUrl = searchParams.get("tab");
   const activeTab = tabs.some((t) => t.value === tabFromUrl) ? (tabFromUrl as string) : "profilo";
@@ -311,6 +333,17 @@ const AreaPersonale = () => {
               <PanelPreferiti userId={user.id} />
             </TabsContent>
 
+            <TabsContent value="editoriale" className="mt-0">
+              <PanelEditoriale userId={user.id} />
+            </TabsContent>
+
+            {isCurator && (
+              <TabsContent value="editoriale-curatela" className="mt-0">
+                <PanelEditorialeCuratela userId={user.id} />
+              </TabsContent>
+            )}
+
+
             {isStaff && (
               <TabsContent value="podcast" className="mt-0">
                 <PanelArticoli
@@ -375,6 +408,8 @@ const AreaPersonale = () => {
                 <SystemStatusPanel />
                 <AnalyticsDashboardPanel />
                 <UsersManagementPanel />
+                <EditorialEditionsPanel />
+
                 <ContactMessagesPanel />
                 <RealityReportsPanel />
                 <AuditLogPanel />
