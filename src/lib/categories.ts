@@ -9,10 +9,13 @@ export const REALITY_CATEGORIES = [
   "Danza",
   "Design / Product Design",
   "Editoria / Scrittura",
+  "Formazione / Didattica",
   "Fotografia",
   "Installazione",
   "Makers / Artigianato Digitale",
   "New Media Art",
+  "Residenza",
+
   "Performance",
   "Pittura",
   "Scultura",
