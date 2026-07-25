@@ -244,6 +244,7 @@ const AreaPersonale = () => {
     "podcast",
     "preferiti",
     "editoriale",
+    "editoriale-articoli",
     "editoriale-curatela",
     "realta",
     "membri",
