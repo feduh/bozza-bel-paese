@@ -39,7 +39,7 @@ const Privacy = () => {
               <li>Gestire gli account dei membri del collettivo e degli autori delle realtà mappate.</li>
               <li>Pubblicare contenuti editoriali e profili pubblici solo dopo consenso esplicito (campo <em>consent_public</em>).</li>
               <li>Mantenere e migliorare la mappatura pubblica delle realtà artistiche italiane.</li>
-              <li>Inviare la newsletter agli iscritti che hanno confermato l'iscrizione.</li>
+              
               <li>Garantire la sicurezza del servizio e prevenire abusi.</li>
             </ul>
           </section>
