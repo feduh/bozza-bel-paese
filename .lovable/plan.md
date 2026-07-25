@@ -1,92 +1,97 @@
-# Editoriale curato annualmente
+# Riorganizzazione Area Personale
 
-Aggiungiamo un livello editoriale sopra alla categoria "Editoriali" già esistente: ogni anno un'**edizione** con un **curatore in carica** (admin/coordinatore promosso ad hoc), che riceve **pitch dai membri registrati** e decide cosa pubblicare. La pagina `/editoriale` diventa vetrina dell'edizione corrente, con archivio delle passate.
+Obiettivo: rendere l'area personale ampia come il resto del sito, ordinare le tante voci in gruppi logici (non un'unica fila di 12+ tab) e dare a ciascun ruolo un punto di ingresso chiaro con qualche funzione mirata in più.
 
-## 1. Modello dati (nuove tabelle)
+## Problemi attuali (confermati leggendo `src/pages/AreaPersonale.tsx` e `src/index.css`)
 
-`**editorial_editions**`
+- Il contenitore forza `max-w-5xl`, mentre `.editorial-container` di default è `max-w-7xl` come il resto del sito: la pagina appare stretta.
+- Fino a 12 tab in fila orizzontale scorrevole, tutti allo stesso livello: profilo, calendario, articoli, preferiti, editoriale, curatela, podcast, realtà, membri, moderazione, admin. Difficile orientarsi, soprattutto per admin.
+- Il tab "Admin" è un unico contenitore con 6 pannelli impilati (system status, analytics, utenti, edizioni editoriali, messaggi, segnalazioni, audit log) — scroll infinito.
+- Nessun colpo d'occhio iniziale: si atterra su "Profilo" invece che su una panoramica con lo stato delle cose che riguardano l'utente (bozze, programmati, pitch, coda moderazione, realtà in attesa).
 
-- `year` (unique), `title` (es. "Edizione 2026 — Geografie minori"), `theme_description`, `curator_user_id` → profiles, `status` (`draft` / `open_submissions` / `closed_submissions` / `published` / `archived`), `submissions_open_at`, `submissions_close_at`, `cover_image_url`
+## Nuova struttura
 
-`**editorial_submissions**` (pitch dei membri)
+### Layout
 
-- `edition_id`, `author_user_id`, `title`, `abstract`, `outline` (opzionale), `references` (opzionale), `status` (`pending` / `accepted` / `rejected` / `withdrawn` / `converted`), `curator_notes`, `converted_post_id` → blog_posts
+- Rimuovere `max-w-5xl`, tornare al `.editorial-container` standard (`max-w-7xl`) come le altre pagine.
+- Da `md` in su: **sidebar a sinistra** (larghezza fissa ~240px, sticky) con la navigazione raggruppata; contenuto a destra a piena larghezza.
+- Su mobile: la sidebar diventa un `Sheet`/drawer richiamabile da un pulsante in alto; in aggiunta resta una barra tab compatta con solo i gruppi principali.
+- Usiamo il pattern shadcn `Sidebar` già presente nel design system, con `collapsible="icon"` per il mini-collapse su desktop.
 
-`**blog_posts**`: aggiungere `editorial_edition_id` (nullable). Un articolo appartiene a un'edizione solo se effettivamente pubblicato nell'Editoriale.
+### Raggruppamento voci (coerente per tutti i ruoli, le voci compaiono solo se rilevanti)
 
-## 2. Permessi (senza nuovo ruolo)
+- **Panoramica** (nuovo) — dashboard di atterraggio.
+- **Il mio lavoro**
+  - Profilo
+  - Calendario
+  - Articoli
+  - Podcast *(staff)*
+  - Preferiti
+- **Editoriale**
+  - Le mie candidature (attuale "Editoriale")
+  - Curatela *(solo se curatore dell'edizione attiva)*
+- **Community** *(coordinatore/admin)*
+  - Realtà (proposta + pendenti)
+  - Membri (invito + affiliazioni)
+  - Moderazione
+- **Amministrazione** *(admin)*, come sotto-sezioni separate invece di un unico scroll:
+  - Stato & Analytics
+  - Utenti & Ruoli
+  - Edizioni editoriali
+  - Messaggi di contatto
+  - Segnalazioni realtà
+  - Audit log
 
-Il **curatore è un  coordinatore** con `curator_user_id` sull'edizione attiva. Le RLS controllano quel campo, non un ruolo aggiuntivo.
+Ogni sotto-sezione admin diventa la sua "pagina" interna (una alla volta, non tutte impilate).
 
-- Admin: vede tutto.
-- Coordinatore-curatore (dell'edizione in `open_submissions`/`closed_submissions`): vede tutte le submission dell'edizione, cambia status, promuove una submission a bozza articolo (categoria "Editoriali", `editorial_edition_id` popolato), può programmare/pubblicare quegli articoli.
-- Membri (autori/coordinatori): vedono e gestiscono **solo le proprie** submission.
-- Pubblico: legge solo articoli già `published` con `editorial_edition_id`.
+### Nuova "Panoramica" (per tutti)
 
-## 3. Flussi utente
+Card compatte, contenuto filtrato per ruolo. Nessuna nuova query pesante: riusa i dati già caricati in `loadAll`.
 
-**Membro (Area Personale → nuova tab "Editoriale")**
+- Saluto + link rapido a "Modifica profilo" e "Nuovo articolo".
+- **Le tue bozze / programmati**: conteggio + lista corta con link a Articoli/Calendario.
+- **Le tue candidature editoriali**: N pending / accepted / rejected, link.
+- **Curatore** *(se curatore)*: N pitch pending sull'edizione, CTA "Vai alla curatela".
+- **Realtà in attesa** *(coordinatore/admin)*: N in `pendente` create da te, tempo residuo prima dell'auto-conferma.
+- **Da moderare** *(staff)*: N articoli `pending`, link diretto.
+- **Sistema** *(admin)*: N messaggi non letti + N segnalazioni nuove.
 
-- Se c'è un'edizione in `open_submissions`: form di candidatura (titolo, abstract 800 char, outline opzionale, bio-editoriale opzionale che pre-compila da `author_bio`).
-- Lista dei propri pitch con stato e note del curatore. Può ritirare finché è `pending`.
-- Se il pitch è `accepted`: bottone "Sviluppa articolo" → crea bozza in `blog_posts` collegata all'edizione, apre l'editor esistente.
+### Funzioni aggiuntive per ruolo (piccole, coerenti con l'esistente)
 
-**Curatore (Area Personale → tab "Editoriale — curatela", visibile solo se `curator_user_id = me`)**
+- **Autore**
+  - Nella panoramica: "Continua l'ultima bozza" (link diretto all'editor dell'ultimo `draft`).
+  - Filtro rapido su "Articoli" per stato (draft / pending / scheduled / published), oggi assente.
+- **Coordinatore**
+  - Widget "Realtà create da me" con stato di auto-conferma già presente, promosso in panoramica.
+  - Scorciatoia per aprire l'editor podcast direttamente dalla panoramica.
+- **Admin**
+  - Panoramica con conteggi live di messaggi/segnalazioni non lavorati come badge.
+  - Sotto-sezione Amministrazione con menu laterale interno, invece dello scroll unico attuale.
+  - "Attività recenti" (ultimi 5 record da `admin_audit_log`) come mini-widget nella panoramica.
 
-- Dashboard edizione: candidature per stato (pending / accepted / rejected), filtri, note interne.
-- Azioni: accetta / rifiuta / rimetti in pending / promuovi a bozza articolo.
-- Programmazione pubblicazioni dell'edizione (riusa `scheduled_for` esistente).
-- Impostazioni edizione: tema, date submission, cover.
+## Cosa NON cambia
 
-**Admin (pannello Admin → "Edizioni editoriali")**
+- Nessuna modifica ai singoli pannelli (`PanelProfilo`, `PanelArticoli`, `PanelCalendario`, `PanelModerazione`, `PanelRealta`, `PanelPreferiti`, `PanelEditoriale`, `PanelEditorialeCuratela`, `AuthorsAffiliationPanel`, `InviteMemberForm`, e i pannelli admin): li richiamiamo come sono dalle nuove sezioni.
+- Nessuna modifica DB / RLS / edge functions.
+- URL `/area-personale?tab=...` resta valido: manteniamo gli stessi valori di `tab` (`profilo`, `articoli`, `calendario`, `preferiti`, `editoriale`, `editoriale-curatela`, `podcast`, `realta`, `membri`, `moderazione`, `admin`) più il nuovo default `panoramica`, così i link esistenti nelle notifiche continuano a funzionare. Per le sotto-sezioni admin useremo un secondo parametro (es. `?tab=admin&section=utenti`).
 
-- Crea edizione, assegna curatore, apre/chiude submission, archivia.
-- Storico curatori.
+## Dettagli tecnici
 
-## 4. Pagine pubbliche
-
-- `**/editoriale**` (rifatta): hero con "Curato da [Curatore], Edizione [Anno]", tema, cover, link a pagina bio del curatore. Sotto: articoli dell'edizione corrente (lead + griglia, come già impostato). CTA "Candida un pitch" se `open_submissions` e utente loggato (o login prompt).
-- `**/editoriale/:year**`: pagina di ogni edizione passata (stesso layout, archiviata).
-- `**/editoriale/archivio**`: elenco cronologico edizioni.
-- `**/editoriale/curatore/:userId**`: bio estesa del curatore in carica (riusa profile + `author_bio`, sezione "Edizioni curate").
-
-## 5. Modifiche a pagine esistenti
-
-- `/magazine` continua a escludere gli articoli con categoria "Editoriali" (già fatto).
-- `MagazinePost.tsx`: se l'articolo ha `editorial_edition_id`, mostrare badge "Edizione [Anno] — a cura di [Curatore]" con link.
-- Navbar dropdown "Racconti": nessuna modifica strutturale (Editoriale già presente).
-
-## 6. Notifiche
-
-Riuso della tabella `notifications`:
-
-- Submission ricevuta → notifica curatore.
-- Submission accettata/rifiutata → notifica autore.
-- Apertura call annuale → notifica broadcast a tutti i membri.
-
-## 7. Dettagli tecnici
-
-- Nuova enum `editorial_edition_status` e `editorial_submission_status`.
-- Trigger `updated_at` sulle due nuove tabelle.
-- Funzione security-definer `is_curator_of_edition(_edition_id uuid)` per RLS pulite (evita ricorsione tra `blog_posts` ↔ `editorial_editions`).
-- GRANT `SELECT` a `anon` su `editorial_editions` (per la pagina pubblica) e su `blog_posts` già esistente; tutto il resto solo `authenticated`.
-- Vincolo: massimo un'edizione con `status` diverso da `archived` per anno.
-- Un articolo può appartenere a una sola edizione (`editorial_edition_id` scalar, non array).
-
-## 8. Fuori scope (per ora)
-
-- Peer review pubblica delle candidature.
-- Compensi/contratti autori.
-- Versioning delle bozze durante la revisione (si usa l'editor esistente).
+- File nuovi:
+  - `src/components/area/AreaSidebar.tsx` — sidebar shadcn con gruppi condizionati dai ruoli, `NavLink` che aggiornano il query param `tab`.
+  - `src/components/area/PanelPanoramica.tsx` — dashboard di atterraggio, riceve tutti i dati già in stato dal parent.
+  - `src/components/area/PanelAdmin.tsx` — wrapper che gestisce il sotto-menu (`section=`) e rende un solo pannello admin alla volta.
+- File modificati:
+  - `src/pages/AreaPersonale.tsx` — sostituisce `Tabs` con `SidebarProvider` + routing interno via query param; rimuove `max-w-5xl`; aggiunge query mini-conteggi (`admin_audit_log`, contact_messages/reality_reports non letti) solo per admin, in parallelo agli altri fetch di `loadAll`.
+  - `src/i18n/locales/it.json` — nuove label ("Panoramica", intestazioni gruppi sidebar, sotto-sezioni admin).
+- Nessuna nuova dipendenza (shadcn `Sidebar` e `Sheet` già presenti).
 
 ## Ordine di implementazione
 
-1. Migrazione DB (tabelle, enum, RLS, funzione helper, GRANT).
-2. Admin: pannello edizioni + assegnazione curatore.
-3. Membro: form pitch + lista candidature in Area Personale.
-4. Curatore: dashboard curatela.
-5. Promozione submission → `blog_posts` (riuso editor esistente).
-6. Pagine pubbliche `/editoriale` e archivio.
-7. Notifiche + badge sui post.
+1. Sidebar + layout a due colonne, container full-width, mapping dei tab attuali senza cambi funzionali.
+2. `PanelPanoramica` con widget condizionati per ruolo.
+3. `PanelAdmin` con sotto-menu interno.
+4. Piccole aggiunte per ruolo (filtro stato in Articoli, "Continua bozza", conteggi admin).
+5. Verifica su desktop e mobile (drawer sidebar, sticky header, deep link `?tab=...&section=...`).
 
-Ti va di procedere così, o vuoi che qualche passaggio salti/cambi ordine prima di partire?
+Va bene procedere così, o vuoi cambiare qualcosa nel raggruppamento (es. tenere Editoriale dentro "Il mio lavoro", o unire Community con Amministrazione)?
