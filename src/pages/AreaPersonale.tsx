@@ -333,6 +333,17 @@ const AreaPersonale = () => {
               <PanelPreferiti userId={user.id} />
             </TabsContent>
 
+            <TabsContent value="editoriale" className="mt-0">
+              <PanelEditoriale userId={user.id} />
+            </TabsContent>
+
+            {isCurator && (
+              <TabsContent value="editoriale-curatela" className="mt-0">
+                <PanelEditorialeCuratela userId={user.id} />
+              </TabsContent>
+            )}
+
+
             {isStaff && (
               <TabsContent value="podcast" className="mt-0">
                 <PanelArticoli
