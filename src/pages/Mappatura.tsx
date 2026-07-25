@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, List, Map, ArrowRight, X, Navigation, Loader2 } from "lucide-react";
+import { MapPin, List, Map, ArrowRight, X, Navigation, Loader2, ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
