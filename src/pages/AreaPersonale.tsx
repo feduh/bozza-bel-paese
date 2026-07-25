@@ -13,7 +13,8 @@ import {
   UserPlus,
   Mic,
   Plus,
-} from "lucide-react";
+  BookOpen,
+
 
 import SEO from "@/components/SEO";
 import { useTranslation } from "react-i18next";
