@@ -135,7 +135,11 @@ const Index = () => {
           </div>
         </section>
 
+        {/* ============ FEATURED FROM MAGAZINE ============ */}
+        <FeaturedSection />
+
         {/* ============ STATS ============ */}
+
         <section className="border-y-2 border-foreground py-10 md:py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((s) => (
