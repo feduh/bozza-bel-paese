@@ -2,28 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  User as UserIcon,
-  FileText,
-  ShieldCheck,
-  MapPin,
-  CalendarClock,
-  Clock,
-  Bookmark,
-  UserPlus,
-  Mic,
-  Plus,
-  BookOpen,
-} from "lucide-react";
-
-
-
-
+import { Menu, Mic, Plus, UserPlus } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useTranslation } from "react-i18next";
 import type { ScheduledItem } from "@/components/ScheduledTimeline";
 import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import AreaSidebar, { type AreaTabValue } from "@/components/area/AreaSidebar";
 import PanelProfilo from "@/components/area/PanelProfilo";
 import PanelArticoli from "@/components/area/PanelArticoli";
 import PanelCalendario from "@/components/area/PanelCalendario";
@@ -34,14 +19,8 @@ import InviteMemberForm from "@/components/InviteMemberForm";
 import AuthorsAffiliationPanel from "@/components/AuthorsAffiliationPanel";
 import PanelEditoriale from "@/components/area/PanelEditoriale";
 import PanelEditorialeCuratela from "@/components/area/PanelEditorialeCuratela";
-import EditorialEditionsPanel from "@/components/admin/EditorialEditionsPanel";
-
-import AuditLogPanel from "@/components/admin/AuditLogPanel";
-import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
-import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
-import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
-import SystemStatusPanel from "@/components/admin/SystemStatusPanel";
-import AnalyticsDashboardPanel from "@/components/admin/AnalyticsDashboardPanel";
+import PanelPanoramica from "@/components/area/PanelPanoramica";
+import PanelAdmin from "@/components/area/PanelAdmin";
 import type {
   AreaProfile,
   AreaPost,
@@ -69,9 +48,12 @@ const AreaPersonale = () => {
   const [profileMsg, setProfileMsg] = useState("");
   const [showInvite, setShowInvite] = useState(false);
   const [isCurator, setIsCurator] = useState(false);
+  const [editorialCounts, setEditorialCounts] = useState({ pending: 0, accepted: 0 });
+  const [curatelaPending, setCuratelaPending] = useState(0);
+  const [adminCounts, setAdminCounts] = useState({ messages: 0, reports: 0 });
 
-
-  const isStaff = myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
+  const isStaff =
+    myRoles.includes("admin") || myRoles.includes("moderator") || myRoles.includes("coordinatore");
   const isAdmin = myRoles.includes("admin");
   const canProposeRealities = isAdmin || myRoles.includes("coordinatore");
   const canInviteMembers = isAdmin || myRoles.includes("coordinatore");
@@ -103,16 +85,35 @@ const AreaPersonale = () => {
     const rs = (roles ?? []).map((r: { role: string }) => r.role);
     setMyRoles(rs);
 
-    const { count: curatorCount } = await supabase
+    const { data: curatorEditions } = await supabase
       .from("editorial_editions")
-      .select("id", { count: "exact", head: true })
+      .select("id")
       .eq("curator_user_id", user.id);
-    setIsCurator((curatorCount ?? 0) > 0);
+    setIsCurator((curatorEditions?.length ?? 0) > 0);
+    if (curatorEditions && curatorEditions.length > 0) {
+      const ids = curatorEditions.map((e: { id: string }) => e.id);
+      const { count } = await supabase
+        .from("editorial_submissions")
+        .select("id", { count: "exact", head: true })
+        .in("edition_id", ids)
+        .eq("status", "pending");
+      setCuratelaPending(count ?? 0);
+    }
 
+    const { data: mySubs } = await supabase
+      .from("editorial_submissions")
+      .select("status")
+      .eq("author_user_id", user.id);
+    setEditorialCounts({
+      pending: (mySubs ?? []).filter((s: { status: string }) => s.status === "pending").length,
+      accepted: (mySubs ?? []).filter((s: { status: string }) => s.status === "accepted").length,
+    });
 
     const { data: mine } = await supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id")
+      .select(
+        "id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id",
+      )
       .eq("user_id", user.id)
       .order("published_at", { ascending: false });
     setPosts((mine as AreaPost[]) ?? []);
@@ -120,7 +121,9 @@ const AreaPersonale = () => {
     if (rs.includes("admin") || rs.includes("moderator") || rs.includes("coordinatore")) {
       const { data: queue } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id, author_name, user_id")
+        .select(
+          "id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id, author_name, user_id",
+        )
         .eq("status", "pending")
         .order("published_at", { ascending: true });
       const list = (queue as AreaModerationPost[]) ?? [];
@@ -137,6 +140,20 @@ const AreaPersonale = () => {
         .eq("confirmed_status", "pendente")
         .order("created_at", { ascending: false });
       setMyPendingRealities((pending as AreaPendingReality[]) ?? []);
+    }
+
+    if (rs.includes("admin")) {
+      const [{ count: msgCount }, { count: repCount }] = await Promise.all([
+        supabase
+          .from("contact_messages")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "nuovo"),
+        supabase
+          .from("reality_reports")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "nuova"),
+      ]);
+      setAdminCounts({ messages: msgCount ?? 0, reports: repCount ?? 0 });
     }
 
     const scheduled: ScheduledItem[] = [];
@@ -197,7 +214,8 @@ const AreaPersonale = () => {
   }, [user?.id]);
 
   const { articleCount, podcastCount } = useMemo(() => {
-    let art = 0, pod = 0;
+    let art = 0,
+      pod = 0;
     for (const p of posts) {
       const cats = (p.category ?? "").toLowerCase().split(",").map((c) => c.trim());
       if (cats.includes("podcast")) pod += 1;
@@ -206,44 +224,40 @@ const AreaPersonale = () => {
     return { articleCount: art, podcastCount: pod };
   }, [posts]);
 
-  const tabs = useMemo(() => {
-    const tabList: Array<{ value: string; label: string; icon: typeof UserIcon; badge?: number }> = [
-      { value: "profilo", label: t("area.tabs.profile"), icon: UserIcon },
-      { value: "calendario", label: t("area.tabs.calendar"), icon: CalendarClock, badge: scheduledItems.length || undefined },
-      { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: articleCount || undefined },
-      { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
-      { value: "editoriale", label: "Editoriale", icon: BookOpen },
-    ];
-    if (isCurator) {
-      tabList.push({ value: "editoriale-curatela", label: "Curatela", icon: BookOpen });
-    }
+  const validTabs: AreaTabValue[] = [
+    "panoramica",
+    "profilo",
+    "calendario",
+    "articoli",
+    "podcast",
+    "preferiti",
+    "editoriale",
+    "editoriale-curatela",
+    "realta",
+    "membri",
+    "moderazione",
+    "admin",
+  ];
+  const tabFromUrl = searchParams.get("tab") as AreaTabValue | null;
+  const activeTab: AreaTabValue =
+    tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "panoramica";
 
-    if (isStaff) {
-      tabList.push({ value: "podcast", label: "Podcast", icon: Mic, badge: podcastCount || undefined });
-    }
-    if (canProposeRealities) {
-      tabList.push({ value: "realta", label: t("area.tabs.realities"), icon: MapPin, badge: myPendingRealities.length || undefined });
-    }
-    if (canInviteMembers) {
-      tabList.push({ value: "membri", label: t("area.tabs.members"), icon: UserPlus });
-    }
-    if (isStaff) {
-      tabList.push({ value: "moderazione", label: t("area.tabs.moderation"), icon: Clock, badge: moderationQueue.length || undefined });
-    }
-    if (isAdmin) {
-      tabList.push({ value: "admin", label: t("area.tabs.admin"), icon: ShieldCheck });
-    }
-    return tabList;
-
-  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, isCurator, articleCount, podcastCount, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
-
-  const tabFromUrl = searchParams.get("tab");
-  const activeTab = tabs.some((t) => t.value === tabFromUrl) ? (tabFromUrl as string) : "profilo";
-
-  const setActiveTab = (v: string) => {
+  const setActiveTab = (v: AreaTabValue) => {
     const next = new URLSearchParams(searchParams);
     next.set("tab", v);
+    if (v !== "admin") next.delete("section");
     setSearchParams(next, { replace: true });
+  };
+
+  const badges: Partial<Record<AreaTabValue, number>> = {
+    calendario: scheduledItems.length || undefined,
+    articoli: articleCount || undefined,
+    podcast: podcastCount || undefined,
+    editoriale: editorialCounts.pending || undefined,
+    "editoriale-curatela": curatelaPending || undefined,
+    realta: myPendingRealities.length || undefined,
+    moderazione: moderationQueue.length || undefined,
+    admin: (adminCounts.messages + adminCounts.reports) || undefined,
   };
 
   if (!user) {
@@ -251,174 +265,191 @@ const AreaPersonale = () => {
     return null;
   }
 
-  return (
-    <div className="py-16">
-      <SEO title="Area personale" description="Dashboard: profilo, calendario, articoli e moderazione." canonicalPath="/area-personale" />
-      <div className="editorial-container max-w-5xl">
-        <h1 className="editorial-heading mb-2">
-          {t("area.title")} <span className="italic text-primary">{t("area.titleAccent")}</span>
-        </h1>
-        <p className="editorial-body text-muted-foreground mb-8">
-          {t("area.lead")}
-        </p>
+  const displayName =
+    profile?.display_name?.split(" ")[0] || user.email?.split("@")[0] || "collega";
 
-        {loading ? (
-          <div className="text-center py-20 text-muted-foreground font-body">{t("area.loading")}</div>
-        ) : !profile ? (
-          <div className="text-center py-20 font-body">
-            <p className="text-muted-foreground mb-6">Profilo non trovato. Non è stato possibile caricare le tue informazioni.</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button 
-                onClick={() => window.location.reload()} 
-                className="btn-brutalist-outline py-2 px-6"
-              >
-                Ricarica
-              </button>
-              <Link 
-                to="/" 
-                className="btn-brutalist py-2 px-6"
-              >
-                Torna alla Home
-              </Link>
-            </div>
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="text-center py-20 text-muted-foreground font-body">
+          {t("area.loading")}
+        </div>
+      );
+    }
+    if (!profile) {
+      return (
+        <div className="text-center py-20 font-body">
+          <p className="text-muted-foreground mb-6">
+            Profilo non trovato. Non è stato possibile caricare le tue informazioni.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-brutalist-outline py-2 px-6"
+            >
+              Ricarica
+            </button>
+            <Link to="/" className="btn-brutalist py-2 px-6">
+              Torna alla Home
+            </Link>
           </div>
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="sticky top-16 z-10 -mx-4 px-4 py-3 bg-background/85 backdrop-blur border-b border-border">
-              <TabsList className="h-auto flex overflow-x-auto scrollbar-hide gap-1 bg-muted/60 p-1 whitespace-nowrap">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <TabsTrigger
-                      key={tab.value}
-                      value={tab.value}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2 font-body flex-shrink-0"
-                    >
-                      <Icon size={14} />
-                      <span>{tab.label}</span>
-                      {tab.badge !== undefined && (
-                        <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] font-bold bg-background/70 text-foreground border border-border data-[state=active]:bg-primary-foreground/20">
-                          {tab.badge}
-                        </span>
-                      )}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
+        </div>
+      );
+    }
+
+    switch (activeTab) {
+      case "panoramica":
+        return (
+          <PanelPanoramica
+            displayName={displayName}
+            posts={posts}
+            scheduledCount={scheduledItems.length}
+            moderationCount={moderationQueue.length}
+            pendingRealities={myPendingRealities}
+            isStaff={isStaff}
+            isAdmin={isAdmin}
+            isCurator={isCurator}
+            canProposeRealities={canProposeRealities}
+            editorialCounts={editorialCounts}
+            curatelaPending={curatelaPending}
+            adminCounts={adminCounts}
+            goTo={setActiveTab}
+          />
+        );
+      case "profilo":
+        return (
+          <PanelProfilo
+            profile={profile}
+            setProfile={setProfile}
+            reality={reality}
+            myRoles={myRoles}
+            userId={user.id}
+            saving={savingProfile}
+            setSaving={setSavingProfile}
+            msg={profileMsg}
+            setMsg={setProfileMsg}
+          />
+        );
+      case "calendario":
+        return <PanelCalendario items={scheduledItems} showAuthor={isAdmin} />;
+      case "articoli":
+        return <PanelArticoli posts={posts} isStaff={isStaff} onChanged={loadAll} />;
+      case "podcast":
+        return isStaff ? (
+          <PanelArticoli
+            posts={posts}
+            isStaff={isStaff}
+            onChanged={loadAll}
+            presetCategory="Podcast"
+            title="I miei podcast"
+            icon={Mic}
+            newLabel="Nuovo podcast"
+            newHref="/area-personale/podcast/nuovo"
+            editHrefBuilder={(pid) => `/area-personale/podcast/${pid}/modifica`}
+          />
+        ) : null;
+      case "preferiti":
+        return <PanelPreferiti userId={user.id} />;
+      case "editoriale":
+        return <PanelEditoriale userId={user.id} />;
+      case "editoriale-curatela":
+        return isCurator ? <PanelEditorialeCuratela userId={user.id} /> : null;
+      case "realta":
+        return canProposeRealities ? (
+          <PanelRealta isAdmin={isAdmin} pending={myPendingRealities} onCreated={loadAll} />
+        ) : null;
+      case "membri":
+        return canInviteMembers ? (
+          <div className="space-y-8">
+            <section className="p-8 rounded-lg bg-card border border-border">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h2 className="font-display text-xl font-semibold flex items-center gap-2">
+                    <UserPlus size={20} />{" "}
+                    {isAdmin ? t("area.inviteMember") : t("area.inviteAuthor")}
+                  </h2>
+                  <p className="font-body text-sm text-muted-foreground mt-1">
+                    {isAdmin ? t("area.inviteDescAdmin") : t("area.inviteDescCoord")}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowInvite((s) => !s)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
+                >
+                  <Plus size={14} /> {showInvite ? "Chiudi form" : "Nuovo membro"}
+                </button>
+              </div>
+              {showInvite && (
+                <div className="mt-6">
+                  <InviteMemberForm
+                    allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]}
+                  />
+                </div>
+              )}
+            </section>
+            <AuthorsAffiliationPanel />
+          </div>
+        ) : null;
+      case "moderazione":
+        return isStaff ? (
+          <PanelModerazione
+            queue={moderationQueue}
+            nameMap={modNameMap}
+            onChanged={loadAll}
+          />
+        ) : null;
+      case "admin":
+        return isAdmin ? (
+          <PanelAdmin
+            messageCount={adminCounts.messages}
+            reportCount={adminCounts.reports}
+          />
+        ) : null;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <>
+      <SEO
+        title="Area personale"
+        description="Dashboard: profilo, calendario, articoli e moderazione."
+        canonicalPath="/area-personale"
+      />
+      <SidebarProvider defaultOpen>
+        <div className="flex min-h-[calc(100vh-4rem)] w-full">
+          <AreaSidebar
+            active={activeTab}
+            onChange={setActiveTab}
+            isStaff={isStaff}
+            isAdmin={isAdmin}
+            isCurator={isCurator}
+            canProposeRealities={canProposeRealities}
+            canInviteMembers={canInviteMembers}
+            badges={badges}
+          />
+          <main className="flex-1 min-w-0">
+            <div className="sticky top-16 z-10 bg-background/85 backdrop-blur border-b border-border">
+              <div className="flex items-center gap-3 px-4 md:px-8 py-3">
+                <SidebarTrigger className="md:hidden" aria-label="Apri menu area personale">
+                  <Menu size={18} />
+                </SidebarTrigger>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-body text-muted-foreground uppercase tracking-widest">
+                    {t("area.title")} {t("area.titleAccent")}
+                  </p>
+                  <h1 className="font-display text-lg md:text-xl font-semibold truncate">
+                    {profile?.display_name || t("area.titleAccent")}
+                  </h1>
+                </div>
+              </div>
             </div>
-
-            <TabsContent value="profilo" className="mt-0">
-              <PanelProfilo
-                profile={profile}
-                setProfile={setProfile}
-                reality={reality}
-                myRoles={myRoles}
-                userId={user.id}
-                saving={savingProfile}
-                setSaving={setSavingProfile}
-                msg={profileMsg}
-                setMsg={setProfileMsg}
-              />
-            </TabsContent>
-
-            <TabsContent value="calendario" className="mt-0">
-              <PanelCalendario items={scheduledItems} showAuthor={isAdmin} />
-            </TabsContent>
-
-            <TabsContent value="articoli" className="mt-0">
-              <PanelArticoli posts={posts} isStaff={isStaff} onChanged={loadAll} />
-            </TabsContent>
-
-            <TabsContent value="preferiti" className="mt-0">
-              <PanelPreferiti userId={user.id} />
-            </TabsContent>
-
-            <TabsContent value="editoriale" className="mt-0">
-              <PanelEditoriale userId={user.id} />
-            </TabsContent>
-
-            {isCurator && (
-              <TabsContent value="editoriale-curatela" className="mt-0">
-                <PanelEditorialeCuratela userId={user.id} />
-              </TabsContent>
-            )}
-
-
-            {isStaff && (
-              <TabsContent value="podcast" className="mt-0">
-                <PanelArticoli
-                  posts={posts}
-                  isStaff={isStaff}
-                  onChanged={loadAll}
-                  presetCategory="Podcast"
-                  title="I miei podcast"
-                  icon={Mic}
-                  newLabel="Nuovo podcast"
-                  newHref="/area-personale/podcast/nuovo"
-                  editHrefBuilder={(pid) => `/area-personale/podcast/${pid}/modifica`}
-                />
-              </TabsContent>
-            )}
-
-
-
-            {canProposeRealities && (
-              <TabsContent value="realta" className="mt-0">
-                <PanelRealta isAdmin={isAdmin} pending={myPendingRealities} onCreated={loadAll} />
-              </TabsContent>
-            )}
-
-            {canInviteMembers && (
-              <TabsContent value="membri" className="mt-0 space-y-8">
-                <section className="p-8 rounded-lg bg-card border border-border">
-                  <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <div>
-                      <h2 className="font-display text-xl font-semibold flex items-center gap-2">
-                        <UserPlus size={20} /> {isAdmin ? t("area.inviteMember") : t("area.inviteAuthor")}
-                      </h2>
-                      <p className="font-body text-sm text-muted-foreground mt-1">
-                        {isAdmin ? t("area.inviteDescAdmin") : t("area.inviteDescCoord")}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setShowInvite((s) => !s)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
-                    >
-                      <Plus size={14} /> {showInvite ? "Chiudi form" : "Nuovo membro"}
-                    </button>
-                  </div>
-                  {showInvite && (
-                    <div className="mt-6">
-                      <InviteMemberForm allowedRoles={isAdmin ? ["author", "coordinatore"] : ["author"]} />
-                    </div>
-                  )}
-                </section>
-                <AuthorsAffiliationPanel />
-              </TabsContent>
-            )}
-
-            {isStaff && (
-              <TabsContent value="moderazione" className="mt-0">
-                <PanelModerazione queue={moderationQueue} nameMap={modNameMap} onChanged={loadAll} />
-              </TabsContent>
-            )}
-
-            {isAdmin && (
-              <TabsContent value="admin" className="mt-0 space-y-8">
-                <SystemStatusPanel />
-                <AnalyticsDashboardPanel />
-                <UsersManagementPanel />
-                <EditorialEditionsPanel />
-
-                <ContactMessagesPanel />
-                <RealityReportsPanel />
-                <AuditLogPanel />
-              </TabsContent>
-            )}
-          </Tabs>
-        )}
-      </div>
-    </div>
+            <div className="px-4 md:px-8 py-8 max-w-7xl">{renderContent()}</div>
+          </main>
+        </div>
+      </SidebarProvider>
+    </>
   );
 };
 
