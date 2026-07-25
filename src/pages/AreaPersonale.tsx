@@ -408,6 +408,8 @@ const AreaPersonale = () => {
                 <SystemStatusPanel />
                 <AnalyticsDashboardPanel />
                 <UsersManagementPanel />
+                <EditorialEditionsPanel />
+
                 <ContactMessagesPanel />
                 <RealityReportsPanel />
                 <AuditLogPanel />
