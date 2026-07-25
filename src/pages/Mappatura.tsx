@@ -484,8 +484,9 @@ const Mappatura = () => {
           </p>
         )}
 
-
+        </div>
         <h2 className="sr-only">Risultati</h2>
+
         <p className="micro-label mb-6 text-foreground/70" aria-live="polite" aria-atomic="true">
           {t("map.results", { count: filtered.length })}
         </p>
