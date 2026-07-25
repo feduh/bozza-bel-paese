@@ -47,7 +47,9 @@ const Magazine = () => {
         .eq("status", "published")
         .order("published_at", { ascending: false });
       if (cancelled) return;
-      const list = (data as MagazinePost[]) ?? [];
+      const list = ((data as MagazinePost[]) ?? []).filter(
+        (p) => !parseCategories(p.category).includes("Editoriali")
+      );
       setPosts(list);
       const names = await fetchAuthorNames(list.map((p) => p.user_id));
       if (!cancelled) setNameMap(names);
