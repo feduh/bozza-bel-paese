@@ -60,8 +60,10 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
         .map((c) => c.trim())
         .includes(cat.toLowerCase());
     if (presetCategory) return posts.filter((p) => inCategory(p, presetCategory));
-    // Default "Articoli" view: esclude i podcast (hanno tab dedicata)
-    return posts.filter((p) => !inCategory(p, "Podcast"));
+    // Default "Articoli" view: esclude podcast ed editoriali (hanno tab dedicate)
+    return posts.filter(
+      (p) => !inCategory(p, "Podcast") && !inCategory(p, "Editoriali"),
+    );
   }, [posts, presetCategory]);
 
   const filtered = useMemo(() => {
