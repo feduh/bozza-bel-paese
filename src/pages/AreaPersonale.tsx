@@ -14,6 +14,9 @@ import {
   Mic,
   Plus,
   BookOpen,
+} from "lucide-react";
+
+
 
 
 import SEO from "@/components/SEO";
