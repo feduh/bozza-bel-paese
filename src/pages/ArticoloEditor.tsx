@@ -83,12 +83,13 @@ const ArticoloEditor = () => {
   const [copyrightResult, setCopyrightResult] = useState<{ status: "ok" | "blocked"; notes: string } | null>(null);
 
   const [form, setForm] = useState({
-    title: "",
-    category: !isEdit && categoryParam ? categoryParam : "",
+    title: !isEdit && titleParam ? titleParam : "",
+    category: !isEdit && (editionIdParam ? "Editoriali" : categoryParam ?? ""),
     excerpt: "",
     content: "",
     coverImageUrl: "",
   });
+
 
 
   const isStaff = useMemo(
