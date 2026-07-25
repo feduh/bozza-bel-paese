@@ -1,10 +1,58 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Bookmark } from "lucide-react";
+import { ArrowRight, Bookmark, Calendar, User } from "lucide-react";
 import SEO from "@/components/SEO";
+import { supabase } from "@/integrations/supabase/client";
+import SmartImage from "@/components/SmartImage";
+import { parseCategories } from "@/lib/articleCategories";
+import { fetchAuthorNames, resolveAuthorName } from "@/lib/authorNames";
+import { PostCardSkeletonGrid } from "@/components/skeletons";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+type EditorialPost = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  author_name: string;
+  user_id: string;
+  category: string;
+  cover_image_url: string | null;
+  published_at: string;
+};
+
 const Editoriale = () => {
+  const [posts, setPosts] = useState<EditorialPost[]>([]);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at")
+        .eq("status", "published")
+        .order("published_at", { ascending: false });
+      if (cancelled) return;
+      const list = ((data as EditorialPost[]) ?? []).filter((p) =>
+        parseCategories(p.category).includes("Editoriali")
+      );
+      setPosts(list);
+      const names = await fetchAuthorNames(list.map((p) => p.user_id));
+      if (!cancelled) {
+        setNameMap(names);
+        setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const [lead, ...rest] = posts;
+
   return (
     <div className="bg-foreground text-background py-16 md:py-24">
       <SEO
@@ -14,7 +62,7 @@ const Editoriale = () => {
       />
 
       <div className="editorial-container space-y-16">
-        {/* Header editoriale — visivamente distinto */}
+        {/* Header editoriale */}
         <header className="border-b-2 border-background/40 pb-12">
           <div className="flex items-center gap-3 mb-6">
             <Bookmark size={16} className="text-secondary" aria-hidden="true" />
@@ -35,28 +83,117 @@ const Editoriale = () => {
           </p>
         </header>
 
-        {/* Placeholder — tema dell'anno */}
-        <section className="border-2 border-background/40 p-8 md:p-14">
-          <div className="micro-label text-secondary mb-4">Tema dell'anno · in preparazione</div>
-          <h2
-            className="text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-6"
-            style={{ fontVariationSettings: "'wght' 700" }}
-          >
-            Ancora nulla da pubblicare qui.
-          </h2>
-          <p className="text-base md:text-lg text-background/80 max-w-2xl leading-relaxed mb-8">
-            Stiamo definendo il primo tema editoriale insieme al curatore dell'anno.
-            Torna presto: qui troverai una raccolta di saggi, interviste e materiali
-            che compongono la nostra <strong className="text-background">visione critica</strong> sulla scena
-            indipendente italiana.
-          </p>
-          <Link
-            to="/magazine"
-            className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
-          >
-            Vai al Magazine libero <ArrowRight size={14} />
-          </Link>
-        </section>
+        {loading ? (
+          <PostCardSkeletonGrid count={3} />
+        ) : posts.length === 0 ? (
+          <section className="border-2 border-background/40 p-8 md:p-14">
+            <div className="micro-label text-secondary mb-4">Tema dell'anno · in preparazione</div>
+            <h2
+              className="text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-6"
+              style={{ fontVariationSettings: "'wght' 700" }}
+            >
+              Ancora nulla da pubblicare qui.
+            </h2>
+            <p className="text-base md:text-lg text-background/80 max-w-2xl leading-relaxed mb-8">
+              Stiamo definendo il primo tema editoriale insieme al curatore dell'anno.
+              Torna presto: qui troverai una raccolta di saggi, interviste e materiali
+              che compongono la nostra <strong className="text-background">visione critica</strong> sulla scena
+              indipendente italiana.
+            </p>
+            <Link
+              to="/magazine"
+              className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
+            >
+              Vai al Magazine libero <ArrowRight size={14} />
+            </Link>
+          </section>
+        ) : (
+          <>
+            {/* Lead article */}
+            {lead && (
+              <Link
+                to={`/magazine/${lead.slug}`}
+                className="group block border-2 border-background/40 hover:border-secondary transition-colors"
+              >
+                <div className="grid md:grid-cols-2 gap-0">
+                  {lead.cover_image_url && (
+                    <div className="aspect-[4/3] md:aspect-auto overflow-hidden bg-background/5">
+                      <SmartImage
+                        src={lead.cover_image_url}
+                        alt={lead.title}
+                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                      />
+                    </div>
+                  )}
+                  <div className="p-8 md:p-12 flex flex-col justify-center">
+                    <div className="micro-label text-secondary mb-4">Lettura in evidenza</div>
+                    <h2
+                      className="text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-6 group-hover:text-secondary transition-colors"
+                      style={{ fontVariationSettings: "'wght' 700" }}
+                    >
+                      {lead.title}
+                    </h2>
+                    <p className="text-base md:text-lg text-background/80 leading-relaxed mb-6 line-clamp-3">
+                      {lead.excerpt}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4 text-xs font-mono uppercase tracking-widest text-background/60">
+                      <span className="flex items-center gap-2">
+                        <User size={12} />
+                        {resolveAuthorName(nameMap, lead.user_id, lead.author_name)}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <Calendar size={12} />
+                        {new Date(lead.published_at).toLocaleDateString("it-IT")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )}
+
+            {/* Rest */}
+            {rest.length > 0 && (
+              <section className="grid md:grid-cols-2 gap-8">
+                {rest.map((post) => (
+                  <Link
+                    key={post.id}
+                    to={`/magazine/${post.slug}`}
+                    className="group block border-2 border-background/40 hover:border-secondary transition-colors p-6 md:p-8"
+                  >
+                    {post.cover_image_url && (
+                      <div className="aspect-[16/9] overflow-hidden bg-background/5 mb-6">
+                        <SmartImage
+                          src={post.cover_image_url}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        />
+                      </div>
+                    )}
+                    <h3
+                      className="text-2xl md:text-3xl uppercase leading-tight tracking-tight mb-4 group-hover:text-secondary transition-colors"
+                      style={{ fontVariationSettings: "'wght' 700" }}
+                    >
+                      {post.title}
+                    </h3>
+                    <p className="text-sm md:text-base text-background/80 leading-relaxed mb-4 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4 text-xs font-mono uppercase tracking-widest text-background/60">
+                      <span className="flex items-center gap-2">
+                        <User size={12} />
+                        {resolveAuthorName(nameMap, post.user_id, post.author_name)}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <Calendar size={12} />
+                        {new Date(post.published_at).toLocaleDateString("it-IT")}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </section>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
