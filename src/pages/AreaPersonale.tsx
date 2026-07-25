@@ -103,6 +103,13 @@ const AreaPersonale = () => {
     const rs = (roles ?? []).map((r: { role: string }) => r.role);
     setMyRoles(rs);
 
+    const { count: curatorCount } = await supabase
+      .from("editorial_editions")
+      .select("id", { count: "exact", head: true })
+      .eq("curator_user_id", user.id);
+    setIsCurator((curatorCount ?? 0) > 0);
+
+
     const { data: mine } = await supabase
       .from("blog_posts")
       .select("id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id")
