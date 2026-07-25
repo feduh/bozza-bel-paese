@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, List, Map, ArrowRight, X, Navigation, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -48,6 +48,7 @@ const Mappatura = () => {
 
   const [realities, setRealities] = useState<Reality[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [view, setView] = useState<ViewMode>(() => {
     const v = searchParams.get("vista");
     return v === "list" ? v : "map";
@@ -68,10 +69,14 @@ const Mappatura = () => {
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState<"idle" | "loading" | "denied" | "error">("idle");
 
-  useEffect(() => {
-    const fetchRealities = async () => {
-      const { data: realitiesData } = await supabase.from("realities").select("*");
-      const { data: tagsData } = await supabase.from("reality_tags").select("*");
+  const fetchRealities = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const { data: realitiesData, error: realitiesError } = await supabase.from("realities").select("*");
+      const { data: tagsData, error: tagsError } = await supabase.from("reality_tags").select("*");
+
+      if (realitiesError || tagsError) throw realitiesError || tagsError;
 
       if (realitiesData) {
         const mapped = realitiesData.map((r) => {
@@ -85,10 +90,17 @@ const Mappatura = () => {
         });
         setRealities(mapped);
       }
+    } catch (err) {
+      console.error("Error fetching realities:", err);
+      setError(true);
+    } finally {
       setLoading(false);
-    };
-    fetchRealities();
+    }
   }, []);
+
+  useEffect(() => {
+    fetchRealities();
+  }, [fetchRealities]);
 
   // Sync state → URL (debounced for search)
   useEffect(() => {
@@ -250,6 +262,21 @@ const Mappatura = () => {
         <Skeleton className="h-12 w-2/3 mb-4" />
         <Skeleton className="h-4 w-1/2 mb-10" />
         <Skeleton className="h-[600px] w-full rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-20 editorial-container text-center">
+        <h2 className="editorial-heading mb-4 text-primary">Si è verificato un errore</h2>
+        <p className="editorial-body mb-8">Non è stato possibile caricare le realtà. Per favore, riprova.</p>
+        <button
+          onClick={() => fetchRealities()}
+          className="px-6 py-3 brutalist-border bg-background hover:bg-foreground hover:text-background font-bold uppercase tracking-widest transition-colors text-xs"
+        >
+          Riprova
+        </button>
       </div>
     );
   }
