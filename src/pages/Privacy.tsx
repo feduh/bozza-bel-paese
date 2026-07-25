@@ -44,7 +44,7 @@ const Privacy = () => {
             </ul>
           </section>
           <section><h2 className="font-display text-xl font-semibold mb-3">4. Base giuridica</h2>
-            <p>Il trattamento si fonda su: consenso esplicito (Art. 6.1.a GDPR) per la visibilità pubblica del profilo e per l'iscrizione alla newsletter; esecuzione di un rapporto di collaborazione (Art. 6.1.b GDPR) per la gestione degli account dei membri; legittimo interesse (Art. 6.1.f GDPR) per rispondere alle richieste del modulo contatti e per la sicurezza del servizio.</p>
+            <p>Il trattamento si fonda su: consenso esplicito (Art. 6.1.a GDPR) per la visibilità pubblica del profilo; esecuzione di un rapporto di collaborazione (Art. 6.1.b GDPR) per la gestione degli account dei membri; legittimo interesse (Art. 6.1.f GDPR) per rispondere alle richieste del modulo contatti e per la sicurezza del servizio.</p>
           </section>
           <section><h2 className="font-display text-xl font-semibold mb-3">5. Conservazione dei dati</h2>
             <p>I messaggi del modulo contatti vengono conservati per il tempo necessario a gestire la richiesta e, al massimo, per 24 mesi. I dati degli account vengono conservati finché l'account è attivo; alla cancellazione vengono rimossi entro 30 giorni, salvo obblighi di legge. Gli audit log delle azioni amministrative sono conservati per 12 mesi a fini di sicurezza.</p>
