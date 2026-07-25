@@ -212,7 +212,12 @@ const AreaPersonale = () => {
       { value: "calendario", label: t("area.tabs.calendar"), icon: CalendarClock, badge: scheduledItems.length || undefined },
       { value: "articoli", label: t("area.tabs.articles"), icon: FileText, badge: articleCount || undefined },
       { value: "preferiti", label: t("area.tabs.favorites"), icon: Bookmark },
+      { value: "editoriale", label: "Editoriale", icon: BookOpen },
     ];
+    if (isCurator) {
+      tabList.push({ value: "editoriale-curatela", label: "Curatela", icon: BookOpen });
+    }
+
     if (isStaff) {
       tabList.push({ value: "podcast", label: "Podcast", icon: Mic, badge: podcastCount || undefined });
     }
