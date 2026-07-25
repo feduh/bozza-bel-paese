@@ -617,7 +617,7 @@ const DroneHero = () => {
                 </div>
                 {(w.city || w.region) && (
                   <div
-                    className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-background/60"
+                    className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-background/85"
                     style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
                   >
                     {[w.city, w.region].filter(Boolean).join(" · ")}
@@ -655,7 +655,7 @@ const DroneHero = () => {
           <br />
           d'Italia
         </h1>
-        <p className="font-mono text-[11px] md:text-xs uppercase tracking-[0.15em] text-background/70 max-w-md">
+        <p className="font-mono text-[11px] md:text-xs uppercase tracking-[0.15em] text-background/90 max-w-md">
           Sorvoliamo la penisola, scena per scena.
         </p>
         <div className="flex flex-wrap gap-3 pointer-events-auto pt-2">
