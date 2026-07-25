@@ -32,6 +32,7 @@ export type AreaTabValue =
   | "podcast"
   | "preferiti"
   | "editoriale"
+  | "editoriale-articoli"
   | "editoriale-curatela"
   | "realta"
   | "membri"
@@ -85,6 +86,12 @@ const AreaSidebar = ({
 
   const editorial: Item[] = [
     { value: "editoriale", label: "Candidature", icon: BookOpen, badge: badges.editoriale },
+    {
+      value: "editoriale-articoli",
+      label: "Articoli editoriali",
+      icon: FileText,
+      badge: badges["editoriale-articoli"],
+    },
   ];
   if (isCurator)
     editorial.push({
