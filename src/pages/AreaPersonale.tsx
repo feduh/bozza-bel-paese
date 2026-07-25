@@ -364,20 +364,19 @@ const AreaPersonale = () => {
       case "preferiti":
         return <PanelPreferiti userId={user.id} />;
       case "editoriale":
+        return <PanelEditoriale userId={user.id} />;
+      case "editoriale-articoli":
         return (
-          <div className="space-y-8">
-            <PanelEditoriale userId={user.id} />
-            <PanelArticoli
-              posts={posts}
-              isStaff={isStaff}
-              onChanged={loadAll}
-              presetCategory="Editoriali"
-              title="I miei articoli editoriali"
-              icon={BookOpen}
-              newLabel="Nuovo articolo editoriale"
-              newHref="/area-personale/articolo/nuovo?category=Editoriali"
-            />
-          </div>
+          <PanelArticoli
+            posts={posts}
+            isStaff={isStaff}
+            onChanged={loadAll}
+            presetCategory="Editoriali"
+            title="I miei articoli editoriali"
+            icon={BookOpen}
+            newLabel="Nuovo articolo editoriale"
+            newHref="/area-personale/articolo/nuovo?category=Editoriali"
+          />
         );
       case "editoriale-curatela":
         return isCurator ? <PanelEditorialeCuratela userId={user.id} /> : null;
