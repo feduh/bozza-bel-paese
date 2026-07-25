@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
 import { CalendarClock } from "lucide-react";
 
+export type ScheduledKind = "editoriale" | "podcast" | "magazine";
+
 export type ScheduledItem = {
   id: string;
   title: string;
   scheduled_for: string;
   author_name?: string;
   isMine?: boolean;
+  kind?: ScheduledKind;
+  category?: string | null;
 };
 
 type Props = {
