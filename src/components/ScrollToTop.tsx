@@ -20,14 +20,19 @@ const ScrollToTop = () => {
   }, []);
 
   useEffect(() => {
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const behavior: ScrollBehavior = prefersReducedMotion ? "auto" : "smooth";
+
     if (hash) {
       const el = document.getElementById(hash.slice(1));
       if (el) {
-        el.scrollIntoView({ behavior: "auto", block: "start" });
+        el.scrollIntoView({ behavior, block: "start" });
         return;
       }
     }
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior });
   }, [pathname, hash, search]);
 
   return null;
