@@ -346,7 +346,17 @@ const Mappatura = () => {
             {geoStatus === "loading" ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
             {userPos ? t("map.nearYou") : t("map.nearMe")}
           </button>
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((s) => !s)}
+            aria-expanded={filtersOpen}
+            className="md:hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 brutalist-border text-xs uppercase tracking-[0.15em] font-bold transition-colors bg-background hover:bg-foreground hover:text-background"
+          >
+            <ChevronDown size={14} className={`transition-transform ${filtersOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+            Filtri
+          </button>
         </div>
+
 
         {/* Riga 2: chip categorie multi-selezione (con pallino colore integrato, fanno anche da legenda) */}
         <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Tipologia di realtà">
