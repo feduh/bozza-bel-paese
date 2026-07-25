@@ -382,7 +382,9 @@ const ArticoloEditor = () => {
       if (editionIdParam) payload.editorial_edition_id = editionIdParam;
       const { data: inserted, error } = await supabase
         .from("blog_posts")
-        .insert(payload)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert(payload as any)
+
         .select("id")
         .maybeSingle();
       setSubmitting(false);
