@@ -193,6 +193,10 @@ const DroneHero = () => {
     if (isTouchDevice) setHovering(true);
   }, [isTouchDevice]);
 
+  useEffect(() => {
+    if (reducedMotion) setActiveIdx(0);
+  }, [reducedMotion]);
+
   const applyMapTransform = () => {
     const g = mapGroupRef.current;
     if (!g) return;
@@ -470,7 +474,7 @@ const DroneHero = () => {
   const fit0 = Math.min(panel.h / VB_H, panel.w / VB_W);
   const scale0 = fit0 * ZOOM;
   const effectiveScale = fit0 * (isTouchDevice ? ZOOM_MOBILE : ZOOM);
-  const showRocket = hovering const showRocket = hovering && !(reducedMotion && isTouchDevice);const showRocket = hovering && !(reducedMotion && isTouchDevice); !reducedMotion;
+  const showRocket = hovering && !reducedMotion;
 
   return (
     <div
