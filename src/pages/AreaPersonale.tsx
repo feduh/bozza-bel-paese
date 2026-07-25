@@ -235,7 +235,7 @@ const AreaPersonale = () => {
     }
     return tabList;
 
-  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, articleCount, podcastCount, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
+  }, [canProposeRealities, canInviteMembers, isStaff, isAdmin, isCurator, articleCount, podcastCount, scheduledItems.length, myPendingRealities.length, moderationQueue.length, t]);
 
   const tabFromUrl = searchParams.get("tab");
   const activeTab = tabs.some((t) => t.value === tabFromUrl) ? (tabFromUrl as string) : "profilo";
