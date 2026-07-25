@@ -28,7 +28,7 @@ const Privacy = () => {
               <li><strong>Account coordinatori/autori</strong> (su invito): email, nome visualizzato, biografia, foto profilo, ruoli, social, città e dati professionali che decidi di condividere.</li>
               <li><strong>Segnalazione realtà</strong>: dati della realtà segnalata, indirizzo, coordinate, descrizione ed eventuali tuoi recapiti se forniti.</li>
               <li><strong>Contenuti editoriali</strong>: testi, immagini e metadati degli articoli che pubblichi come autore.</li>
-              <li><strong>Newsletter</strong>: indirizzo email e stato di iscrizione (solo se ti iscrivi esplicitamente).</li>
+              
               <li><strong>Dati tecnici minimi</strong>: log di accesso al backend e audit log delle azioni amministrative, strettamente necessari alla sicurezza del servizio.</li>
             </ul>
             <p className="mt-3">Non utilizziamo cookie di profilazione né strumenti di tracciamento pubblicitario di terze parti. Il sito è disponibile esclusivamente in lingua italiana.</p>
