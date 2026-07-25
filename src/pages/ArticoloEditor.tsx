@@ -364,7 +364,7 @@ const ArticoloEditor = () => {
       }
     } else {
       const slug = `${slugify(parsed.data.title)}-${Math.random().toString(36).slice(2, 8)}`;
-      const payload = {
+      const payload: Record<string, unknown> = {
         title: parsed.data.title,
         category: parsed.data.category,
         excerpt: parsed.data.excerpt,
@@ -379,13 +379,25 @@ const ArticoloEditor = () => {
         published_at: scheduledIso ?? new Date().toISOString(),
         ...copyrightPayloadForDb,
       };
-      const { error } = await supabase.from("blog_posts").insert(payload);
+      if (editionIdParam) payload.editorial_edition_id = editionIdParam;
+      const { data: inserted, error } = await supabase
+        .from("blog_posts")
+        .insert(payload)
+        .select("id")
+        .maybeSingle();
       setSubmitting(false);
       if (error) {
         setGlobalError(error.message);
         return;
       }
+      if (submissionIdParam && inserted?.id) {
+        await supabase
+          .from("editorial_submissions")
+          .update({ status: "converted", converted_post_id: inserted.id })
+          .eq("id", submissionIdParam);
+      }
     }
+
 
     navigate("/area-personale");
   };
