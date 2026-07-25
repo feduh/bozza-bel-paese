@@ -1,36 +1,42 @@
 import { Link } from "react-router-dom";
-import { Radio, Mic, ArrowRight, PlayCircle, Headphones } from "lucide-react";
+import { Radio, Mic, ArrowRight, Headphones } from "lucide-react";
 import SEO from "@/components/SEO";
+import coverNomadi from "@/assets/podcast/voci-spazi-nomadi.jpg";
+import coverSud from "@/assets/podcast/mappe-sonore-sud.jpg";
+import coverArchivio from "@/assets/podcast/archivio-realta-scomparse.jpg";
 
-// Prima versione: due esempi finti per prototipare la sezione podcast/video.
+// Esempi editoriali (contenuti non ancora prodotti) — copertine generate ad hoc,
+// nessun materiale di terzi.
 const examples = [
   {
-    kind: "video" as const,
-    slug: "collettivo-senza-sede",
-    title: "Intervista a un collettivo che non ha una sede",
-    author: "Il Bel Paese",
-    duration: "12'40\"",
-    cover: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-    tag: "Video",
+    slug: "voci-spazi-nomadi",
+    title: "Voci dagli spazi nomadi",
+    author: "Il Bel Paese × partner radio",
+    duration: "28'40\"",
+    cover: coverNomadi,
   },
   {
-    kind: "podcast" as const,
-    slug: "radio-indipendenti",
-    title: "Radio indipendenti: geografie del suono",
-    author: "Ospite: nome radio partner",
-    duration: "34'12\"",
-    cover: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&auto=format&fit=crop",
-    tag: "Podcast",
+    slug: "mappe-sonore-sud",
+    title: "Mappe sonore del Sud",
+    author: "Il Bel Paese × partner radio",
+    duration: "41'05\"",
+    cover: coverSud,
+  },
+  {
+    slug: "archivio-realta-scomparse",
+    title: "Archivio delle realtà scomparse",
+    author: "Il Bel Paese × partner radio",
+    duration: "35'22\"",
+    cover: coverArchivio,
   },
 ];
-
 
 const LaVostraVoce = () => {
   return (
     <div className="bg-background py-16 md:py-20">
       <SEO
         title="La vostra voce — Il Bel Paese"
-        description="Interviste, video e podcast della scena indipendente italiana, in collaborazione con radio e piattaforme podcast indipendenti."
+        description="Interviste, testimonianze e podcast della scena indipendente italiana, in collaborazione con radio e piattaforme podcast indipendenti."
         canonicalPath="/la-vostra-voce"
       />
       <div className="editorial-container space-y-12 md:space-y-16">
@@ -39,64 +45,61 @@ const LaVostraVoce = () => {
             La <span className="text-primary">vostra</span> voce
           </h1>
           <p className="editorial-body text-foreground/80 max-w-3xl">
-            Uno spazio per interviste, testimonianze orali e video documentari della scena
+            Uno spazio per interviste, testimonianze orali e racconti audio della scena
             indipendente italiana. In collaborazione con radio e piattaforme podcast
             altrettanto indipendenti.
           </p>
         </header>
 
-        {/* Esempi finti — prototipo card */}
+        {/* Esempi editoriali — copertine originali, nessun contenuto di terzi */}
         <section aria-labelledby="esempi-heading">
           <div className="flex items-end justify-between mb-6 border-b-2 border-foreground pb-4">
             <h2 id="esempi-heading" className="editorial-subheading">
               <span className="text-primary">Anteprima</span> — come sarà
             </h2>
-            <span className="micro-label text-foreground/60">Esempi</span>
+            <span className="micro-label text-foreground/60">Esempi editoriali</span>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {examples.map((e) => {
-              const Icon = e.kind === "video" ? PlayCircle : Headphones;
-              return (
-                <Link
-                  key={e.title}
-                  to={`/racconti/podcast/${e.slug}`}
-                  className="brutalist-card overflow-hidden group block"
-                >
-                  <div className="relative aspect-video bg-muted overflow-hidden border-b-2 border-foreground">
-                    <img
-                      src={e.cover}
-                      alt=""
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover"
-                      onError={(ev) => {
-                        (ev.currentTarget as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
-                      <Icon size={56} className="text-background drop-shadow-lg" aria-hidden="true" />
-                    </div>
-                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
-                      {e.tag}
-                    </span>
-                    <span className="absolute bottom-3 right-3 micro-label bg-foreground text-background px-2 py-0.5">
-                      {e.duration}
-                    </span>
+          <div className="grid md:grid-cols-3 gap-6">
+            {examples.map((e) => (
+              <Link
+                key={e.slug}
+                to={`/racconti/podcast/${e.slug}`}
+                className="brutalist-card overflow-hidden group block"
+              >
+                <div className="relative aspect-video bg-muted overflow-hidden border-b-2 border-foreground">
+                  <img
+                    src={e.cover}
+                    alt=""
+                    loading="lazy"
+                    width={1280}
+                    height={720}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/10 group-hover:bg-foreground/25 transition-colors">
+                    <Headphones size={52} className="text-background drop-shadow-lg" aria-hidden="true" />
                   </div>
-                  <div className="p-5 space-y-2">
-                    <h3
-                      className="text-lg leading-tight tracking-tight"
-                      style={{ fontVariationSettings: "'wght' 600" }}
-                    >
-                      {e.title}
-                    </h3>
-                    <p className="text-xs text-foreground/60">{e.author}</p>
-                  </div>
-                </Link>
-              );
-            })}
+                  <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
+                    Podcast
+                  </span>
+                  <span className="absolute bottom-3 right-3 micro-label bg-foreground text-background px-2 py-0.5">
+                    {e.duration}
+                  </span>
+                </div>
+                <div className="p-5 space-y-2">
+                  <h3
+                    className="text-lg leading-tight tracking-tight"
+                    style={{ fontVariationSettings: "'wght' 600" }}
+                  >
+                    {e.title}
+                  </h3>
+                  <p className="text-xs text-foreground/60">{e.author}</p>
+                </div>
+              </Link>
+            ))}
           </div>
           <p className="mt-4 text-xs text-foreground/60 font-body italic">
-            Questi sono esempi finti per definire il layout: non riproducono contenuti reali.
+            Esempi editoriali: episodi non ancora prodotti. Le copertine sono illustrazioni
+            originali realizzate per prototipare il layout.
           </p>
         </section>
 
