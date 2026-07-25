@@ -35,6 +35,10 @@ const ArticoloEditor = () => {
   const [params] = useSearchParams();
   const replyToParam = params.get("reply_to");
   const categoryParam = params.get("category");
+  const editionIdParam = params.get("edition");
+  const submissionIdParam = params.get("submission");
+  const titleParam = params.get("title");
+
 
 
   const isEdit = !!id;
