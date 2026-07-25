@@ -61,6 +61,7 @@ export type Database = {
           copyright_declaration: Json | null
           cover_image_url: string | null
           created_at: string
+          editorial_edition_id: string | null
           excerpt: string
           id: string
           podcast_duration: string | null
@@ -85,6 +86,7 @@ export type Database = {
           copyright_declaration?: Json | null
           cover_image_url?: string | null
           created_at?: string
+          editorial_edition_id?: string | null
           excerpt: string
           id?: string
           podcast_duration?: string | null
@@ -109,6 +111,7 @@ export type Database = {
           copyright_declaration?: Json | null
           cover_image_url?: string | null
           created_at?: string
+          editorial_edition_id?: string | null
           excerpt?: string
           id?: string
           podcast_duration?: string | null
@@ -124,6 +127,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "blog_posts_editorial_edition_id_fkey"
+            columns: ["editorial_edition_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_editions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "blog_posts_reply_to_id_fkey"
             columns: ["reply_to_id"]
@@ -168,6 +178,108 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      editorial_editions: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          curator_user_id: string | null
+          id: string
+          status: Database["public"]["Enums"]["editorial_edition_status"]
+          submissions_close_at: string | null
+          submissions_open_at: string | null
+          theme_description: string | null
+          title: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          curator_user_id?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["editorial_edition_status"]
+          submissions_close_at?: string | null
+          submissions_open_at?: string | null
+          theme_description?: string | null
+          title: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          curator_user_id?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["editorial_edition_status"]
+          submissions_close_at?: string | null
+          submissions_open_at?: string | null
+          theme_description?: string | null
+          title?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      editorial_submissions: {
+        Row: {
+          abstract: string
+          author_user_id: string
+          converted_post_id: string | null
+          created_at: string
+          curator_notes: string | null
+          edition_id: string
+          id: string
+          outline: string | null
+          references_text: string | null
+          status: Database["public"]["Enums"]["editorial_submission_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          abstract: string
+          author_user_id: string
+          converted_post_id?: string | null
+          created_at?: string
+          curator_notes?: string | null
+          edition_id: string
+          id?: string
+          outline?: string | null
+          references_text?: string | null
+          status?: Database["public"]["Enums"]["editorial_submission_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          abstract?: string
+          author_user_id?: string
+          converted_post_id?: string | null
+          created_at?: string
+          curator_notes?: string | null
+          edition_id?: string
+          id?: string
+          outline?: string | null
+          references_text?: string | null
+          status?: Database["public"]["Enums"]["editorial_submission_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_submissions_converted_post_id_fkey"
+            columns: ["converted_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_submissions_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_editions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       newsletter_deliveries: {
         Row: {
@@ -736,11 +848,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_curator_of_edition: { Args: { _edition_id: string }; Returns: boolean }
       newsletter_enqueue_issue: { Args: { _issue_id: string }; Returns: number }
       publish_scheduled_posts: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "author" | "coordinatore"
+      editorial_edition_status:
+        | "draft"
+        | "open_submissions"
+        | "closed_submissions"
+        | "published"
+        | "archived"
+      editorial_submission_status:
+        | "pending"
+        | "accepted"
+        | "rejected"
+        | "withdrawn"
+        | "converted"
       reality_type: "nomade" | "con-sede" | "scomparsa"
     }
     CompositeTypes: {
@@ -870,6 +995,20 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user", "author", "coordinatore"],
+      editorial_edition_status: [
+        "draft",
+        "open_submissions",
+        "closed_submissions",
+        "published",
+        "archived",
+      ],
+      editorial_submission_status: [
+        "pending",
+        "accepted",
+        "rejected",
+        "withdrawn",
+        "converted",
+      ],
       reality_type: ["nomade", "con-sede", "scomparsa"],
     },
   },
