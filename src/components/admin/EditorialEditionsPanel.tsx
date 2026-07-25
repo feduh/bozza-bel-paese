@@ -51,7 +51,7 @@ const EditorialEditionsPanel = () => {
     setLoading(true);
     const [{ data: eds }, { data: rolesData }] = await Promise.all([
       supabase.from("editorial_editions").select("*").order("year", { ascending: false }),
-      supabase.from("user_roles").select("user_id").in("role", ["admin", "coordinatore"]),
+      supabase.from("user_roles").select("user_id").in("role", ["admin", "coordinatore", "author"]),
     ]);
     setEditions((eds as Edition[]) ?? []);
     const ids = [...new Set((rolesData ?? []).map((r: { user_id: string }) => r.user_id))];
