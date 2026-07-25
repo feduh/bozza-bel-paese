@@ -156,6 +156,13 @@ const AreaPersonale = () => {
       setAdminCounts({ messages: msgCount ?? 0, reports: repCount ?? 0 });
     }
 
+    const kindOf = (cat?: string | null): "editoriale" | "podcast" | "magazine" => {
+      const c = (cat || "").toLowerCase();
+      if (c.includes("editorial")) return "editoriale";
+      if (c.includes("podcast")) return "podcast";
+      return "magazine";
+    };
+
     const scheduled: ScheduledItem[] = [];
     const ownScheduled = ((mine as AreaPost[]) ?? []).filter(
       (p) => p.status === "scheduled" && p.scheduled_for,
@@ -166,6 +173,8 @@ const AreaPersonale = () => {
         title: p.title,
         scheduled_for: p.scheduled_for as string,
         isMine: true,
+        category: p.category ?? null,
+        kind: kindOf(p.category),
       });
     }
     if (rs.includes("admin")) {
@@ -179,7 +188,7 @@ const AreaPersonale = () => {
       if (coordIds.length > 0) {
         const { data: coordScheduled } = await supabase
           .from("blog_posts")
-          .select("id, title, scheduled_for, author_name, user_id")
+          .select("id, title, category, scheduled_for, author_name, user_id")
           .eq("status", "scheduled")
           .in("user_id", coordIds);
         const names = await fetchAuthorNames(
@@ -188,6 +197,7 @@ const AreaPersonale = () => {
         for (const p of (coordScheduled ?? []) as Array<{
           id: string;
           title: string;
+          category: string | null;
           scheduled_for: string;
           author_name: string;
           user_id: string;
@@ -199,6 +209,8 @@ const AreaPersonale = () => {
             scheduled_for: p.scheduled_for,
             author_name: resolveAuthorName(names, p.user_id, p.author_name),
             isMine: false,
+            category: p.category ?? null,
+            kind: kindOf(p.category),
           });
         }
       }
