@@ -6,7 +6,9 @@ import SEO from "@/components/SEO";
 import CountUp from "@/components/CountUp";
 import DroneHero from "@/components/home/DroneHero";
 import Marquee from "@/components/home/Marquee";
+import FeaturedSection from "@/components/home/FeaturedSection";
 import { supabase } from "@/integrations/supabase/client";
+
 
 const Index = () => {
   const { t } = useTranslation();
