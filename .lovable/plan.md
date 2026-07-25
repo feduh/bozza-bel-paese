@@ -1,32 +1,36 @@
 ## Obiettivo
-1. Far funzionare l'apertura del menu dell'area personale sui tablet (768–1023px).
-2. Rendere visivamente distinguibile il trigger dell'area personale dall'hamburger globale della navbar.
+Le pagine `/la-vostra-voce` e `/racconti/podcast/:slug` mostrano oggi due esempi placeholder con problemi di copyright:
+- copertina 1 = miniatura YouTube ("dQw4w9WgXcQ", Rick Astley) — copyright altrui
+- copertina 2 = foto Unsplash caricata da URL esterno — licenza permissiva ma dipendenza da CDN esterna e volto riconoscibile
 
-## Analisi del bug
-- `useIsMobile` (`src/hooks/use-mobile.tsx`) usa breakpoint `< 768px`. A partire da 768px `isMobile=false`, quindi `toggleSidebar` non apre lo `Sheet` mobile ma agisce sulla sidebar desktop.
-- In `src/pages/AreaPersonale.tsx` il `SidebarTrigger` ha `className="md:hidden"`, quindi da 768px in su il pulsante scompare del tutto. Risultato: su tablet non c'è modo di aprire il menu.
-- Il trigger usa `<PanelLeft />`, un'icona simile all'hamburger globale → nessuna distinzione visiva.
+Vanno sostituiti con esempi coerenti col progetto, credibili come "anteprima", e con immagini generate da noi (nessun copyright terzo, nessun hotlink).
 
-## Modifiche
+## Cosa cambia
 
-### 1. `src/pages/AreaPersonale.tsx`
-- Cambiare la classe del `SidebarTrigger` da `md:hidden` a `lg:hidden` così resta visibile su mobile e tablet.
-- Nascondere `AreaSidebar` (desktop) fino a `lg`: rendere il contenitore `hidden lg:block` (o equivalente). Su tablet il menu verrà mostrato solo tramite `Sheet`.
-- Stilizzare il pulsante trigger come pill riconoscibile: bordo/background `bg-sidebar-accent`, padding aumentato, gap con label testuale "Menu area" accanto all'icona.
+### 1. Nuovi esempi (3, tutti "podcast" audio)
+Rimuoviamo la card "video" (non abbiamo ancora nulla di video e crea aspettative fuori scopo) e proponiamo 3 esempi audio ispirati a temi reali del sito — spazi indipendenti, geografie artistiche, realtà scomparse:
 
-### 2. `src/components/area/AreaSidebar.tsx` (o override locale nel trigger in AreaPersonale)
-- Sostituire l'icona di default del `SidebarTrigger`: passare children personalizzati (es. `<LayoutDashboard />` + testo "Menu area") invece di affidarsi al `PanelLeft` di default. Se `SidebarTrigger` non accetta children, wrappare in un `Button` custom che invoca `useSidebar().toggleSidebar()`.
+- `voci-spazi-nomadi` — "Voci dagli spazi nomadi" — dialogo con un collettivo senza sede fissa, durata `28'40"`
+- `mappe-sonore-sud` — "Mappe sonore del Sud" — le scene indipendenti fuori dai grandi centri, `41'05"`
+- `archivio-realta-scomparse` — "Archivio delle realtà scomparse" — memoria orale di spazi chiusi, `35'22"`
 
-### 3. Breakpoint sidebar Sheet
-- Approccio scelto: **non** modificare `useIsMobile` globale (usato altrove). In `src/components/ui/sidebar.tsx` la logica `if (isMobile)` renderizza lo `Sheet`. Per estenderla ai tablet nell'area personale senza toccare l'hook globale, opzioni valutate durante l'implementazione:
-  - (a) Portare il breakpoint a 1024 solo se una verifica rapida degli altri usi non evidenzia regressioni;
-  - (b) In alternativa, forzare l'apertura via `openMobile` controllato dal componente di pagina, oppure introdurre un secondo hook `useIsBelowLg` usato dal solo layout area personale.
-- La scelta finale sarà (b) se (a) rischia regressioni; verrà decisa leggendo gli usi di `useIsMobile` prima di scrivere la modifica.
+Autore mostrato: "Il Bel Paese × [partner da definire]" — chiarisce che le collaborazioni radio non sono ancora attive.
 
-## Cosa NON tocco
-- Navbar globale del sito, `DroneHero.tsx`, `ROTATING_WORDS`, footer.
-- Comportamento desktop (≥1024px): resta invariato con sidebar fissa laterale.
+### 2. Copertine generate
+Tre immagini JPG generate con `imagegen`, coerenti col linguaggio brutalist / editoriale del sito (palette carta, nero, primary), salvate in `src/assets/podcast/`:
+- `voci-spazi-nomadi.jpg`
+- `mappe-sonore-sud.jpg`
+- `archivio-realta-scomparse.jpg`
 
-## Verifica
-- Preview a 768px e 1024px: il pulsante "Menu area" è visibile su tablet, apre lo `Sheet` correttamente e si chiude cliccando fuori.
-- Icona + label chiaramente distinta dall'hamburger della navbar globale.
+Stile: illustrazioni tipografiche/astratte con onda sonora o simboli editoriali — nessun volto, nessun logo di terzi.
+
+### 3. File toccati
+- `src/pages/LaVostraVoce.tsx` — nuovo array `examples` (3 podcast), import delle 3 copertine, rimozione dell'icona `PlayCircle` (resta solo `Headphones`), aggiornamento della griglia a `md:grid-cols-3`, disclaimer "Esempi editoriali: contenuti non ancora prodotti".
+- `src/pages/PodcastEpisodio.tsx` — nuovo dizionario `episodi` con le 3 voci sopra, `kind` sempre `"podcast"`, description più concreta (2-3 frasi), stesse copertine importate.
+- (nessuna modifica al DB, al routing o all'editor podcast staff)
+
+## Dettagli tecnici
+- Import delle copertine come asset Vite (`import cover from "@/assets/podcast/..."`), così Vite le fingerprintizza e non serve `onError` fallback.
+- Rimuoviamo gli URL esterni: niente `i.ytimg.com` né `images.unsplash.com`.
+- Manteniamo la tipografia, i `brutalist-card`, i micro-label e la CTA "Stiamo cercando alleati" invariati.
+- Il route `/racconti/podcast/:slug` continua a servire il vecchio slug `radio-indipendenti` e `collettivo-senza-sede`? No: sono placeholder senza traffico esterno, li sostituiamo integralmente coi 3 nuovi slug.

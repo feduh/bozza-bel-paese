@@ -1,34 +1,41 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, PlayCircle, Headphones } from "lucide-react";
+import { ArrowLeft, Headphones } from "lucide-react";
 import SEO from "@/components/SEO";
+import coverNomadi from "@/assets/podcast/voci-spazi-nomadi.jpg";
+import coverSud from "@/assets/podcast/mappe-sonore-sud.jpg";
+import coverArchivio from "@/assets/podcast/archivio-realta-scomparse.jpg";
 
-// Placeholder di prototipo — nessun contenuto reale.
+// Esempi editoriali per prototipare la pagina episodio — nessun contenuto reale.
 const episodi: Record<string, {
-  kind: "video" | "podcast";
   title: string;
   author: string;
   duration: string;
   cover: string;
   description: string;
 }> = {
-  "collettivo-senza-sede": {
-    kind: "video",
-    title: "Intervista a un collettivo che non ha una sede",
-    author: "Il Bel Paese",
-    duration: "12'40\"",
-    cover: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+  "voci-spazi-nomadi": {
+    title: "Voci dagli spazi nomadi",
+    author: "Il Bel Paese × partner radio",
+    duration: "28'40\"",
+    cover: coverNomadi,
     description:
-      "Una conversazione con un collettivo nomade che da anni attraversa la penisola senza uno spazio fisso: come si costruisce comunità quando la casa cambia ogni mese?",
+      "Un dialogo con chi fa cultura senza una sede fissa: collettivi che occupano temporaneamente scuole, capannoni, cortili, e che ripartono ogni volta da zero. Come si costruisce comunità quando la casa cambia ogni mese? Quali strumenti restano, quali si perdono, e cosa possiamo imparare da una forma di lavoro artistico che rifiuta la stanzialità come unica misura di serietà.",
   },
-  "radio-indipendenti": {
-    kind: "podcast",
-    title: "Radio indipendenti: geografie del suono",
-    author: "Ospite: nome radio partner",
-    duration: "34'12\"",
-    cover:
-      "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=1200&auto=format&fit=crop",
+  "mappe-sonore-sud": {
+    title: "Mappe sonore del Sud",
+    author: "Il Bel Paese × partner radio",
+    duration: "41'05\"",
+    cover: coverSud,
     description:
-      "Un viaggio attraverso le radio libere italiane che tengono viva la scena musicale e artistica indipendente, dalle antenne di quartiere agli stream notturni.",
+      "Un viaggio d'ascolto attraverso le scene indipendenti che tengono viva la ricerca artistica fuori dalle rotte di Milano, Torino e Bologna: residenze in Basilicata, festival in provincia di Trapani, spazi autogestiti nell'entroterra calabrese. Ci chiediamo cosa significhi \"periferia\" quando la periferia è, per numero di realtà attive, il centro reale di un'Italia culturalmente diffusa.",
+  },
+  "archivio-realta-scomparse": {
+    title: "Archivio delle realtà scomparse",
+    author: "Il Bel Paese × partner radio",
+    duration: "35'22\"",
+    cover: coverArchivio,
+    description:
+      "Una puntata dedicata alla memoria orale degli spazi che non ci sono più: gallerie chiuse, associazioni sciolte, laboratori sfrattati. Non un elenco funebre, ma un archivio vivo — voci di chi c'era, materiali salvati, tracce che continuano a produrre effetti sulla scena presente. Perché una realtà che chiude non finisce: si trasforma nelle persone che l'hanno attraversata.",
   },
 };
 
@@ -47,13 +54,11 @@ const PodcastEpisodio = () => {
     );
   }
 
-  const Icon = ep.kind === "video" ? PlayCircle : Headphones;
-
   return (
     <div className="bg-background py-16 md:py-20">
       <SEO
         title={`${ep.title} — Podcast`}
-        description={ep.description}
+        description={ep.description.slice(0, 155)}
         canonicalPath={`/racconti/podcast/${slug}`}
       />
       <div className="editorial-container max-w-4xl">
@@ -70,16 +75,15 @@ const PodcastEpisodio = () => {
               src={ep.cover}
               alt=""
               loading="lazy"
+              width={1280}
+              height={720}
               className="absolute inset-0 w-full h-full object-cover"
-              onError={(ev) => {
-                (ev.currentTarget as HTMLImageElement).style.display = "none";
-              }}
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-foreground/20">
-              <Icon size={72} className="text-background drop-shadow-lg" aria-hidden="true" />
+            <div className="absolute inset-0 flex items-center justify-center bg-foreground/15">
+              <Headphones size={72} className="text-background drop-shadow-lg" aria-hidden="true" />
             </div>
             <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 micro-label px-2.5 py-1 brutalist-border bg-background">
-              {ep.kind === "video" ? "Video" : "Podcast"}
+              Podcast
             </span>
             <span className="absolute bottom-3 right-3 micro-label bg-foreground text-background px-2 py-0.5">
               {ep.duration}
@@ -100,7 +104,7 @@ const PodcastEpisodio = () => {
         </p>
 
         <p className="mt-10 text-xs text-foreground/60 font-body italic">
-          Contenuto di prototipo: la pagina definitiva ospiterà player, trascrizione e crediti reali.
+          Esempio editoriale: la pagina definitiva ospiterà player, trascrizione e crediti reali.
         </p>
       </div>
     </div>
