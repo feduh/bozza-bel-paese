@@ -210,24 +210,27 @@ const PinchOnlyZoom = () => {
     const container = map.getContainer();
 
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) {
-        // gesto di pinch sul trackpad → zoom mappa
-        e.preventDefault();
-        const delta = -e.deltaY;
-        const zoomDelta = delta > 0 ? 1 : -1;
-        const rect = container.getBoundingClientRect();
-        const point = map.mouseEventToContainerPoint(e as unknown as MouseEvent);
-        const targetZoom = map.getZoom() + zoomDelta * 0.5;
-        map.setZoomAround(point, targetZoom, { animate: true });
-      }
-      // altrimenti: lascia scorrere la pagina naturalmente
+      // Trackpad pinch → il browser emette wheel con ctrlKey=true
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      // deltaY proporzionale all'intensità del pinch
+      const zoomDelta = -e.deltaY * 0.02;
+      const point = map.mouseEventToContainerPoint(e as unknown as MouseEvent);
+      const currentZoom = map.getZoom();
+      const targetZoom = Math.max(
+        map.getMinZoom(),
+        Math.min(map.getMaxZoom(), currentZoom + zoomDelta)
+      );
+      map.setZoomAround(point, targetZoom, { animate: false });
     };
 
-    container.addEventListener("wheel", onWheel, { passive: false });
-    return () => container.removeEventListener("wheel", onWheel);
+    container.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    return () => container.removeEventListener("wheel", onWheel, { capture: true } as any);
   }, [map]);
   return null;
 };
+
 
 const LazyMap = ({
   center,
