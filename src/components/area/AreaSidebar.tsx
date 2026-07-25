@@ -21,6 +21,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 export type AreaTabValue =
@@ -61,6 +62,11 @@ const AreaSidebar = ({
   canInviteMembers,
   badges,
 }: Props) => {
+  const { isMobile, setOpenMobile } = useSidebar();
+  const handleSelect = (v: AreaTabValue) => {
+    onChange(v);
+    if (isMobile) setOpenMobile(false);
+  };
   const groups: Group[] = [];
 
   groups.push({
@@ -132,8 +138,12 @@ const AreaSidebar = ({
                     <SidebarMenuItem key={it.value}>
                       <SidebarMenuButton
                         isActive={isActive}
-                        onClick={() => onChange(it.value)}
-                        className="font-body"
+                        onClick={() => handleSelect(it.value)}
+                        className={`font-body relative transition-colors ${
+                          isActive
+                            ? "!bg-primary !text-primary-foreground hover:!bg-primary/90 before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:rounded-r before:bg-primary-foreground"
+                            : ""
+                        }`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="flex-1 truncate">{it.label}</span>

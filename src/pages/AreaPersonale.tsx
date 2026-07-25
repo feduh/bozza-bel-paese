@@ -433,11 +433,11 @@ const AreaPersonale = () => {
             <div className="sticky top-16 z-10 bg-background/85 backdrop-blur border-b border-border">
               <div className="flex items-center gap-3 px-4 md:px-8 py-3">
                 <SidebarTrigger
-                  className="lg:hidden h-9 w-auto px-3 gap-2 rounded-full border border-sidebar-border bg-sidebar-accent/60 text-sidebar-accent-foreground hover:bg-sidebar-accent"
+                  className="lg:hidden h-9 w-auto px-3 gap-2 rounded-full bg-primary text-primary-foreground border border-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
                   aria-label="Apri menu area personale"
                 >
                   <LayoutDashboard size={16} />
-                  <span className="text-xs font-body font-medium">Menu area</span>
+                  <span className="text-xs font-body font-semibold">Menu area</span>
                 </SidebarTrigger>
                 <div className="min-w-0">
                   <p className="text-[11px] font-body text-muted-foreground uppercase tracking-widest">
