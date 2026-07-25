@@ -113,7 +113,7 @@ const AreaSidebar = ({
   }
 
   return (
-    <Sidebar collapsible="icon" className="border-r">
+    <Sidebar collapsible="icon" className="border-r top-16 !h-[calc(100svh-4rem)]">
       <SidebarHeader className="px-4 pt-4 pb-2">
         <p className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">
           Area personale
