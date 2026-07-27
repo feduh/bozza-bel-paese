@@ -164,10 +164,10 @@ const Mappatura = () => {
     const yMax = yearMax ? parseInt(yearMax, 10) : null;
     const list = realities.filter((r) => {
       if (selectedCategories.size > 0 && !selectedCategories.has(getCategory(r.type, r.status))) return false;
-      if (regionFilter !== "all" && r.region !== regionFilter) return false;
-      if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
+      if (regionFilter.size > 0 && !regionFilter.has(r.region)) return false;
+      if (disciplineFilter.size > 0 && !r.tags.some((tg) => disciplineFilter.has(tg))) return false;
       const cats = r.categories && r.categories.length > 0 ? r.categories : (r.category ? [r.category] : []);
-      if (categoryFilter !== "all" && !cats.includes(categoryFilter)) return false;
+      if (categoryFilter.size > 0 && !cats.some((c) => categoryFilter.has(c))) return false;
       if (yMin !== null && r.year_founded < yMin) return false;
       if (yMax !== null && r.year_founded > yMax) return false;
       if (q) {
