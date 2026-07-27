@@ -16,6 +16,7 @@ import {
 } from "@/lib/realityCategory";
 import { REALITY_CATEGORIES } from "@/lib/categories";
 import { escapeHtml } from "@/lib/utils";
+import MultiSelectPopover from "@/components/MultiSelectPopover";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
@@ -67,9 +68,11 @@ const Mappatura = () => {
     const valid: Category[] = ["spazio", "spazio-senza-spazio", "spazio-fu-spazio", "spazio-fu-senza"];
     return new Set(raw.split(",").filter((v): v is Category => (valid as string[]).includes(v)));
   });
-  const [regionFilter, setRegionFilter] = useState<string>(searchParams.get("regione") ?? "all");
-  const [disciplineFilter, setDisciplineFilter] = useState<string>(searchParams.get("disciplina") ?? "all");
-  const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
+  const parseSet = (raw: string | null) =>
+    new Set(raw ? raw.split(",").filter(Boolean) : []);
+  const [regionFilter, setRegionFilter] = useState<Set<string>>(() => parseSet(searchParams.get("regione")));
+  const [disciplineFilter, setDisciplineFilter] = useState<Set<string>>(() => parseSet(searchParams.get("disciplina")));
+  const [categoryFilter, setCategoryFilter] = useState<Set<string>>(() => parseSet(searchParams.get("categoria")));
   const [sortMode, setSortMode] = useState<SortMode>("default");
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const deferredSearch = useDeferredValue(search);
@@ -122,9 +125,9 @@ const Mappatura = () => {
       };
       const tipoStr = [...selectedCategories].join(",");
       setOrDel("tipo", tipoStr, "");
-      setOrDel("regione", regionFilter, "all");
-      setOrDel("categoria", categoryFilter, "all");
-      setOrDel("disciplina", disciplineFilter, "all");
+      setOrDel("regione", [...regionFilter].join(","), "");
+      setOrDel("categoria", [...categoryFilter].join(","), "");
+      setOrDel("disciplina", [...disciplineFilter].join(","), "");
       setOrDel("q", search.trim(), "");
       setOrDel("vista", view, "map");
       setOrDel("annoMin", yearMin, "");
@@ -161,10 +164,10 @@ const Mappatura = () => {
     const yMax = yearMax ? parseInt(yearMax, 10) : null;
     const list = realities.filter((r) => {
       if (selectedCategories.size > 0 && !selectedCategories.has(getCategory(r.type, r.status))) return false;
-      if (regionFilter !== "all" && r.region !== regionFilter) return false;
-      if (disciplineFilter !== "all" && !r.tags.includes(disciplineFilter)) return false;
+      if (regionFilter.size > 0 && !regionFilter.has(r.region)) return false;
+      if (disciplineFilter.size > 0 && !r.tags.some((tg) => disciplineFilter.has(tg))) return false;
       const cats = r.categories && r.categories.length > 0 ? r.categories : (r.category ? [r.category] : []);
-      if (categoryFilter !== "all" && !cats.includes(categoryFilter)) return false;
+      if (categoryFilter.size > 0 && !cats.some((c) => categoryFilter.has(c))) return false;
       if (yMin !== null && r.year_founded < yMin) return false;
       if (yMax !== null && r.year_founded > yMax) return false;
       if (q) {
@@ -193,9 +196,9 @@ const Mappatura = () => {
   // Numero di filtri "attivi" per badge
   const activeFilterCount =
     selectedCategories.size +
-    (regionFilter !== "all" ? 1 : 0) +
-    (disciplineFilter !== "all" ? 1 : 0) +
-    (categoryFilter !== "all" ? 1 : 0) +
+    regionFilter.size +
+    disciplineFilter.size +
+    categoryFilter.size +
     (yearMin ? 1 : 0) +
     (yearMax ? 1 : 0) +
     (sortMode !== "default" ? 1 : 0);
@@ -204,9 +207,9 @@ const Mappatura = () => {
 
   const clearFilters = () => {
     setSelectedCategories(new Set());
-    setRegionFilter("all");
-    setDisciplineFilter("all");
-    setCategoryFilter("all");
+    setRegionFilter(new Set());
+    setDisciplineFilter(new Set());
+    setCategoryFilter(new Set());
     setSortMode("default");
     setSearch("");
     setYearMin("");
@@ -294,32 +297,30 @@ const Mappatura = () => {
   // ============= Blocco interno filtri secondari (region/discipline/category/year/sort) =============
   const SecondaryFilters = ({ compact = false }: { compact?: boolean }) => (
     <div className={compact ? "flex flex-col gap-3" : "w-full flex flex-col sm:flex-row sm:flex-wrap gap-3 items-stretch sm:items-center"}>
-      <select
-        value={regionFilter}
-        onChange={(e) => setRegionFilter(e.target.value)}
-        className="w-full sm:flex-1 sm:min-w-[160px] min-h-[44px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
-      >
-        <option value="all">{t("map.filterRegion")}</option>
-        {regions.map((r) => (<option key={r} value={r}>{r}</option>))}
-      </select>
-      <select
-        value={disciplineFilter}
-        onChange={(e) => setDisciplineFilter(e.target.value)}
-        className="w-full sm:flex-1 sm:min-w-[160px] min-h-[44px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
-        aria-label="Filtra per tag / media"
-      >
-        <option value="all">Tutti i tag / media</option>
-        {allDisciplines.map((d) => (<option key={d} value={d}>{d}</option>))}
-      </select>
-      <select
-        value={categoryFilter}
-        onChange={(e) => setCategoryFilter(e.target.value)}
-        className="w-full sm:flex-1 sm:min-w-[160px] min-h-[44px] px-4 py-2.5 brutalist-border bg-background text-sm focus:outline-none focus:border-primary"
-        aria-label="Filtra per disciplina"
-      >
-        <option value="all">{t("map.filterCategory")}</option>
-        {REALITY_CATEGORIES.map((c) => (<option key={c} value={c}>{c}</option>))}
-      </select>
+      <MultiSelectPopover
+        label={t("map.filterRegion")}
+        placeholder={t("map.filterRegion")}
+        options={regions}
+        selected={regionFilter}
+        onChange={setRegionFilter}
+        className={compact ? "w-full" : "w-full sm:flex-1 sm:min-w-[160px]"}
+      />
+      <MultiSelectPopover
+        label="Tag / media"
+        placeholder="Tutti i tag / media"
+        options={allDisciplines}
+        selected={disciplineFilter}
+        onChange={setDisciplineFilter}
+        className={compact ? "w-full" : "w-full sm:flex-1 sm:min-w-[160px]"}
+      />
+      <MultiSelectPopover
+        label={t("map.filterCategory")}
+        placeholder={t("map.filterCategory")}
+        options={[...REALITY_CATEGORIES]}
+        selected={categoryFilter}
+        onChange={setCategoryFilter}
+        className={compact ? "w-full" : "w-full sm:flex-1 sm:min-w-[160px]"}
+      />
       {view !== "map" && (
         <select
           value={sortMode}
@@ -600,9 +601,27 @@ const Mappatura = () => {
                 />
               ) : null;
             })}
-            {regionFilter !== "all" && <ActiveFilterPill label={regionFilter} onRemove={() => setRegionFilter("all")} />}
-            {disciplineFilter !== "all" && <ActiveFilterPill label={`Tag: ${disciplineFilter}`} onRemove={() => setDisciplineFilter("all")} />}
-            {categoryFilter !== "all" && <ActiveFilterPill label={categoryFilter} onRemove={() => setCategoryFilter("all")} />}
+            {[...regionFilter].map((v) => (
+              <ActiveFilterPill
+                key={`reg-${v}`}
+                label={v}
+                onRemove={() => setRegionFilter((prev) => { const n = new Set(prev); n.delete(v); return n; })}
+              />
+            ))}
+            {[...disciplineFilter].map((v) => (
+              <ActiveFilterPill
+                key={`tag-${v}`}
+                label={`Tag: ${v}`}
+                onRemove={() => setDisciplineFilter((prev) => { const n = new Set(prev); n.delete(v); return n; })}
+              />
+            ))}
+            {[...categoryFilter].map((v) => (
+              <ActiveFilterPill
+                key={`cat-${v}`}
+                label={v}
+                onRemove={() => setCategoryFilter((prev) => { const n = new Set(prev); n.delete(v); return n; })}
+              />
+            ))}
             {yearMin && <ActiveFilterPill label={`Da ${yearMin}`} onRemove={() => setYearMin("")} />}
             {yearMax && <ActiveFilterPill label={`A ${yearMax}`} onRemove={() => setYearMax("")} />}
             {search && <ActiveFilterPill label={`"${search}"`} onRemove={() => setSearch("")} />}
