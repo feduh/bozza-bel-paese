@@ -125,9 +125,9 @@ const Mappatura = () => {
       };
       const tipoStr = [...selectedCategories].join(",");
       setOrDel("tipo", tipoStr, "");
-      setOrDel("regione", regionFilter, "all");
-      setOrDel("categoria", categoryFilter, "all");
-      setOrDel("disciplina", disciplineFilter, "all");
+      setOrDel("regione", [...regionFilter].join(","), "");
+      setOrDel("categoria", [...categoryFilter].join(","), "");
+      setOrDel("disciplina", [...disciplineFilter].join(","), "");
       setOrDel("q", search.trim(), "");
       setOrDel("vista", view, "map");
       setOrDel("annoMin", yearMin, "");
