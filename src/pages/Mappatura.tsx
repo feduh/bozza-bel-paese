@@ -601,9 +601,27 @@ const Mappatura = () => {
                 />
               ) : null;
             })}
-            {regionFilter !== "all" && <ActiveFilterPill label={regionFilter} onRemove={() => setRegionFilter("all")} />}
-            {disciplineFilter !== "all" && <ActiveFilterPill label={`Tag: ${disciplineFilter}`} onRemove={() => setDisciplineFilter("all")} />}
-            {categoryFilter !== "all" && <ActiveFilterPill label={categoryFilter} onRemove={() => setCategoryFilter("all")} />}
+            {[...regionFilter].map((v) => (
+              <ActiveFilterPill
+                key={`reg-${v}`}
+                label={v}
+                onRemove={() => setRegionFilter((prev) => { const n = new Set(prev); n.delete(v); return n; })}
+              />
+            ))}
+            {[...disciplineFilter].map((v) => (
+              <ActiveFilterPill
+                key={`tag-${v}`}
+                label={`Tag: ${v}`}
+                onRemove={() => setDisciplineFilter((prev) => { const n = new Set(prev); n.delete(v); return n; })}
+              />
+            ))}
+            {[...categoryFilter].map((v) => (
+              <ActiveFilterPill
+                key={`cat-${v}`}
+                label={v}
+                onRemove={() => setCategoryFilter((prev) => { const n = new Set(prev); n.delete(v); return n; })}
+              />
+            ))}
             {yearMin && <ActiveFilterPill label={`Da ${yearMin}`} onRemove={() => setYearMin("")} />}
             {yearMax && <ActiveFilterPill label={`A ${yearMax}`} onRemove={() => setYearMax("")} />}
             {search && <ActiveFilterPill label={`"${search}"`} onRemove={() => setSearch("")} />}
