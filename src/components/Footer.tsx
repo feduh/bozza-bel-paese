@@ -28,14 +28,17 @@ const Footer = () => {
     <footer className="border-t border-border bg-card py-12 mt-20">
       <div className="editorial-container">
         <div className="grid md:grid-cols-12 gap-8 md:gap-12">
-          <div className="md:col-span-3 md:pr-4">
+          <div className="md:col-span-4 md:pr-4">
             <div className="flex items-center gap-2 mb-3">
               <LogoPittogramma className="w-7 h-7 text-foreground" flameClassName="text-foreground" />
               <h3 className="font-display text-lg font-bold text-foreground tracking-tight uppercase">ILBELPAESE</h3>
             </div>
-            <p className="font-body text-sm text-muted-foreground leading-relaxed max-w-sm">
+            <p className="font-body text-sm text-muted-foreground leading-relaxed max-w-sm mb-2">
               {t("footer.tagline")}
             </p>
+            <a href="mailto:info@ilbelpaese.it" className="text-sm text-muted-foreground hover:text-primary transition-colors break-words">
+              info@ilbelpaese.it
+            </a>
           </div>
           <div className="md:col-span-3">
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.navigation")}</h4>
@@ -65,17 +68,15 @@ const Footer = () => {
               ))}
             </div>
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h4 className="font-display text-sm font-semibold mb-3">{t("footer.legal")}</h4>
-            <div className="space-y-2 mb-6">
+            <div className="space-y-2">
               {legalLinks.map((l) => (
                 <Link key={l.to} to={l.to} className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                   {l.label}
                 </Link>
               ))}
             </div>
-            <h4 className="font-display text-sm font-semibold mb-3">{t("footer.contacts")}</h4>
-            <p className="text-sm text-muted-foreground break-words">info@ilbelpaese.it</p>
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-1">
