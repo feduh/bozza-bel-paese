@@ -16,6 +16,7 @@ import {
 } from "@/lib/realityCategory";
 import { REALITY_CATEGORIES } from "@/lib/categories";
 import { escapeHtml } from "@/lib/utils";
+import MultiSelectPopover from "@/components/MultiSelectPopover";
 
 const LazyMap = lazy(() => import("@/components/LazyMap"));
 
