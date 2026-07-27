@@ -196,9 +196,9 @@ const Mappatura = () => {
   // Numero di filtri "attivi" per badge
   const activeFilterCount =
     selectedCategories.size +
-    (regionFilter !== "all" ? 1 : 0) +
-    (disciplineFilter !== "all" ? 1 : 0) +
-    (categoryFilter !== "all" ? 1 : 0) +
+    regionFilter.size +
+    disciplineFilter.size +
+    categoryFilter.size +
     (yearMin ? 1 : 0) +
     (yearMax ? 1 : 0) +
     (sortMode !== "default" ? 1 : 0);
@@ -207,9 +207,9 @@ const Mappatura = () => {
 
   const clearFilters = () => {
     setSelectedCategories(new Set());
-    setRegionFilter("all");
-    setDisciplineFilter("all");
-    setCategoryFilter("all");
+    setRegionFilter(new Set());
+    setDisciplineFilter(new Set());
+    setCategoryFilter(new Set());
     setSortMode("default");
     setSearch("");
     setYearMin("");
