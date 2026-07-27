@@ -68,9 +68,11 @@ const Mappatura = () => {
     const valid: Category[] = ["spazio", "spazio-senza-spazio", "spazio-fu-spazio", "spazio-fu-senza"];
     return new Set(raw.split(",").filter((v): v is Category => (valid as string[]).includes(v)));
   });
-  const [regionFilter, setRegionFilter] = useState<string>(searchParams.get("regione") ?? "all");
-  const [disciplineFilter, setDisciplineFilter] = useState<string>(searchParams.get("disciplina") ?? "all");
-  const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("categoria") ?? "all");
+  const parseSet = (raw: string | null) =>
+    new Set(raw ? raw.split(",").filter(Boolean) : []);
+  const [regionFilter, setRegionFilter] = useState<Set<string>>(() => parseSet(searchParams.get("regione")));
+  const [disciplineFilter, setDisciplineFilter] = useState<Set<string>>(() => parseSet(searchParams.get("disciplina")));
+  const [categoryFilter, setCategoryFilter] = useState<Set<string>>(() => parseSet(searchParams.get("categoria")));
   const [sortMode, setSortMode] = useState<SortMode>("default");
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const deferredSearch = useDeferredValue(search);
