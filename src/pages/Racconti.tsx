@@ -28,13 +28,13 @@ const Racconti = () => (
         {/* Editoriale — grande, autoritativo */}
         <Link
           to="/editoriale"
-          className="md:col-span-7 border-4 border-foreground bg-background relative flex flex-col justify-between p-8 md:p-10 shadow-[12px_12px_0_hsl(var(--primary))] hover:-translate-x-1 hover:-translate-y-1 transition-transform group"
+          className="md:col-span-7 border-4 border-foreground bg-background relative flex flex-col justify-between p-8 md:p-10 shadow-[12px_12px_0_hsl(var(--primary))] hover:-translate-x-1 hover:-translate-y-1 transition-transform group overflow-hidden"
         >
           <span
             aria-hidden="true"
-            className="absolute -left-6 top-16 -rotate-90 origin-right hidden md:block"
+            className="absolute -left-3 bottom-8 -rotate-90 origin-bottom-left hidden md:block pointer-events-none"
           >
-            <span className="bg-foreground text-background px-4 py-1 text-xs font-bold uppercase tracking-[0.2em]">
+            <span className="bg-foreground text-background px-4 py-1 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap">
               Annuale · Curato
             </span>
           </span>
