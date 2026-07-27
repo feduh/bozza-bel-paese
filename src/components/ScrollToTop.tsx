@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
  * Se l'URL contiene un hash (#sezione), prova a scrollare a quell'elemento.
  */
 const ScrollToTop = () => {
-  const { pathname, hash, search } = useLocation();
+  const { pathname, hash } = useLocation();
 
   // Disabilita il ripristino automatico dello scroll del browser al refresh.
   useEffect(() => {
@@ -33,7 +33,7 @@ const ScrollToTop = () => {
       }
     }
     window.scrollTo({ top: 0, left: 0, behavior });
-  }, [pathname, hash, search]);
+  }, [pathname, hash]);
 
   return null;
 };
