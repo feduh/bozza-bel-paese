@@ -84,24 +84,24 @@ const Racconti = () => (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-3 h-3 bg-foreground" aria-hidden="true" />
-                <span className="micro-label">Contributi liberi</span>
+                <span className="micro-label">Aggiornamento continuo</span>
               </div>
               <h3
                 className="text-3xl md:text-4xl font-display font-bold uppercase tracking-tighter leading-none mb-3"
                 style={{ fontVariationSettings: "'wght' 700" }}
               >
-                Magazine Libero
+                Magazine
               </h3>
               <p className="text-sm md:text-base font-body leading-snug text-foreground/80">
-                Pluralità di voci, interviste e reportage dalla rete. Uno
-                spazio aperto agli autori per raccontare le realtà che
-                frequentano.
+                Articoli, reportage e interviste pubblicati durante tutto
+                l'anno dagli autori della rete. Uno spazio libero per
+                seguire da vicino ciò che accade nei territori.
               </p>
             </div>
 
             <div className="mt-6 flex items-center justify-between">
               <span className="font-display font-bold uppercase tracking-wide underline decoration-4 decoration-secondary underline-offset-4">
-                Scopri
+                Sfoglia gli articoli
               </span>
               <ArrowRight
                 size={26}
@@ -121,7 +121,7 @@ const Racconti = () => (
                 className="text-3xl md:text-4xl font-display font-bold uppercase tracking-tighter leading-none"
                 style={{ fontVariationSettings: "'wght' 700" }}
               >
-                Podcast
+                La vostra voce
               </h3>
               <div className="flex gap-1 items-end h-6" aria-hidden="true">
                 <div className="w-1.5 h-4 bg-secondary animate-pulse" />
@@ -133,11 +133,12 @@ const Racconti = () => (
 
             <div className="mt-6">
               <p className="text-sm md:text-base font-body italic text-background/80 mb-5 leading-snug">
-                "La vostra voce": interviste audio e video prodotte con
-                radio e piattaforme indipendenti alleate.
+                Il podcast del progetto: interviste audio e video alle
+                realtà mappate, prodotte insieme a radio e piattaforme
+                indipendenti partner.
               </p>
               <span className="inline-flex items-center gap-2 border-2 border-secondary px-4 py-2 text-sm font-display font-bold uppercase tracking-[0.15em] text-secondary group-hover:bg-secondary group-hover:text-foreground transition-colors">
-                Ascolta ora
+                Ascolta gli episodi
                 <ArrowRight size={16} strokeWidth={3} />
               </span>
             </div>
