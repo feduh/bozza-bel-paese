@@ -34,7 +34,7 @@ const Racconti = () => (
           className="md:col-span-7 border-2 border-foreground bg-foreground text-background flex flex-col justify-between p-8 md:p-10 shadow-brutalist hover:shadow-brutalist-aqua hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all group"
         >
           <div>
-            <h2 className="editorial-subheading mb-4">Editoriale</h2>
+            <h2 className="editorial-subheading mb-4 text-secondary">Editoriale</h2>
             <p className="editorial-body text-background/80 max-w-md">
               Un numero all'anno, un tema, una curatela affidata a una voce esperta
               del settore. Saggi, interviste e contributi che indagano in profondità
@@ -57,14 +57,14 @@ const Racconti = () => (
             className="flex-1 border-2 border-foreground bg-card p-6 md:p-7 shadow-brutalist hover:shadow-brutalist-aqua hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex flex-col justify-between group"
           >
             <div>
-              <h3 className="editorial-subheading mb-3">Magazine</h3>
+              <h3 className="editorial-subheading mb-3 text-primary">Magazine</h3>
               <p className="editorial-body text-foreground/80">
                 Articoli, reportage e interviste pubblicati durante l'anno dagli
                 autori della rete.
               </p>
             </div>
             <div className="mt-6 flex items-center justify-between">
-              <span className="font-display font-bold uppercase tracking-wide underline decoration-4 decoration-secondary underline-offset-4">
+              <span className="font-display font-bold uppercase tracking-wide underline decoration-4 decoration-primary underline-offset-4">
                 Sfoglia gli articoli
               </span>
               <ArrowRight size={26} strokeWidth={3} className="group-hover:translate-x-2 transition-transform" />
@@ -74,17 +74,17 @@ const Racconti = () => (
           {/* Podcast */}
           <Link
             to="/la-vostra-voce"
-            className="flex-1 border-2 border-foreground bg-foreground text-background p-6 md:p-7 shadow-brutalist hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform flex flex-col justify-between group"
+            className="flex-1 border-2 border-foreground bg-card p-6 md:p-7 shadow-brutalist hover:shadow-brutalist-aqua hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex flex-col justify-between group"
           >
             <div>
-              <h3 className="editorial-subheading mb-3">La vostra voce</h3>
-              <p className="editorial-body text-background/80">
+              <h3 className="editorial-subheading mb-3 text-primary">La vostra voce</h3>
+              <p className="editorial-body text-foreground/80">
                 Il podcast del progetto: interviste alle realtà mappate, prodotte
                 con radio e piattaforme indipendenti partner.
               </p>
             </div>
             <div className="mt-6 flex items-center justify-between">
-              <span className="font-display font-bold uppercase tracking-wide underline decoration-4 decoration-secondary underline-offset-4 text-secondary">
+              <span className="font-display font-bold uppercase tracking-wide underline decoration-4 decoration-primary underline-offset-4 text-primary">
                 Ascolta gli episodi
               </span>
               <ArrowRight size={26} strokeWidth={3} className="group-hover:translate-x-2 transition-transform" />
