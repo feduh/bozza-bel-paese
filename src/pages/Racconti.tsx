@@ -15,10 +15,10 @@ const Racconti = () => (
         <h1 className="editorial-heading">Racconti</h1>
         <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mt-6">
           <p className="max-w-md text-lg md:text-xl font-body font-medium uppercase leading-none text-foreground">
-            Tre voci. Un unico paese.<br />Scegli da dove iniziare.
+            Tre modi di raccontare<br />la scena indipendente italiana.
           </p>
           <span className="self-start md:self-auto text-sm font-bold uppercase tracking-[0.2em] border-2 border-foreground px-3 py-1 bg-secondary text-foreground">
-            Hub · 2026
+            Editoriale · Magazine · Podcast
           </span>
         </div>
       </header>
@@ -35,7 +35,7 @@ const Racconti = () => (
             className="absolute -left-3 bottom-8 -rotate-90 origin-bottom-left hidden md:block pointer-events-none"
           >
             <span className="bg-foreground text-background px-4 py-1 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap">
-              Annuale · Curato
+              Numero annuale
             </span>
           </span>
 
@@ -59,15 +59,15 @@ const Racconti = () => (
               Editoriale
             </h2>
             <p className="text-base md:text-lg max-w-sm font-body font-medium border-l-4 border-primary pl-4 leading-relaxed">
-              Un solo tema, sviscerato con rigore. La selezione annuale
-              curata dai coordinatori attorno a una domanda che attraversa
-              la scena indipendente.
+              Un numero all'anno, un tema, una curatela affidata a una voce
+              esperta del settore. Saggi, interviste e contributi che
+              indagano in profondità un nodo della scena indipendente.
             </p>
           </div>
 
           <div className="mt-10 md:mt-12 flex items-center justify-between gap-4">
             <span className="inline-flex items-center gap-3 bg-foreground text-background px-6 md:px-8 py-4 text-base md:text-lg font-display font-bold uppercase tracking-tighter group-hover:bg-primary transition-colors">
-              Entra nell'archivio
+              Leggi l'edizione
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </span>
             <span className="micro-label hidden md:inline">Ed. 2026</span>
