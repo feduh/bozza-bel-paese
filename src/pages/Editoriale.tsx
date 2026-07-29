@@ -68,10 +68,15 @@ const Editoriale = () => {
       if (current?.curator_user_id) {
         const { data: cp } = await supabase
           .from("profiles")
-          .select("display_name")
+          .select("user_id, display_name, avatar_url, author_bio")
           .eq("user_id", current.curator_user_id)
           .maybeSingle();
-        if (!cancelled) setCuratorName(cp?.display_name ?? null);
+        if (!cancelled) {
+          setCuratorName(cp?.display_name ?? null);
+          setCuratorUserId(cp?.user_id ?? null);
+          setCuratorAvatar(cp?.avatar_url ?? null);
+          setCuratorBio(cp?.author_bio ?? null);
+        }
       }
 
       // Posts of current edition, else legacy fallback: category=Editoriali
