@@ -286,6 +286,8 @@ const Editoriale = () => {
                 )}
               </div>
             </div>
+            )}
+
 
             {rest.length > 0 && (
               <section className="grid md:grid-cols-2 gap-8">
