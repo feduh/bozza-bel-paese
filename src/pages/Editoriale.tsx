@@ -215,46 +215,76 @@ const Editoriale = () => {
           </section>
         ) : (
           <>
-            {lead && (
-              <Link
-                to={`/magazine/${lead.slug}`}
-                className="group block border-2 border-background/40 hover:border-secondary transition-colors"
-              >
-                <div className="grid md:grid-cols-2 gap-0">
-                  {lead.cover_image_url && (
-                    <div className="aspect-[4/3] md:aspect-auto overflow-hidden bg-background/5">
-                      <SmartImage
-                        src={lead.cover_image_url}
-                        alt={lead.title}
-                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                      />
-                    </div>
-                  )}
-                  <div className="p-8 md:p-12 flex flex-col justify-center">
-                    <div className="micro-label text-secondary mb-4">Lettura in evidenza</div>
-                    <h2
-                      className="text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-6 group-hover:text-secondary transition-colors"
-                      style={{ fontVariationSettings: "'wght' 700" }}
-                    >
-                      {lead.title}
-                    </h2>
-                    <p className="text-base md:text-lg text-background/80 leading-relaxed mb-6 line-clamp-3">
-                      {lead.excerpt}
+            <div className="grid md:grid-cols-2 gap-0 border-2 border-background/40">
+              {/* Colonna sinistra: tema dell'anno */}
+              <div className="p-8 md:p-12 flex flex-col justify-between min-h-[320px]">
+                <div>
+                  <div className="micro-label text-secondary mb-4">Tema dell'anno</div>
+                  <h2
+                    className="text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-6"
+                    style={{ fontVariationSettings: "'wght' 700" }}
+                  >
+                    {edition.title}
+                  </h2>
+                  {edition.theme_description ? (
+                    <p className="editorial-body text-background/80 leading-relaxed whitespace-pre-line">
+                      {edition.theme_description}
                     </p>
-                    <div className="flex flex-wrap items-center gap-4 text-xs font-mono uppercase tracking-widest text-background/60">
-                      <span className="flex items-center gap-2">
-                        <User size={12} />
-                        {resolveAuthorName(nameMap, lead.user_id, lead.author_name)}
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <Calendar size={12} />
-                        {new Date(lead.published_at).toLocaleDateString("it-IT")}
-                      </span>
+                  ) : (
+                    <p className="editorial-body text-background/70 leading-relaxed">
+                      Stiamo definendo il tema dell'edizione insieme al curatore. Torna presto per scoprirlo.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Colonna destra: curatore dell'anno */}
+              <div className="p-8 md:p-12 border-t-2 md:border-t-0 md:border-l-2 border-background/40 flex flex-col justify-between min-h-[320px]">
+                <div>
+                  <div className="micro-label text-secondary mb-4">A cura di</div>
+                  <div className="flex items-center gap-4 mb-5">
+                    {curatorAvatar ? (
+                      <SmartImage
+                        src={curatorAvatar}
+                        alt={curatorName ?? "Curatore"}
+                        className="w-16 h-16 rounded-full object-cover border-2 border-background/30"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-background/10 border-2 border-background/30 flex items-center justify-center font-display text-lg text-background/80">
+                        {curatorName
+                          ? curatorName
+                              .split(" ")
+                              .map((n) => n[0])
+                              .slice(0, 2)
+                              .join("")
+                              .toUpperCase()
+                          : "?"}
+                      </div>
+                    )}
+                    <div className="font-display text-2xl text-background">
+                      {curatorName ?? "Curatore in definizione"}
                     </div>
                   </div>
+                  {curatorBio ? (
+                    <p className="text-sm md:text-base text-background/80 leading-relaxed line-clamp-4">
+                      {curatorBio}
+                    </p>
+                  ) : (
+                    <p className="text-sm md:text-base text-background/70 leading-relaxed">
+                      La biografia del curatore verrà pubblicata a breve.
+                    </p>
+                  )}
                 </div>
-              </Link>
-            )}
+                {curatorUserId && (
+                  <Link
+                    to={`/autori/${curatorUserId}`}
+                    className="mt-6 inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors self-start"
+                  >
+                    Vai al profilo <ArrowRight size={14} />
+                  </Link>
+                )}
+              </div>
+            </div>
 
             {rest.length > 0 && (
               <section className="grid md:grid-cols-2 gap-8">
