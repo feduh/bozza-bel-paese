@@ -215,6 +215,7 @@ const Editoriale = () => {
           </section>
         ) : (
           <>
+            {edition && (
             <div className="grid md:grid-cols-2 gap-0 border-2 border-background/40">
               {/* Colonna sinistra: tema dell'anno */}
               <div className="p-8 md:p-12 flex flex-col justify-between min-h-[320px]">
