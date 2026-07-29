@@ -37,6 +37,9 @@ const Editoriale = () => {
   const { user } = useAuth();
   const [edition, setEdition] = useState<Edition | null>(null);
   const [curatorName, setCuratorName] = useState<string | null>(null);
+  const [curatorUserId, setCuratorUserId] = useState<string | null>(null);
+  const [curatorAvatar, setCuratorAvatar] = useState<string | null>(null);
+  const [curatorBio, setCuratorBio] = useState<string | null>(null);
   const [posts, setPosts] = useState<EditorialPost[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [otherEditions, setOtherEditions] = useState<Edition[]>([]);
