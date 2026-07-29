@@ -118,7 +118,7 @@ const Editoriale = () => {
     };
   }, []);
 
-  const [lead, ...rest] = posts;
+  const rest = posts;
   const isOpen = edition?.status === "open_submissions";
 
   return (
