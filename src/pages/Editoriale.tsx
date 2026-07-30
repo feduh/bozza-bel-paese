@@ -42,30 +42,49 @@ const Editoriale = () => {
   const [curatorBio, setCuratorBio] = useState<string | null>(null);
   const [posts, setPosts] = useState<EditorialPost[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
-  const [otherEditions, setOtherEditions] = useState<Edition[]>([]);
+  const [allEditions, setAllEditions] = useState<Edition[]>([]);
+  const [selectedEditionId, setSelectedEditionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Carica l'elenco delle edizioni una sola volta
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Current edition: prefer open_submissions, else most recent non-archived
       const { data: eds } = await supabase
         .from("editorial_editions")
         .select("*")
         .neq("status", "archived")
         .order("year", { ascending: false });
       const list = (eds as Edition[]) ?? [];
+      if (cancelled) return;
+      setAllEditions(list);
       const current =
         list.find((e) => e.status === "open_submissions") ??
         list.find((e) => e.status === "published") ??
         list.find((e) => e.status === "closed_submissions") ??
         list[0] ??
         null;
-      if (cancelled) return;
-      setEdition(current);
-      setOtherEditions(list.filter((e) => e.id !== current?.id));
+      setSelectedEditionId(current?.id ?? null);
+      if (!current) setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-      if (current?.curator_user_id) {
+  // Carica i dati dell'edizione selezionata
+  useEffect(() => {
+    let cancelled = false;
+    const current = allEditions.find((e) => e.id === selectedEditionId) ?? null;
+    setEdition(current);
+    if (!current) return;
+    setLoading(true);
+    setCuratorName(null);
+    setCuratorUserId(null);
+    setCuratorAvatar(null);
+    setCuratorBio(null);
+    (async () => {
+      if (current.curator_user_id) {
         const { data: cp } = await supabase
           .from("profiles")
           .select("user_id, display_name, avatar_url, author_bio")
@@ -79,21 +98,18 @@ const Editoriale = () => {
         }
       }
 
-      // Posts of current edition, else legacy fallback: category=Editoriali
-      let editorialPosts: EditorialPost[] = [];
-      if (current) {
-        const { data } = await supabase
-          .from("blog_posts")
-          .select(
-            "id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at, editorial_edition_id",
-          )
-          .eq("status", "published")
-          .eq("editorial_edition_id", current.id)
-          .order("published_at", { ascending: false });
-        editorialPosts = (data as EditorialPost[]) ?? [];
-      }
+      const { data } = await supabase
+        .from("blog_posts")
+        .select(
+          "id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at, editorial_edition_id",
+        )
+        .eq("status", "published")
+        .eq("editorial_edition_id", current.id)
+        .order("published_at", { ascending: false });
+      let editorialPosts = (data as EditorialPost[]) ?? [];
+
       if (editorialPosts.length === 0) {
-        const { data } = await supabase
+        const { data: legacy } = await supabase
           .from("blog_posts")
           .select(
             "id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at, editorial_edition_id",
@@ -101,7 +117,7 @@ const Editoriale = () => {
           .eq("status", "published")
           .is("editorial_edition_id", null)
           .order("published_at", { ascending: false });
-        editorialPosts = ((data as EditorialPost[]) ?? []).filter((p) =>
+        editorialPosts = ((legacy as EditorialPost[]) ?? []).filter((p) =>
           parseCategories(p.category).includes("Editoriali"),
         );
       }
@@ -116,8 +132,10 @@ const Editoriale = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEditionId, allEditions]);
 
+  const otherEditions = allEditions.filter((e) => e.id !== edition?.id);
   const rest = posts;
   const isOpen = edition?.status === "open_submissions";
 
@@ -132,12 +150,32 @@ const Editoriale = () => {
       <div className="editorial-container space-y-16">
         {/* Header editoriale */}
         <header className="border-b-2 border-background/40 pb-8">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
             <Bookmark size={16} className="text-secondary" aria-hidden="true" />
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-secondary">
               {edition ? `Edizione ${edition.year}` : "Editoriale"}
             </span>
+            {allEditions.length > 1 && (
+              <div className="flex flex-wrap items-center gap-2 md:ml-4">
+                {allEditions.map((e) => (
+                  <button
+                    key={e.id}
+                    type="button"
+                    onClick={() => setSelectedEditionId(e.id)}
+                    aria-pressed={e.id === selectedEditionId}
+                    className={`px-3 py-1.5 font-mono text-xs uppercase tracking-[0.18em] border-2 transition-colors ${
+                      e.id === selectedEditionId
+                        ? "bg-secondary text-secondary-foreground border-secondary"
+                        : "border-background/40 text-background/70 hover:border-secondary hover:text-secondary"
+                    }`}
+                  >
+                    {e.year}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
           <h1
             className="text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tight"
             style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.03em" }}
