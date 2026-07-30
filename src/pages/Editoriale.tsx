@@ -140,23 +140,26 @@ const Editoriale = () => {
   const isOpen = edition?.status === "open_submissions";
 
   return (
-    <div className="bg-foreground text-background py-16 md:py-24">
+    <div className="bg-foreground text-background py-12 md:py-20">
       <SEO
         title="Editoriale — Il Bel Paese"
         description="La selezione annuale di un tema curato dall'editore dell'anno. Un percorso critico dentro la scena indipendente italiana."
         canonicalPath="/editoriale"
       />
 
-      <div className="editorial-container space-y-16">
-        {/* Header editoriale */}
-        <header className="border-b-2 border-background/40 pb-8">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <Bookmark size={16} className="text-secondary" aria-hidden="true" />
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-secondary">
+      <div className="editorial-container space-y-14 md:space-y-20">
+        {/* ── Testata: numero d'annata + selettore edizione ── */}
+        <header>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-background/25 pb-4">
+            <span className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-secondary">
+              <Bookmark size={14} aria-hidden="true" />
               {edition ? `Edizione ${edition.year}` : "Editoriale"}
             </span>
             {allEditions.length > 1 && (
-              <div className="flex flex-wrap items-center gap-2 md:ml-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-background/50">
+                  Annata
+                </span>
                 {allEditions.map((e) => (
                   <button
                     key={e.id}
@@ -176,114 +179,113 @@ const Editoriale = () => {
             )}
           </div>
 
-          <h1
-            className="text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.9] tracking-tight"
-            style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.03em" }}
-          >
-            <span className="text-secondary">Editoriale</span>
-          </h1>
-          <p className="editorial-body text-background/70 max-w-3xl mt-4">
-            Una selezione annuale attorno a un tema, curata dall'editore dell'anno. Uno spazio critico separato dal
-            Magazine libero: qui si costruisce una linea, un pensiero, un percorso di lettura.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4 mt-6 text-xs font-mono uppercase tracking-widest text-background/70">
-            {edition?.submissions_close_at && isOpen && (
-              <span className="flex items-center gap-2">
-                <Calendar size={12} />
-                Candidature aperte fino al{" "}
-                {new Date(edition.submissions_close_at).toLocaleDateString("it-IT", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </span>
-            )}
-            {isOpen && (
-              <Link
-                to={user ? "/area-personale?tab=editoriale" : "/login?redirect=/area-personale?tab=editoriale"}
-                className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-end pt-8 md:pt-10">
+            <div className="lg:col-span-7">
+              <h1
+                className="text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.85] text-secondary"
+                style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.035em" }}
               >
-                Candida un pitch <ArrowRight size={14} />
-              </Link>
-            )}
+                Editoriale
+              </h1>
+            </div>
+            <div className="lg:col-span-5">
+              <p className="editorial-body text-background/70">
+                Una selezione annuale attorno a un tema, curata dall'editore dell'anno. Uno spazio critico separato
+                dal Magazine libero: qui si costruisce una linea, un pensiero, un percorso di lettura.
+              </p>
+              {isOpen && (
+                <div className="flex flex-wrap items-center gap-4 mt-6">
+                  <Link
+                    to={user ? "/area-personale?tab=editoriale" : "/login?redirect=/area-personale?tab=editoriale"}
+                    className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
+                  >
+                    Candida un pitch <ArrowRight size={14} />
+                  </Link>
+                  {edition?.submissions_close_at && (
+                    <span className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-background/60">
+                      <Calendar size={12} />
+                      Fino al{" "}
+                      {new Date(edition.submissions_close_at).toLocaleDateString("it-IT", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        {/* Tema + Curatore dell'anno (sempre visibile quando c'è un'edizione) */}
+        {/* ── Le due card portanti: Tema dell'anno · Curatore dell'anno ── */}
         {edition && (
-          <div className="grid md:grid-cols-2 gap-0 border-2 border-background/40">
-            {/* Colonna sinistra: tema dell'anno */}
-            <div className="p-8 md:p-12 flex flex-col justify-between min-h-[320px]">
-              <div>
-                <div className="micro-label text-secondary mb-4">Tema dell'anno</div>
-                <h2
-                  className="text-3xl md:text-5xl uppercase leading-tight tracking-tight mb-6"
-                  style={{ fontVariationSettings: "'wght' 700" }}
-                >
-                  {edition.title}
-                </h2>
-                {edition.theme_description ? (
-                  <p className="editorial-body text-background/80 leading-relaxed whitespace-pre-line">
-                    {edition.theme_description}
-                  </p>
-                ) : (
-                  <p className="editorial-body text-background/70 leading-relaxed">
-                    Stiamo definendo il tema dell'edizione insieme al curatore. Torna presto per scoprirlo.
-                  </p>
-                )}
-              </div>
-            </div>
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-8">
+            {/* Tema dell'anno — card dominante */}
+            <article className="lg:col-span-7 relative border-2 border-secondary bg-secondary/[0.06] p-8 md:p-12">
+              <span
+                aria-hidden="true"
+                className="absolute top-6 right-6 md:top-8 md:right-10 font-mono text-5xl md:text-7xl leading-none text-secondary/20 select-none"
+                style={{ fontVariationSettings: "'wght' 700" }}
+              >
+                {edition.year}
+              </span>
+              <div className="micro-label text-secondary mb-5">Tema dell'anno</div>
+              <h2
+                className="text-3xl md:text-5xl uppercase leading-[0.95] tracking-tight mb-6 max-w-[16ch]"
+                style={{ fontVariationSettings: "'wght' 700" }}
+              >
+                {edition.title}
+              </h2>
+              <div className="w-16 h-[3px] bg-secondary mb-6" />
+              <p className="editorial-body text-background/80 leading-relaxed whitespace-pre-line max-w-[52ch]">
+                {edition.theme_description ??
+                  "Stiamo definendo il tema dell'edizione insieme al curatore. Torna presto per scoprirlo."}
+              </p>
+            </article>
 
-            {/* Colonna destra: curatore dell'anno */}
-            <div className="p-8 md:p-12 border-t-2 md:border-t-0 md:border-l-2 border-background/40 flex flex-col justify-between min-h-[320px]">
-              <div>
-                <div className="micro-label text-secondary mb-4">A cura di</div>
-                <div className="flex items-center gap-4 mb-5">
-                  {curatorAvatar ? (
-                    <SmartImage
-                      src={curatorAvatar}
-                      alt={curatorName ?? "Curatore"}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-background/30"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-background/10 border-2 border-background/30 flex items-center justify-center font-display text-lg text-background/80">
-                      {curatorName
-                        ? curatorName
-                            .split(" ")
-                            .map((n) => n[0])
-                            .slice(0, 2)
-                            .join("")
-                            .toUpperCase()
-                        : "?"}
-                    </div>
-                  )}
-                  <div className="font-display text-2xl text-background">
-                    {curatorName ?? "Curatore in definizione"}
-                  </div>
-                </div>
-                {curatorBio ? (
-                  <p className="text-sm md:text-base text-background/80 leading-relaxed line-clamp-4">
-                    {curatorBio}
-                  </p>
-                ) : (
-                  <p className="text-sm md:text-base text-background/70 leading-relaxed">
-                    La biografia del curatore verrà pubblicata a breve.
-                  </p>
-                )}
+            {/* Curatore dell'anno */}
+            <aside className="lg:col-span-5 border-2 border-background/40 p-8 md:p-10 flex flex-col">
+              <div className="micro-label text-secondary mb-5 flex items-center gap-2">
+                <UserCheck size={13} aria-hidden="true" /> Curatore dell'anno
               </div>
+              {curatorAvatar ? (
+                <SmartImage
+                  src={curatorAvatar}
+                  alt={curatorName ?? "Curatore"}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-secondary mb-5"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-background/10 border-2 border-secondary flex items-center justify-center font-display text-2xl text-background/80 mb-5">
+                  {curatorName
+                    ? curatorName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()
+                    : "?"}
+                </div>
+              )}
+              <div className="font-display text-3xl leading-tight text-background">
+                {curatorName ?? "Curatore in definizione"}
+              </div>
+              <p className="text-sm md:text-base text-background/75 leading-relaxed mt-4 line-clamp-6">
+                {curatorBio ?? "La biografia del curatore verrà pubblicata a breve."}
+              </p>
               {curatorUserId && (
                 <Link
                   to={`/autori/${curatorUserId}`}
-                  className="mt-6 inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors self-start"
+                  className="mt-auto pt-8 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-secondary hover:gap-3 transition-all self-start"
                 >
                   Vai al profilo <ArrowRight size={14} />
                 </Link>
               )}
-            </div>
+            </aside>
           </div>
         )}
 
+        {/* ── Indice dei contributi ── */}
         {loading ? (
           <PostCardSkeletonGrid count={3} />
         ) : posts.length === 0 ? (
@@ -310,61 +312,90 @@ const Editoriale = () => {
             </Link>
           </section>
         ) : (
-          <>
-            {rest.length > 0 && (
-              <section className="grid md:grid-cols-2 gap-8">
-                {rest.map((post) => (
+          <section>
+            <div className="flex items-baseline justify-between gap-4 border-b border-background/25 pb-3 mb-2">
+              <div className="micro-label text-secondary">Indice dei contributi</div>
+              <span className="font-mono text-xs text-background/50">
+                {rest.length.toString().padStart(2, "0")} {rest.length === 1 ? "voce" : "voci"}
+              </span>
+            </div>
+            <ul>
+              {rest.map((post, i) => (
+                <li key={post.id}>
                   <Link
-                    key={post.id}
                     to={`/magazine/${post.slug}`}
-                    className="group block border-2 border-background/40 hover:border-secondary transition-colors p-6 md:p-8"
+                    className="group grid md:grid-cols-12 gap-4 md:gap-8 items-start py-7 md:py-9 border-b border-background/20 hover:border-secondary transition-colors"
                   >
-                    {post.cover_image_url && (
-                      <div className="aspect-[16/9] overflow-hidden bg-background/5 mb-6">
-                        <SmartImage
-                          src={post.cover_image_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                        />
-                      </div>
-                    )}
-                    <h3
-                      className="text-2xl md:text-3xl uppercase leading-tight tracking-tight mb-4 group-hover:text-secondary transition-colors"
-                      style={{ fontVariationSettings: "'wght' 700" }}
-                    >
-                      {post.title}
-                    </h3>
-                    <p className="text-sm md:text-base text-background/80 leading-relaxed mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-4 text-xs font-mono uppercase tracking-widest text-background/60">
-                      <span className="flex items-center gap-2">
-                        <User size={12} />
-                        {resolveAuthorName(nameMap, post.user_id, post.author_name)}
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <Calendar size={12} />
-                        {new Date(post.published_at).toLocaleDateString("it-IT")}
+                    <div className="md:col-span-1">
+                      <span
+                        className="font-mono text-sm text-secondary/70 group-hover:text-secondary transition-colors"
+                        aria-hidden="true"
+                      >
+                        {(i + 1).toString().padStart(2, "0")}
                       </span>
                     </div>
+                    <div className={post.cover_image_url ? "md:col-span-7" : "md:col-span-11"}>
+                      <h3
+                        className="text-2xl md:text-[2rem] uppercase leading-[1.05] tracking-tight group-hover:text-secondary transition-colors"
+                        style={{ fontVariationSettings: "'wght' 700" }}
+                      >
+                        {post.title}
+                      </h3>
+                      <p className="text-sm md:text-base text-background/75 leading-relaxed mt-3 line-clamp-2 max-w-[62ch]">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-4 mt-4 text-xs font-mono uppercase tracking-widest text-background/55">
+                        <span className="flex items-center gap-2">
+                          <User size={12} />
+                          {resolveAuthorName(nameMap, post.user_id, post.author_name)}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <Calendar size={12} />
+                          {new Date(post.published_at).toLocaleDateString("it-IT")}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+                          Leggi <ArrowRight size={12} />
+                        </span>
+                      </div>
+                    </div>
+                    {post.cover_image_url && (
+                      <div className="md:col-span-4 order-first md:order-none">
+                        <div className="aspect-[4/3] overflow-hidden bg-background/5 border border-background/20">
+                          <SmartImage
+                            src={post.cover_image_url}
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </Link>
-                ))}
-              </section>
-            )}
-          </>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
+        {/* ── Archivio annate ── */}
         {otherEditions.length > 0 && (
-          <section className="border-t-2 border-background/40 pt-12">
-            <div className="micro-label text-secondary mb-6">Edizioni precedenti</div>
-            <ul className="grid md:grid-cols-2 gap-4">
+          <section>
+            <div className="micro-label text-secondary mb-5">Edizioni precedenti</div>
+            <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {otherEditions.map((e) => (
-                <li key={e.id} className="border border-background/30 p-5 hover:border-secondary transition-colors">
-                  <div className="font-mono text-xs text-background/60">{e.year}</div>
-                  <div className="font-display text-lg text-background mt-1">{e.title}</div>
-                  {e.theme_description && (
-                    <p className="text-sm text-background/70 mt-2 line-clamp-2">{e.theme_description}</p>
-                  )}
+                <li key={e.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedEditionId(e.id)}
+                    className="w-full text-left border border-background/30 p-5 hover:border-secondary transition-colors group"
+                  >
+                    <div className="font-mono text-xs text-secondary">{e.year}</div>
+                    <div className="font-display text-lg text-background mt-1 group-hover:text-secondary transition-colors">
+                      {e.title}
+                    </div>
+                    {e.theme_description && (
+                      <p className="text-sm text-background/65 mt-2 line-clamp-2">{e.theme_description}</p>
+                    )}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -373,6 +404,7 @@ const Editoriale = () => {
       </div>
     </div>
   );
+
 };
 
 export default Editoriale;
