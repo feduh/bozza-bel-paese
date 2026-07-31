@@ -179,22 +179,20 @@ const Editoriale = () => {
             )}
           </div>
 
-          <div className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-end pt-8 md:pt-10">
-            <div className="lg:col-span-7">
-              <h1
-                className="text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.85] text-secondary"
-                style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.035em" }}
-              >
-                Editoriale
-              </h1>
-            </div>
-            <div className="lg:col-span-5">
+          <div className="border-b-2 border-background pb-10 pt-8 md:pt-10 space-y-6 md:space-y-8">
+            <h1
+              className="text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.85] text-secondary"
+              style={{ fontVariationSettings: "'wght' 700", letterSpacing: "-0.035em" }}
+            >
+              Editoriale
+            </h1>
+            <div className="max-w-3xl space-y-6">
               <p className="editorial-body text-background/70">
                 Una selezione annuale attorno a un tema, curata dall'editore dell'anno. Uno spazio critico separato
                 dal Magazine libero: qui si costruisce una linea, un pensiero, un percorso di lettura.
               </p>
               {isOpen && (
-                <div className="flex flex-wrap items-center gap-4 mt-6">
+                <div className="flex flex-wrap items-center gap-4">
                   <Link
                     to={user ? "/area-personale?tab=editoriale" : "/login?redirect=/area-personale?tab=editoriale"}
                     className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
