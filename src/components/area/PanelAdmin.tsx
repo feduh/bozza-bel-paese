@@ -4,6 +4,7 @@ import SystemStatusPanel from "@/components/admin/SystemStatusPanel";
 import AnalyticsDashboardPanel from "@/components/admin/AnalyticsDashboardPanel";
 import UsersManagementPanel from "@/components/admin/UsersManagementPanel";
 import EditorialEditionsPanel from "@/components/admin/EditorialEditionsPanel";
+import SpecialIssuesPanel from "@/components/admin/SpecialIssuesPanel";
 import ContactMessagesPanel from "@/components/admin/ContactMessagesPanel";
 import RealityReportsPanel from "@/components/admin/RealityReportsPanel";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
@@ -33,7 +34,12 @@ const PanelAdmin = ({ messageCount, reportCount }: Props) => {
       </div>
     )},
     { value: "utenti", label: "Utenti & Ruoli", icon: Users, render: () => <UsersManagementPanel /> },
-    { value: "editoriale", label: "Edizioni editoriali", icon: BookOpen, render: () => <EditorialEditionsPanel /> },
+    { value: "editoriale", label: "Editoriale & Special Issue", icon: BookOpen, render: () => (
+      <div className="space-y-8">
+        <EditorialEditionsPanel />
+        <SpecialIssuesPanel />
+      </div>
+    )},
     { value: "messaggi", label: "Messaggi", icon: Mail, render: () => <ContactMessagesPanel />, badge: messageCount },
     { value: "segnalazioni", label: "Segnalazioni", icon: Flag, render: () => <RealityReportsPanel />, badge: reportCount },
     { value: "audit", label: "Audit log", icon: ScrollText, render: () => <AuditLogPanel /> },
