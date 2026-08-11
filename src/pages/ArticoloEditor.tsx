@@ -448,7 +448,7 @@ const ArticoloEditor = () => {
               <ArrowUpLeft size={14} /> Stai rispondendo a
             </div>
             <Link
-              to={`/magazine/${parent.slug}`}
+              to={`/bollettino/${parent.slug}`}
               className="font-display font-semibold hover:text-primary transition-colors"
             >
               {parent.title}

@@ -53,7 +53,7 @@ const Racconti = () => (
         <div className="md:col-span-5 flex flex-col gap-8">
           {/* Magazine */}
           <Link
-            to="/magazine"
+            to="/bollettino"
             className="flex-1 border-2 border-foreground bg-card p-6 md:p-7 shadow-brutalist hover:shadow-brutalist-aqua hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex flex-col justify-between group"
           >
             <div>

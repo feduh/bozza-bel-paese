@@ -222,7 +222,7 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
                   <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border">
                     {p.status === "published" && (
                       <Link
-                        to={`/magazine/${p.slug}`}
+                        to={`/bollettino/${p.slug}`}
                         className="p-2 rounded-md border border-border hover:border-primary/40 transition-colors"
                         title="Vedi pubblicato"
                       >

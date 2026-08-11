@@ -136,7 +136,7 @@ const MagazinePost = () => {
     return (
       <div className="py-20 text-center">
         <p className="font-body text-muted-foreground mb-6">{t("magazine.notFound")}</p>
-        <Link to="/magazine" className="text-primary underline font-body">
+        <Link to="/bollettino" className="text-primary underline font-body">
           {t("magazine.back")}
         </Link>
       </div>
@@ -150,7 +150,7 @@ const MagazinePost = () => {
         description={post.excerpt}
         image={post.cover_image_url ?? undefined}
         type="article"
-        canonicalPath={`/magazine/${post.slug}`}
+        canonicalPath={`/bollettino/${post.slug}`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Article",
@@ -166,7 +166,7 @@ const MagazinePost = () => {
       />
       <div className="editorial-container max-w-3xl">
         <Link
-          to="/magazine"
+          to="/bollettino"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-body mb-8"
         >
           <ArrowLeft size={14} /> {t("magazine.back")}
@@ -174,7 +174,7 @@ const MagazinePost = () => {
 
         {parent && (
           <Link
-            to={`/magazine/${parent.slug}`}
+            to={`/bollettino/${parent.slug}`}
             className="block mb-8 p-4 rounded-lg bg-muted/50 border border-border hover:border-primary/40 transition-colors"
           >
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
@@ -326,7 +326,7 @@ const MagazinePost = () => {
               {replies.map((r) => (
                 <Link
                   key={r.id}
-                  to={`/magazine/${r.slug}`}
+                  to={`/bollettino/${r.slug}`}
                   className="block p-5 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors group"
                 >
                   <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">

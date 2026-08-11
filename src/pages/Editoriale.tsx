@@ -303,7 +303,7 @@ const Editoriale = () => {
                 : "Stiamo definendo il prossimo tema editoriale insieme al curatore dell'anno. Torna presto."}
             </p>
             <Link
-              to="/magazine"
+              to="/bollettino"
               className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
             >
               Vai al Magazine libero <ArrowRight size={14} />
@@ -321,7 +321,7 @@ const Editoriale = () => {
               {rest.map((post, i) => (
                 <li key={post.id}>
                   <Link
-                    to={`/magazine/${post.slug}`}
+                    to={`/bollettino/${post.slug}`}
                     className="group grid md:grid-cols-12 gap-4 md:gap-8 items-start py-7 md:py-9 border-b border-background/20 hover:border-secondary transition-colors"
                   >
                     <div className="md:col-span-1">

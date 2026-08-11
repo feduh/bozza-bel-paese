@@ -117,7 +117,7 @@ const Magazine = () => {
       <SEO
         title={t("magazine.title") + " " + t("magazine.titleAccent")}
         description={t("magazine.lead")}
-        canonicalPath="/magazine"
+        canonicalPath="/bollettino"
       />
       <div className="editorial-container">
         <header className="border-b-2 border-foreground pb-10 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -256,7 +256,7 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
   const locale = "it-IT";
   return (
   <Link
-    to={`/magazine/${post.slug}`}
+    to={`/bollettino/${post.slug}`}
     className="group brutalist-card block overflow-hidden"
   >
     {post.cover_image_url && (

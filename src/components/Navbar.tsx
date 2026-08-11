@@ -30,7 +30,7 @@ const Navbar = () => {
   const raccontoLinks = [
     { to: "/racconti", label: "Panoramica" },
     { to: "/editoriale", label: "Editoriale" },
-    { to: "/magazine", label: "Magazine libero" },
+    { to: "/bollettino", label: "Magazine libero" },
     { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
   ];
 

@@ -223,7 +223,7 @@ const AutoreProfilo = () => {
               {posts.map((post) => (
                 <Link
                   key={post.id}
-                  to={`/magazine/${post.slug}`}
+                  to={`/bollettino/${post.slug}`}
                   className="block p-5 rounded-lg border border-border hover:border-primary/40 transition-colors group"
                 >
                   <div className="flex items-center gap-3 text-xs text-muted-foreground font-body mb-2">
