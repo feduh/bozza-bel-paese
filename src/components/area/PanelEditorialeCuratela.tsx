@@ -24,7 +24,10 @@ type Submission = {
   curator_notes: string | null;
   converted_post_id: string | null;
   created_at: string;
+  special_issue_id: string | null;
 };
+
+type SpecialIssueRef = { id: string; title: string; edition_id: string };
 
 const STATUS_LABEL: Record<Submission["status"], string> = {
   pending: "In attesa",
@@ -47,6 +50,7 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
   const [editions, setEditions] = useState<Edition[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [authorMap, setAuthorMap] = useState<Record<string, string>>({});
+  const [specialIssues, setSpecialIssues] = useState<SpecialIssueRef[]>([]);
   const [activeEditionId, setActiveEditionId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | Submission["status"]>("pending");
   const [loading, setLoading] = useState(true);
@@ -62,14 +66,22 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
     setEditions(list);
     if (list.length > 0 && !activeEditionId) setActiveEditionId(list[0].id);
 
-    if (list.length > 0) {
+    // Special Issue di cui sono guest editor (in aggiunta alle annate che curo)
+    const { data: sis } = await supabase
+      .from("editorial_special_issues")
+      .select("id, title, edition_id")
+      .eq("guest_editor_user_id", userId);
+    const myIssues = (sis as SpecialIssueRef[]) ?? [];
+    setSpecialIssues(myIssues);
+
+    if (list.length > 0 || myIssues.length > 0) {
+      const filters: string[] = [];
+      if (list.length > 0) filters.push(`edition_id.in.(${list.map((e) => e.id).join(",")})`);
+      if (myIssues.length > 0) filters.push(`special_issue_id.in.(${myIssues.map((i) => i.id).join(",")})`);
       const { data: subs } = await supabase
         .from("editorial_submissions")
         .select("*")
-        .in(
-          "edition_id",
-          list.map((e) => e.id),
-        )
+        .or(filters.join(","))
         .order("created_at", { ascending: false });
       const sList = (subs as Submission[]) ?? [];
       setSubmissions(sList);
