@@ -16,6 +16,7 @@ const Footer = () => {
     { to: "/editoriale", label: "Editoriale" },
     { to: "/bollettino", label: "Bollettino" },
     { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
+    { to: "/linee-guida", label: "Linee guida" },
   ];
 
   const legalLinks = [

@@ -32,6 +32,7 @@ const Navbar = () => {
     { to: "/editoriale", label: "Editoriale" },
     { to: "/bollettino", label: "Bollettino" },
     { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
+    { to: "/linee-guida", label: "Linee guida" },
   ];
 
   // Link primari nella navbar (ordine richiesto). "Racconto" viene reso come dropdown separato.
