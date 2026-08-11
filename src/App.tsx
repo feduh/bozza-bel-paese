@@ -66,9 +66,12 @@ const App = () => (
                   <Route path="/cosa-facciamo" element={<CosaFacciamo />} />
                   <Route path="/mappatura" element={<Mappatura />} />
                   <Route path="/realta/:id" element={<RealityDetail />} />
-                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog" element={<Navigate to="/bollettino" replace />} />
+                  <Route path="/magazine" element={<Navigate to="/bollettino" replace />} />
+                  <Route path="/magazine/:slug" element={<LegacyMagazineRedirect />} />
                   <Route path="/bollettino" element={<Blog />} />
                   <Route path="/bollettino/:slug" element={<MagazinePost />} />
+                  <Route path="/linee-guida" element={<LineeGuida />} />
                   <Route path="/la-rete" element={<LaRete />} />
                   <Route path="/autori/:userId" element={<AutoreProfilo />} />
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />
