@@ -14,7 +14,7 @@ const Footer = () => {
   const raccontoLinks = [
     { to: "/racconti", label: "Panoramica" },
     { to: "/editoriale", label: "Editoriale" },
-    { to: "/bollettino", label: "Magazine libero" },
+    { to: "/bollettino", label: "Bollettino" },
     { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
   ];
 
