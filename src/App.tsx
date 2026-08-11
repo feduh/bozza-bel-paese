@@ -9,6 +9,7 @@ import Layout from "./components/Layout";
 import RouteFallback from "./components/RouteFallback";
 import ScrollToTop from "./components/ScrollToTop";
 import { RequireAuth } from "./components/RouteGuards";
+import LegacyMagazineRedirect from "./components/LegacyMagazineRedirect";
 
 // Eager: Home and 404 — needed for fast first paint and error states
 import Index from "./pages/Index";
@@ -34,6 +35,7 @@ const Contatti = lazy(() => import("./pages/Contatti"));
 const LaVostraVoce = lazy(() => import("./pages/LaVostraVoce"));
 const Editoriale = lazy(() => import("./pages/Editoriale"));
 const Racconti = lazy(() => import("./pages/Racconti"));
+const LineeGuida = lazy(() => import("./pages/LineeGuida"));
 const PodcastEpisodio = lazy(() => import("./pages/PodcastEpisodio"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
