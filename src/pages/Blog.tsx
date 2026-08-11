@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { Calendar, User, Plus, ArrowRight, Reply, Search, X, ArrowDownUp } from "lucide-react";
+import { Calendar, User, Plus, ArrowRight, Search, X, ArrowDownUp } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PostCardSkeletonGrid } from "@/components/skeletons";
 import SmartImage from "@/components/SmartImage";
@@ -19,7 +19,6 @@ type MagazinePost = {
   user_id: string;
   category: string;
   cover_image_url: string | null;
-  reply_to_id: string | null;
   published_at: string;
   status: string;
 };
@@ -43,7 +42,7 @@ const Magazine = () => {
     (async () => {
       const { data } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, reply_to_id, published_at, status")
+        .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at, status")
         .eq("status", "published")
         .order("published_at", { ascending: false });
       if (cancelled) return;
@@ -277,11 +276,6 @@ const ArticleCard = ({ post, authorName }: { post: MagazinePost; authorName: str
             {c}
           </span>
         ))}
-        {post.reply_to_id && (
-          <span className="inline-flex items-center gap-1 micro-label px-2 py-1 brutalist-border bg-primary text-primary-foreground">
-            <Reply size={10} /> {t("magazine.replyTag")}
-          </span>
-        )}
       </div>
       <h3 className="text-xl leading-tight tracking-tight mb-3 group-hover:text-primary transition-colors line-clamp-2" style={{ fontVariationSettings: "'wght' 700" }}>
         {post.title}

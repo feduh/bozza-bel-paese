@@ -112,7 +112,7 @@ const AreaPersonale = () => {
     const { data: mine } = await supabase
       .from("blog_posts")
       .select(
-        "id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id",
+        "id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for",
       )
       .eq("user_id", user.id)
       .order("published_at", { ascending: false });
@@ -122,7 +122,7 @@ const AreaPersonale = () => {
       const { data: queue } = await supabase
         .from("blog_posts")
         .select(
-          "id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, reply_to_id, author_name, user_id",
+          "id, slug, title, excerpt, status, category, cover_image_url, published_at, scheduled_for, author_name, user_id",
         )
         .eq("status", "pending")
         .order("published_at", { ascending: true });

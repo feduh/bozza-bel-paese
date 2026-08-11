@@ -33,7 +33,6 @@ const FeaturedSection = () => {
         .from("blog_posts")
         .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at")
         .eq("status", "published")
-        .is("reply_to_id", null)
         .order("published_at", { ascending: false })
         .limit(3);
       if (error || !data) return [] as FeaturedPost[];
