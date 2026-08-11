@@ -33,6 +33,7 @@ const ArticoloEditor = () => {
   const [params] = useSearchParams();
   const categoryParam = params.get("category");
   const editionIdParam = params.get("edition");
+  const specialIssueIdParam = params.get("special");
   const submissionIdParam = params.get("submission");
   const titleParam = params.get("title");
 
@@ -358,6 +359,7 @@ const ArticoloEditor = () => {
         ...copyrightPayloadForDb,
       };
       if (editionIdParam) payload.editorial_edition_id = editionIdParam;
+      if (specialIssueIdParam) payload.special_issue_id = specialIssueIdParam;
       const { data: inserted, error } = await supabase
         .from("blog_posts")
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
