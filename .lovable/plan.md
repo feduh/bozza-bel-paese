@@ -1,75 +1,76 @@
-# Mappatura — restyling filtri, feedback & mobile
+# Nuova architettura editoriale: Editoriale + Special Issue + Bollettino
 
-Interveniamo su `src/pages/Mappatura.tsx` e, in modo minimo, su `src/components/LazyMap.tsx` e `src/components/MapFallback.tsx`. Nessuna modifica al database.
+## Obiettivo
 
-## 1. Filtri più efficaci
+Tradurre le decisioni della call in struttura reale del sito:
 
-**Barra "filtri attivi" (chip rimovibili)**
-Sotto la toolbar principale compare una riga di chip che riassume ogni filtro applicato (categoria, tipologia, regione, disciplina, anno min/max, ricerca testo, geolocalizzazione). Ogni chip ha una × per rimuovere solo quel filtro. A destra della riga resta il pulsante "Reimposta tutto".
-Vantaggio: l'utente vede a colpo d'occhio cosa sta filtrando e può togliere un solo criterio senza aprire i menu.
+1. **Editoriale** annuale curato dall'*editor chief*, con la sua open call.
+2. **Special Issue** curato da un *guest editor* scelto dal chief, con open call e deadline proprie, inserito liberamente dentro l'annata.
+3. **Bollettino** (ex "Magazine libero"): sezione permanente, revisionata, forma libera.
+4. **Linee guida** delle due sezioni sempre accessibili.
+5. **Point Counter Point** rimosso (interfaccia + dati).
 
-**Contatore risultati sempre visibile**
-Il conteggio "X realtà trovate" diventa più prominente (font display, non micro-label), e si aggiorna con una piccola animazione di fade quando cambia. Aggiungiamo sotto un accenno "di N totali" per dare scala.
+## Le mie proposte sui due punti aperti
 
-**Ricerca migliorata**
-- Debounce a 200ms sull'input di ricerca (oggi ogni tasto rifiltra sincronamente tutte le realtà).
-- Icona lente dentro l'input + × per svuotare rapidamente.
-- Placeholder più esplicito: "Cerca per nome, città, disciplina, tag…".
+### Special Issue — numero interno all'annata (raccomandato)
 
-**Riorganizzazione della griglia filtri (desktop)**
-Manteniamo l'ordine ma miglioriamo la coesione:
+Ogni edizione annuale contiene una sequenza di numeri; lo Special Issue è uno di questi numeri, in qualsiasi posizione (primo, ultimo, in mezzo). Vantaggi: resta dentro il racconto dell'annata, eredita l'archivio per anno già esistente, e ha comunque tema, guest editor e call autonomi. Una sezione parallela avrebbe frammentato la navigazione e duplicato l'archivio.
+
+Su `/editoriale` l'annata selezionata mostrerà:
+
 ```text
-[ Vista map/list ] [ Ricerca (flex-1) ] [ Vicino a me ]
-[ Chip tipologia × 4 (multi-select, come oggi) ]
-[ Regione ] [ Disciplina ] [ Categoria ] [ Anno da–a ] [ Ordina (solo list) ]
-[ Chip filtri attivi × N ] [ Reimposta tutto ]
+EDIZIONE 2026
+[ Tema dell'anno ]              [ Editor chief ]
+──────────────────────────────────────────────
+Indice dell'annata
+01  Contributo ...
+02  SPECIAL ISSUE — "Titolo"  ← blocco evidenziato, guest editor + tema proprio
+03  Contributo ...
 ```
 
-## 2. Feedback di caricamento
+Lo Special Issue ha anche una pagina propria (`/editoriale/special/:slug`) con il suo tema, il guest editor e i suoi contributi.
 
-**Skeleton allineato al layout reale**
-Sostituiamo lo skeleton attuale (2 righe + 1 blocco) con:
-- barra filtri fantasma (stessa altezza reale),
-- skeleton della mappa con marker fantasma pulsanti (o della griglia card se `vista=list`),
-- così il layout non "salta" quando i dati arrivano.
+### Linee guida — pagina dedicata + richiamo contestuale (raccomandato)
 
-**Overlay di refresh**
-Durante `fetchRealities` in retry (dopo errore), invece di rimontare tutto mostriamo un overlay traslucido con spinner sopra la mappa/lista già rese — evita il flash di skeleton pieno.
+Strategia UX: le linee guida servono in due momenti diversi, quindi vivono in due forme.
 
-**Stato "aggiornamento filtri"**
-Quando cambia un filtro, il conteggio risultati mostra brevemente uno spinner minuscolo accanto (~200ms, coerente col debounce), così l'utente percepisce che il sistema sta rispondendo.
+- **Pagina `/linee-guida`** — riferimento completo, con ancore `#editoriale`, `#special-issue`, `#bollettino`. Linkata dal dropdown "Racconti" e dal footer.
+- **Richiamo breve nel contesto** — su `/editoriale` e `/bollettino` un blocco compatto con le 3-4 regole chiave e link "Leggi le linee guida complete".
+- **Nell'atto di scrivere** — link alle linee guida della sezione dentro l'editor e dentro il form di candidatura in Area Personale, dove la domanda nasce davvero.
 
-**Errore più utile**
-La schermata di errore attuale è centrata e vuota. Aggiungiamo un'icona, un messaggio più chiaro (con dettaglio "Controlla la connessione") e mantieni il tasto Riprova, ma con lo stesso stile brutalist degli altri CTA della pagina.
+Le call aperte mostrano sempre deadline visibile e stato (aperta / in revisione / pubblicazione in corso).
 
-## 3. Esperienza mobile più fluida
+## Cosa cambia, in pratica
 
-**Bottom sheet filtri**
-Su mobile il pannello filtri diventa un bottom sheet (drawer che sale dal basso) invece di espandersi inline. Il pulsante "Filtri" nella toolbar mostra un badge con il numero di filtri attivi. Il sheet contiene: chip tipologia, regione, disciplina, categoria, anno, ordinamento. Con un footer sticky "Applica (X risultati)" che chiude il sheet.
-Vantaggio: la mappa/lista resta sempre visibile sotto, e i filtri non spingono in basso il contenuto.
+**Pagine pubbliche**
+- `/bollettino` sostituisce `/magazine` (il vecchio indirizzo reindirizza, così i link esistenti continuano a funzionare). Titoli, dropdown navbar, footer e homepage aggiornati a "Bollettino".
+- `/editoriale`: selettore annata già presente, più indice dell'annata con lo Special Issue evidenziato al suo posto e stato delle due call con relative deadline.
+- `/editoriale/special/:slug`: pagina dello Special Issue (tema, guest editor, contributi).
+- `/linee-guida`: nuova pagina.
 
-**Chip tipologia scorrevoli**
-Su mobile i 4 chip (Spazi / Spazi senza spazi / Furono / Furono itineranti) diventano una riga scrollabile orizzontalmente invece che grid 1-colonna → meno scroll verticale, più veloce da cambiare.
+**Area Personale**
+- Candidature: scelta fra call "Editoriale" e call "Special Issue", visibili solo se aperte, con deadline in evidenza.
+- Curatela: l'editor chief gestisce l'annata, crea gli Special Issue e nomina i guest editor; il guest editor vede e valuta solo le candidature del proprio Special Issue.
+- Admin: gestione edizioni estesa con gli Special Issue (titolo, tema, guest editor, periodo call, posizione nell'annata).
+- Rimossi selettore "risposta a" e badge Point Counter Point dagli editor e dai pannelli.
 
-**Altezza mappa dinamica**
-Su mobile la mappa passa da `600px` fisso a `calc(100dvh - 220px)` con un minimo di `420px`. Sfrutta l'altezza reale del viewport senza tagliare i controlli inferiori.
-
-**Toolbar sticky**
-La riga con toggle vista + ricerca + Filtri diventa `sticky top-16` su mobile (sotto la navbar), così l'utente può cambiare vista o filtri senza scrollare in cima.
-
-**Tap target**
-Alziamo tutti i controlli filtro a min-height `44px` su mobile (oggi molti sono `py-2` → ~36px).
+**Ciclo della call**
+Stati espliciti per ogni call: bozza → candidature aperte → in revisione → pubblicazione → archiviata. Le date di apertura/chiusura guidano cosa è visibile al pubblico.
 
 ## Dettagli tecnici
 
-File toccati:
-- `src/pages/Mappatura.tsx` — riorganizzazione JSX, debounce ricerca, chip filtri attivi, bottom sheet mobile (uso `Sheet` da `@/components/ui/sheet` già presente), skeleton dedicato.
-- `src/components/MapFallback.tsx` — rendering più ricco con marker pulsanti fantasma.
-- `src/components/LazyMap.tsx` — nessuna modifica funzionale; solo prop opzionale `height` già presente.
-- Nessuna migration, nessuna edge function, nessun cambio ai dati.
+- Migrazione: nuova tabella `editorial_special_issues` (`edition_id`, `guest_editor_user_id`, `slug`, `title`, `theme_description`, `submissions_open_at`, `submissions_close_at`, `status`, `position`, `cover_image_url`) con GRANT, RLS (lettura pubblica solo se pubblicata; scrittura ad admin/editor chief dell'annata) e trigger `updated_at`.
+- `blog_posts.special_issue_id` e `editorial_submissions.special_issue_id` (nullable) per distinguere contributi/candidature dell'Editoriale da quelli dello Special Issue.
+- Funzione security definer `is_guest_editor_of_special_issue(_id uuid)` sul modello di `is_curator_of_edition`, usata nelle policy delle candidature.
+- Rimozione Point Counter Point: `DROP COLUMN blog_posts.reply_to_id` (con la sua FK) e pulizia in `Blog.tsx`, `MagazinePost.tsx`, `ArticoloEditor.tsx`, `AreaPersonale.tsx`, `PanelArticoli.tsx`, `PanelModerazione.tsx`, `FeaturedSection.tsx`, `area/types.ts`.
+- Rename Bollettino: rotte `/bollettino` e `/bollettino/:slug` con redirect da `/magazine*`; aggiornati `Navbar.tsx`, `Footer.tsx`, `Racconti.tsx`, `Index.tsx`, SEO e `sitemap`. Categoria "Editoriali" resta per i contenuti d'annata.
+- `/linee-guida`: pagina statica in codice (contenuto in un modulo dedicato, facile da modificare), con SEO e ancore per sezione; se in futuro serve, si sposta in database.
+- Palette e tipografia invariate: verde acqua per Editoriale, viola per Bollettino, Special Issue distinto dal terzo accento (oro) per leggersi come numero speciale dentro l'annata.
 
-Note:
-- Il debounce sulla ricerca è puramente lato client (`useDeferredValue` di React 18 o `setTimeout`); preferiamo `useDeferredValue` — zero dipendenze aggiunte.
-- Il bottom sheet usa il componente `Sheet` di shadcn già installato.
-- Manteniamo la sync URL ↔ stato esistente (già presente e funzionante).
-- Nessun tocco al database o alle policy RLS.
+## Ordine di lavoro
+
+1. Migrazione database (special issues, collegamenti, rimozione point counter point).
+2. Rename Bollettino con redirect.
+3. Pagina Linee guida + richiami contestuali.
+4. Special Issue: pagine pubbliche, pannelli curatela/admin, candidature con doppia call.
+5. Pulizia Point Counter Point nell'interfaccia.
