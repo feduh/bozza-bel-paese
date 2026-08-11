@@ -33,7 +33,6 @@ const FeaturedSection = () => {
         .from("blog_posts")
         .select("id, slug, title, excerpt, author_name, user_id, category, cover_image_url, published_at")
         .eq("status", "published")
-        .is("reply_to_id", null)
         .order("published_at", { ascending: false })
         .limit(3);
       if (error || !data) return [] as FeaturedPost[];
@@ -64,7 +63,7 @@ const FeaturedSection = () => {
           <span className="text-primary">{t("home.featured.accent") || "dal magazine"}</span>
         </h2>
         <Link
-          to="/magazine"
+          to="/bollettino"
           className="micro-label hidden sm:inline-flex items-center gap-1 hover:text-primary transition-colors"
         >
           {t("home.featured.all") || "Tutti gli articoli"} <ArrowRight size={14} />
@@ -75,7 +74,7 @@ const FeaturedSection = () => {
         {posts.map((p, idx) => (
           <Link
             key={p.id}
-            to={`/magazine/${p.slug}`}
+            to={`/bollettino/${p.slug}`}
             className={`brutalist-card group flex flex-col overflow-hidden ${
               idx === 0 ? "md:col-span-2 md:grid md:grid-cols-2 md:gap-6" : ""
             }`}
@@ -107,7 +106,7 @@ const FeaturedSection = () => {
       </div>
 
       <Link
-        to="/magazine"
+        to="/bollettino"
         className="mt-6 inline-flex sm:hidden items-center gap-1 micro-label hover:text-primary transition-colors"
       >
         {t("home.featured.all") || "Tutti gli articoli"} <ArrowRight size={14} />

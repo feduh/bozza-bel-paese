@@ -206,11 +206,6 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
                 <div className="flex-1 flex flex-col p-4">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="text-xs font-body text-muted-foreground">{p.category}</span>
-                    {p.reply_to_id && (
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-secondary">
-                        · risposta
-                      </span>
-                    )}
                   </div>
                   <h3 className="font-display font-semibold mb-2 line-clamp-2">{p.title}</h3>
                   {p.status === "scheduled" && p.scheduled_for && (
@@ -222,7 +217,7 @@ const PanelArticoli = ({ posts, isStaff, onChanged, presetCategory, title, icon:
                   <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border">
                     {p.status === "published" && (
                       <Link
-                        to={`/magazine/${p.slug}`}
+                        to={`/bollettino/${p.slug}`}
                         className="p-2 rounded-md border border-border hover:border-primary/40 transition-colors"
                         title="Vedi pubblicato"
                       >

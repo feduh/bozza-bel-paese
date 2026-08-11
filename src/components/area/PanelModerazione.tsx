@@ -77,7 +77,6 @@ const PanelModerazione = ({ queue, nameMap, onChanged }: Props) => {
                   <p className="font-display font-semibold mb-1">{p.title}</p>
                   <p className="text-xs text-muted-foreground font-body mb-1">
                     di {resolveAuthorName(nameMap, p.user_id, p.author_name)} · {p.category}
-                    {p.reply_to_id && " · risposta"}
                   </p>
                   <p className="text-sm font-body text-muted-foreground line-clamp-2">{p.excerpt}</p>
                 </div>

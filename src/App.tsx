@@ -9,6 +9,7 @@ import Layout from "./components/Layout";
 import RouteFallback from "./components/RouteFallback";
 import ScrollToTop from "./components/ScrollToTop";
 import { RequireAuth } from "./components/RouteGuards";
+import LegacyMagazineRedirect from "./components/LegacyMagazineRedirect";
 
 // Eager: Home and 404 — needed for fast first paint and error states
 import Index from "./pages/Index";
@@ -34,6 +35,7 @@ const Contatti = lazy(() => import("./pages/Contatti"));
 const LaVostraVoce = lazy(() => import("./pages/LaVostraVoce"));
 const Editoriale = lazy(() => import("./pages/Editoriale"));
 const Racconti = lazy(() => import("./pages/Racconti"));
+const LineeGuida = lazy(() => import("./pages/LineeGuida"));
 const PodcastEpisodio = lazy(() => import("./pages/PodcastEpisodio"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
@@ -66,9 +68,12 @@ const App = () => (
                   <Route path="/cosa-facciamo" element={<CosaFacciamo />} />
                   <Route path="/mappatura" element={<Mappatura />} />
                   <Route path="/realta/:id" element={<RealityDetail />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/magazine" element={<Blog />} />
-                  <Route path="/magazine/:slug" element={<MagazinePost />} />
+                  <Route path="/blog" element={<Navigate to="/bollettino" replace />} />
+                  <Route path="/magazine" element={<Navigate to="/bollettino" replace />} />
+                  <Route path="/magazine/:slug" element={<LegacyMagazineRedirect />} />
+                  <Route path="/bollettino" element={<Blog />} />
+                  <Route path="/bollettino/:slug" element={<MagazinePost />} />
+                  <Route path="/linee-guida" element={<LineeGuida />} />
                   <Route path="/la-rete" element={<LaRete />} />
                   <Route path="/autori/:userId" element={<AutoreProfilo />} />
                   <Route path="/segnala-realta" element={<SegnalaRealta />} />

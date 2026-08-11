@@ -32,7 +32,6 @@ export type AreaPost = {
   cover_image_url: string | null;
   published_at: string;
   scheduled_for: string | null;
-  reply_to_id: string | null;
 };
 
 export type AreaModerationPost = AreaPost & { author_name: string; user_id: string };

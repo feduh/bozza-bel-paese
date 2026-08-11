@@ -24,7 +24,10 @@ type Submission = {
   curator_notes: string | null;
   converted_post_id: string | null;
   created_at: string;
+  special_issue_id: string | null;
 };
+
+type SpecialIssueRef = { id: string; title: string; edition_id: string };
 
 const STATUS_LABEL: Record<Submission["status"], string> = {
   pending: "In attesa",
@@ -47,7 +50,8 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
   const [editions, setEditions] = useState<Edition[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [authorMap, setAuthorMap] = useState<Record<string, string>>({});
-  const [activeEditionId, setActiveEditionId] = useState<string | null>(null);
+  const [specialIssues, setSpecialIssues] = useState<SpecialIssueRef[]>([]);
+  const [activeScope, setActiveScope] = useState<string>("");
   const [filter, setFilter] = useState<"all" | Submission["status"]>("pending");
   const [loading, setLoading] = useState(true);
 
@@ -60,16 +64,23 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
       .order("year", { ascending: false });
     const list = (eds as Edition[]) ?? [];
     setEditions(list);
-    if (list.length > 0 && !activeEditionId) setActiveEditionId(list[0].id);
 
-    if (list.length > 0) {
+    // Special Issue di cui sono guest editor (in aggiunta alle annate che curo)
+    const { data: sis } = await supabase
+      .from("editorial_special_issues")
+      .select("id, title, edition_id")
+      .eq("guest_editor_user_id", userId);
+    const myIssues = (sis as SpecialIssueRef[]) ?? [];
+    setSpecialIssues(myIssues);
+
+    if (list.length > 0 || myIssues.length > 0) {
+      const filters: string[] = [];
+      if (list.length > 0) filters.push(`edition_id.in.(${list.map((e) => e.id).join(",")})`);
+      if (myIssues.length > 0) filters.push(`special_issue_id.in.(${myIssues.map((i) => i.id).join(",")})`);
       const { data: subs } = await supabase
         .from("editorial_submissions")
         .select("*")
-        .in(
-          "edition_id",
-          list.map((e) => e.id),
-        )
+        .or(filters.join(","))
         .order("created_at", { ascending: false });
       const sList = (subs as Submission[]) ?? [];
       setSubmissions(sList);
@@ -94,13 +105,30 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  const scopeOptions = useMemo(() => {
+    const opts = editions.map((e) => ({ value: `ed:${e.id}`, label: `Editoriale ${e.year} — ${e.title}` }));
+    specialIssues.forEach((si) =>
+      opts.push({ value: `si:${si.id}`, label: `Special Issue — ${si.title}` }),
+    );
+    return opts;
+  }, [editions, specialIssues]);
+
+  useEffect(() => {
+    if (!activeScope && scopeOptions.length > 0) setActiveScope(scopeOptions[0].value);
+  }, [scopeOptions, activeScope]);
+
   const filtered = useMemo(() => {
     return submissions.filter((s) => {
-      if (activeEditionId && s.edition_id !== activeEditionId) return false;
+      if (activeScope.startsWith("ed:")) {
+        if (s.edition_id !== activeScope.slice(3)) return false;
+        if (s.special_issue_id) return false;
+      } else if (activeScope.startsWith("si:")) {
+        if (s.special_issue_id !== activeScope.slice(3)) return false;
+      }
       if (filter !== "all" && s.status !== filter) return false;
       return true;
     });
-  }, [submissions, activeEditionId, filter]);
+  }, [submissions, activeScope, filter]);
 
   const updateStatus = async (s: Submission, status: Submission["status"]) => {
     const { error } = await supabase
@@ -122,14 +150,14 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
     load();
   };
 
-  if (editions.length === 0 && !loading) {
+  if (editions.length === 0 && specialIssues.length === 0 && !loading) {
     return (
       <section className="p-8 rounded-lg bg-card border border-border">
         <h2 className="font-display text-xl font-semibold flex items-center gap-2">
           <BookOpen size={20} /> Curatela editoriale
         </h2>
         <p className="font-body text-sm text-muted-foreground mt-2">
-          Non ti è stata ancora assegnata alcuna edizione da curare.
+          Non ti è stata ancora assegnata alcuna annata o Special Issue da curare.
         </p>
       </section>
     );
@@ -142,23 +170,23 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
           <BookOpen size={20} /> Curatela editoriale
         </h2>
         <p className="font-body text-sm text-muted-foreground mt-1">
-          Valuta le candidature ricevute per l'edizione che curi. Accetta i pitch che confermi in linea con il tema
-          e lascia una nota per gli autori.
+          Valuta le candidature ricevute per l'annata che curi come editor chief o per lo Special Issue di cui sei
+          guest editor. Accetta i pitch in linea con il tema e lascia una nota per gli autori.
         </p>
       </div>
 
       <div className="p-6 rounded-lg bg-card border border-border space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm font-body flex items-center gap-2">
-            <span className="text-muted-foreground">Edizione:</span>
+            <span className="text-muted-foreground">Open call:</span>
             <select
-              value={activeEditionId ?? ""}
-              onChange={(e) => setActiveEditionId(e.target.value)}
+              value={activeScope}
+              onChange={(e) => setActiveScope(e.target.value)}
               className="px-3 py-1.5 rounded-md border border-border bg-background text-sm"
             >
-              {editions.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.year} — {e.title}
+              {scopeOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

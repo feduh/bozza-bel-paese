@@ -1,9 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, User, ArrowLeft, Reply, ArrowUpLeft, Clock } from "lucide-react";
+import { Calendar, User, ArrowLeft, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import SEO from "@/components/SEO";
@@ -22,19 +21,8 @@ type Post = {
   user_id: string;
   category: string;
   cover_image_url: string | null;
-  reply_to_id: string | null;
   published_at: string;
   status: string;
-};
-
-type ReplyMeta = {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  author_name: string;
-  user_id: string;
-  published_at: string;
 };
 
 type AuthorBio = {
@@ -48,11 +36,8 @@ type AuthorBio = {
 
 const MagazinePost = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
-  const [parent, setParent] = useState<ReplyMeta | null>(null);
-  const [replies, setReplies] = useState<ReplyMeta[]>([]);
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [authorBio, setAuthorBio] = useState<AuthorBio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,35 +63,7 @@ const MagazinePost = () => {
       const p = (data as Post | null) ?? null;
       setPost(p);
 
-      let parentRow: ReplyMeta | null = null;
-      let replyRows: ReplyMeta[] = [];
-
-      if (p?.reply_to_id) {
-        const { data: parentData } = await supabase
-          .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, user_id, published_at")
-          .eq("id", p.reply_to_id)
-          .eq("status", "published")
-          .maybeSingle();
-        parentRow = (parentData as ReplyMeta | null) ?? null;
-        if (!cancelled) setParent(parentRow);
-      } else {
-        setParent(null);
-      }
-
-      if (p) {
-        const { data: replyData } = await supabase
-          .from("blog_posts")
-          .select("id, slug, title, excerpt, author_name, user_id, published_at")
-          .eq("reply_to_id", p.id)
-          .eq("status", "published")
-          .order("published_at", { ascending: true });
-        replyRows = (replyData as ReplyMeta[]) ?? [];
-        if (!cancelled) setReplies(replyRows);
-      }
-
-      const allIds = [p?.user_id, parentRow?.user_id, ...replyRows.map((r) => r.user_id)];
-      const names = await fetchAuthorNames(allIds);
+      const names = await fetchAuthorNames([p?.user_id]);
       if (!cancelled) setNameMap(names);
 
       if (p?.user_id) {
@@ -136,7 +93,7 @@ const MagazinePost = () => {
     return (
       <div className="py-20 text-center">
         <p className="font-body text-muted-foreground mb-6">{t("magazine.notFound")}</p>
-        <Link to="/magazine" className="text-primary underline font-body">
+        <Link to="/bollettino" className="text-primary underline font-body">
           {t("magazine.back")}
         </Link>
       </div>
@@ -150,7 +107,7 @@ const MagazinePost = () => {
         description={post.excerpt}
         image={post.cover_image_url ?? undefined}
         type="article"
-        canonicalPath={`/magazine/${post.slug}`}
+        canonicalPath={`/bollettino/${post.slug}`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Article",
@@ -166,29 +123,11 @@ const MagazinePost = () => {
       />
       <div className="editorial-container max-w-3xl">
         <Link
-          to="/magazine"
+          to="/bollettino"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-body mb-8"
         >
           <ArrowLeft size={14} /> {t("magazine.back")}
         </Link>
-
-        {parent && (
-          <Link
-            to={`/magazine/${parent.slug}`}
-            className="block mb-8 p-4 rounded-lg bg-muted/50 border border-border hover:border-primary/40 transition-colors"
-          >
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
-              <ArrowUpLeft size={14} className="text-primary" /> In risposta a
-            </div>
-            <p className="font-display text-base font-semibold text-foreground">
-              {parent.title}
-            </p>
-            <p className="font-body text-xs text-muted-foreground mt-1">
-              di <span className="underline decoration-dotted underline-offset-2">{resolveAuthorName(nameMap, parent.user_id, parent.author_name)}</span>
-            </p>
-
-          </Link>
-        )}
 
         <div className="flex flex-wrap items-center gap-2 mb-6">
           {parseCategories(post.category).map((c) => (
@@ -196,11 +135,6 @@ const MagazinePost = () => {
               {c}
             </span>
           ))}
-          {post.reply_to_id && (
-            <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
-              <Reply size={10} /> Risposta
-            </span>
-          )}
         </div>
 
         <h1 className="font-display uppercase tracking-tight leading-[0.95] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 break-words hyphens-auto" style={{ fontVariationSettings: "'wght' 700" }}>{post.title}</h1>
@@ -290,69 +224,6 @@ const MagazinePost = () => {
           </aside>
         )}
 
-        {/* Reply section */}
-        <div className="mt-16 pt-10 border-t border-border">
-          <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-            <h2 className="font-display text-2xl font-semibold flex items-center gap-2">
-
-              <Reply size={20} className="text-primary" />
-              Risposte {replies.length > 0 && (
-                <span className="text-muted-foreground text-base font-body">({replies.length})</span>
-              )}
-            </h2>
-            {user ? (
-              <Link
-                to={`/area-personale/articolo/nuovo?reply_to=${post.id}`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-body font-medium hover:opacity-90 transition-opacity"
-              >
-                <Reply size={14} /> Scrivi una risposta
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                className="text-sm text-muted-foreground font-body hover:text-primary"
-              >
-                Accedi per rispondere →
-              </Link>
-            )}
-          </div>
-
-          {replies.length === 0 ? (
-            <p className="text-sm text-muted-foreground font-body italic">
-              Nessuna risposta ancora. Sii il primo a contribuire al dialogo.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {replies.map((r) => (
-                <Link
-                  key={r.id}
-                  to={`/magazine/${r.slug}`}
-                  className="block p-5 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors group"
-                >
-                  <h3 className="font-display text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {r.title}
-                  </h3>
-                  <p className="font-body text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {r.excerpt}
-                  </p>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground font-body">
-                    <span className="flex items-center gap-1">
-                      <User size={12} /> {resolveAuthorName(nameMap, r.user_id, r.author_name)}
-                    </span>
-                    <span>·</span>
-                    <span>
-                      {new Date(r.published_at).toLocaleDateString("it-IT", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </article>
   );

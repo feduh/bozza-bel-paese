@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { invokeFunction } from "@/lib/invokeFunction";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Send, Loader2, ArrowUpLeft, Check, ChevronDown, CalendarClock, ShieldCheck, ShieldAlert, Eye } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, Check, ChevronDown, CalendarClock, ShieldCheck, ShieldAlert, Eye } from "lucide-react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReactMarkdown from "react-markdown";
@@ -25,17 +25,15 @@ const slugify = (s: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
 
-type ParentMeta = { id: string; title: string; author_name: string; slug: string };
-
 const ArticoloEditor = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const [params] = useSearchParams();
-  const replyToParam = params.get("reply_to");
   const categoryParam = params.get("category");
   const editionIdParam = params.get("edition");
+  const specialIssueIdParam = params.get("special");
   const submissionIdParam = params.get("submission");
   const titleParam = params.get("title");
 
@@ -49,8 +47,6 @@ const ArticoloEditor = () => {
   const [globalError, setGlobalError] = useState("");
   const [myRoles, setMyRoles] = useState<string[]>([]);
   const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "scheduled" | "published">("draft");
-  const [replyTo, setReplyTo] = useState<string | null>(replyToParam);
-  const [parent, setParent] = useState<ParentMeta | null>(null);
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
@@ -133,7 +129,6 @@ const ArticoloEditor = () => {
         coverImageUrl: data.cover_image_url ?? "",
       });
       setCurrentStatus(data.status as "draft" | "pending" | "scheduled" | "published");
-      setReplyTo(data.reply_to_id);
       if (data.status === "scheduled" && data.scheduled_for) {
         const dt = new Date(data.scheduled_for);
         const pad = (n: number) => String(n).padStart(2, "0");
@@ -165,20 +160,6 @@ const ArticoloEditor = () => {
       cancelled = true;
     };
   }, [id, isEdit]);
-
-  // Load parent meta if reply
-  useEffect(() => {
-    if (!replyTo) {
-      setParent(null);
-      return;
-    }
-    supabase
-      .from("blog_posts")
-      .select("id, title, author_name, slug")
-      .eq("id", replyTo)
-      .maybeSingle()
-      .then(({ data }) => setParent((data as ParentMeta | null) ?? null));
-  }, [replyTo]);
 
   // Autosave drafts (debounced 30s) — only for posts not yet published
   useEffect(() => {
@@ -227,7 +208,6 @@ const ArticoloEditor = () => {
             user_id: user.id,
             slug,
             status: "draft",
-            reply_to_id: replyTo,
           })
           .select("id")
           .maybeSingle();
@@ -244,7 +224,7 @@ const ArticoloEditor = () => {
     }, 10000);
 
     return () => clearTimeout(timer);
-  }, [form, user, loading, submitting, currentStatus, editingId, replyTo]);
+  }, [form, user, loading, submitting, currentStatus, editingId]);
 
   if (!user) {
     navigate("/login");
@@ -375,11 +355,11 @@ const ArticoloEditor = () => {
         slug,
         status: targetStatus,
         scheduled_for: scheduledIso,
-        reply_to_id: replyTo,
         published_at: scheduledIso ?? new Date().toISOString(),
         ...copyrightPayloadForDb,
       };
       if (editionIdParam) payload.editorial_edition_id = editionIdParam;
+      if (specialIssueIdParam) payload.special_issue_id = specialIssueIdParam;
       const { data: inserted, error } = await supabase
         .from("blog_posts")
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -425,7 +405,7 @@ const ArticoloEditor = () => {
     <div className="py-16">
       <SEO
         title={isEdit ? "Modifica articolo" : "Nuovo articolo"}
-        description="Editor del Magazine di Il Bel Paese: scrivi, modifica e pubblica articoli sulla scena artistica indipendente italiana, con copertina, categoria e tag."
+        description="Editor del Bollettino di Il Bel Paese: scrivi, modifica e pubblica articoli sulla scena artistica indipendente italiana, con copertina, categoria e tag."
         canonicalPath="/area-personale"
       />
 
@@ -441,23 +421,6 @@ const ArticoloEditor = () => {
           {isEdit ? "Modifica" : "Nuovo"}{" "}
           <span className="italic text-primary">articolo</span>
         </h1>
-
-        {parent && (
-          <div className="mb-6 p-4 rounded-lg bg-secondary/10 border border-secondary/30">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-secondary mb-1">
-              <ArrowUpLeft size={14} /> Stai rispondendo a
-            </div>
-            <Link
-              to={`/magazine/${parent.slug}`}
-              className="font-display font-semibold hover:text-primary transition-colors"
-            >
-              {parent.title}
-            </Link>
-            <p className="text-xs text-muted-foreground font-body mt-1">
-              di {parent.author_name}
-            </p>
-          </div>
-        )}
 
         <form
           onSubmit={(e) => {
@@ -820,7 +783,7 @@ const ArticoloEditor = () => {
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="font-body text-xs uppercase tracking-wider text-muted-foreground">
-                Anteprima — come apparirà sul Magazine
+                Anteprima — come apparirà sul Bollettino
               </DialogTitle>
             </DialogHeader>
             <article className="space-y-6">

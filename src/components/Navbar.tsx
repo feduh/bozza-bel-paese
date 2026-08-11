@@ -30,8 +30,9 @@ const Navbar = () => {
   const raccontoLinks = [
     { to: "/racconti", label: "Panoramica" },
     { to: "/editoriale", label: "Editoriale" },
-    { to: "/magazine", label: "Magazine libero" },
+    { to: "/bollettino", label: "Bollettino" },
     { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
+    { to: "/linee-guida", label: "Linee guida" },
   ];
 
   // Link primari nella navbar (ordine richiesto). "Racconto" viene reso come dropdown separato.

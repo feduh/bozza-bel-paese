@@ -33,6 +33,15 @@ type Edition = {
   submissions_close_at: string | null;
 };
 
+type SpecialIssue = {
+  id: string;
+  title: string;
+  theme_description: string | null;
+  guest_editor_user_id: string | null;
+  status: "draft" | "open_submissions" | "closed_submissions" | "published" | "archived";
+  submissions_close_at: string | null;
+};
+
 const Editoriale = () => {
   const { user } = useAuth();
   const [edition, setEdition] = useState<Edition | null>(null);
@@ -41,6 +50,8 @@ const Editoriale = () => {
   const [curatorAvatar, setCuratorAvatar] = useState<string | null>(null);
   const [curatorBio, setCuratorBio] = useState<string | null>(null);
   const [posts, setPosts] = useState<EditorialPost[]>([]);
+  const [specialIssues, setSpecialIssues] = useState<SpecialIssue[]>([]);
+  const [guestNames, setGuestNames] = useState<Record<string, string>>({});
   const [nameMap, setNameMap] = useState<Record<string, string>>({});
   const [allEditions, setAllEditions] = useState<Edition[]>([]);
   const [selectedEditionId, setSelectedEditionId] = useState<string | null>(null);
@@ -95,6 +106,29 @@ const Editoriale = () => {
           setCuratorUserId(cp?.user_id ?? null);
           setCuratorAvatar(cp?.avatar_url ?? null);
           setCuratorBio(cp?.author_bio ?? null);
+        }
+      }
+
+      const { data: sis } = await supabase
+        .from("editorial_special_issues")
+        .select("id, title, theme_description, guest_editor_user_id, status, submissions_close_at")
+        .eq("edition_id", current.id)
+        .neq("status", "draft")
+        .order("position", { ascending: true });
+      const issues = (sis as SpecialIssue[]) ?? [];
+      if (!cancelled) setSpecialIssues(issues);
+      const guestIds = issues.map((i) => i.guest_editor_user_id).filter(Boolean) as string[];
+      if (guestIds.length > 0) {
+        const { data: gp } = await supabase
+          .from("profiles")
+          .select("user_id, display_name")
+          .in("user_id", guestIds);
+        if (!cancelled) {
+          const map: Record<string, string> = {};
+          (gp ?? []).forEach((g: { user_id: string; display_name: string }) => {
+            map[g.user_id] = g.display_name;
+          });
+          setGuestNames(map);
         }
       }
 
@@ -189,7 +223,7 @@ const Editoriale = () => {
             <div className="max-w-3xl space-y-6">
               <p className="editorial-body text-background/70">
                 Una selezione annuale attorno a un tema, curata dall'editore dell'anno. Uno spazio critico separato
-                dal Magazine libero: qui si costruisce una linea, un pensiero, un percorso di lettura.
+                dal Bollettino: qui si costruisce una linea, un pensiero, un percorso di lettura.
               </p>
               {isOpen && (
                 <div className="flex flex-wrap items-center gap-4">
@@ -283,6 +317,61 @@ const Editoriale = () => {
           </div>
         )}
 
+        {/* ── Special Issue dell'annata ── */}
+        {specialIssues.length > 0 && (
+          <section>
+            <div className="flex items-baseline justify-between gap-4 border-b border-background/25 pb-3 mb-6">
+              <div className="micro-label text-secondary">Special Issue</div>
+              <Link
+                to="/linee-guida#special-issue"
+                className="font-mono text-xs uppercase tracking-[0.18em] text-background/60 hover:text-secondary"
+              >
+                Linee guida
+              </Link>
+            </div>
+            <ul className="grid md:grid-cols-2 gap-5">
+              {specialIssues.map((si) => (
+                <li key={si.id} className="border-2 border-background/40 p-6 md:p-8">
+                  <div className="micro-label text-secondary mb-3">
+                    {si.status === "open_submissions" ? "Open call aperta" : "Numero speciale"}
+                  </div>
+                  <h3
+                    className="text-2xl md:text-3xl uppercase leading-[1.05] tracking-tight"
+                    style={{ fontVariationSettings: "'wght' 700" }}
+                  >
+                    {si.title}
+                  </h3>
+                  {si.theme_description && (
+                    <p className="text-sm md:text-base text-background/75 leading-relaxed mt-3 line-clamp-4">
+                      {si.theme_description}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-4 mt-5 font-mono text-xs uppercase tracking-widest text-background/60">
+                    <span className="flex items-center gap-2">
+                      <UserCheck size={12} /> Guest editor:{" "}
+                      {si.guest_editor_user_id ? guestNames[si.guest_editor_user_id] ?? "—" : "in definizione"}
+                    </span>
+                    {si.submissions_close_at && (
+                      <span className="flex items-center gap-2">
+                        <Calendar size={12} />
+                        {new Date(si.submissions_close_at).toLocaleDateString("it-IT")}
+                      </span>
+                    )}
+                  </div>
+                  {si.status === "open_submissions" && (
+                    <Link
+                      to={user ? "/area-personale?tab=editoriale" : "/login?redirect=/area-personale?tab=editoriale"}
+                      className="inline-flex items-center gap-2 mt-5 font-mono text-xs uppercase tracking-[0.18em] text-secondary hover:gap-3 transition-all"
+                    >
+                      Candida un pitch <ArrowRight size={14} />
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* ── Indice dei contributi ── */}
         {loading ? (
           <PostCardSkeletonGrid count={3} />
@@ -303,10 +392,10 @@ const Editoriale = () => {
                 : "Stiamo definendo il prossimo tema editoriale insieme al curatore dell'anno. Torna presto."}
             </p>
             <Link
-              to="/magazine"
+              to="/bollettino"
               className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] border-2 border-secondary hover:bg-background hover:text-foreground hover:border-background transition-colors"
             >
-              Vai al Magazine libero <ArrowRight size={14} />
+              Vai al Bollettino <ArrowRight size={14} />
             </Link>
           </section>
         ) : (
@@ -321,7 +410,7 @@ const Editoriale = () => {
               {rest.map((post, i) => (
                 <li key={post.id}>
                   <Link
-                    to={`/magazine/${post.slug}`}
+                    to={`/bollettino/${post.slug}`}
                     className="group grid md:grid-cols-12 gap-4 md:gap-8 items-start py-7 md:py-9 border-b border-background/20 hover:border-secondary transition-colors"
                   >
                     <div className="md:col-span-1">

@@ -68,9 +68,9 @@ export type Database = {
           podcast_kind: string | null
           podcast_url: string | null
           published_at: string
-          reply_to_id: string | null
           scheduled_for: string | null
           slug: string
+          special_issue_id: string | null
           status: string
           title: string
           updated_at: string
@@ -93,9 +93,9 @@ export type Database = {
           podcast_kind?: string | null
           podcast_url?: string | null
           published_at?: string
-          reply_to_id?: string | null
           scheduled_for?: string | null
           slug: string
+          special_issue_id?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -118,9 +118,9 @@ export type Database = {
           podcast_kind?: string | null
           podcast_url?: string | null
           published_at?: string
-          reply_to_id?: string | null
           scheduled_for?: string | null
           slug?: string
+          special_issue_id?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -135,10 +135,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "blog_posts_reply_to_id_fkey"
-            columns: ["reply_to_id"]
+            foreignKeyName: "blog_posts_special_issue_id_fkey"
+            columns: ["special_issue_id"]
             isOneToOne: false
-            referencedRelation: "blog_posts"
+            referencedRelation: "editorial_special_issues"
             referencedColumns: ["id"]
           },
         ]
@@ -221,6 +221,62 @@ export type Database = {
         }
         Relationships: []
       }
+      editorial_special_issues: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          edition_id: string
+          guest_editor_user_id: string | null
+          id: string
+          position: number
+          slug: string
+          status: Database["public"]["Enums"]["editorial_edition_status"]
+          submissions_close_at: string | null
+          submissions_open_at: string | null
+          theme_description: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          edition_id: string
+          guest_editor_user_id?: string | null
+          id?: string
+          position?: number
+          slug: string
+          status?: Database["public"]["Enums"]["editorial_edition_status"]
+          submissions_close_at?: string | null
+          submissions_open_at?: string | null
+          theme_description?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          edition_id?: string
+          guest_editor_user_id?: string | null
+          id?: string
+          position?: number
+          slug?: string
+          status?: Database["public"]["Enums"]["editorial_edition_status"]
+          submissions_close_at?: string | null
+          submissions_open_at?: string | null
+          theme_description?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_special_issues_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editorial_submissions: {
         Row: {
           abstract: string
@@ -232,6 +288,7 @@ export type Database = {
           id: string
           outline: string | null
           references_text: string | null
+          special_issue_id: string | null
           status: Database["public"]["Enums"]["editorial_submission_status"]
           title: string
           updated_at: string
@@ -246,6 +303,7 @@ export type Database = {
           id?: string
           outline?: string | null
           references_text?: string | null
+          special_issue_id?: string | null
           status?: Database["public"]["Enums"]["editorial_submission_status"]
           title: string
           updated_at?: string
@@ -260,6 +318,7 @@ export type Database = {
           id?: string
           outline?: string | null
           references_text?: string | null
+          special_issue_id?: string | null
           status?: Database["public"]["Enums"]["editorial_submission_status"]
           title?: string
           updated_at?: string
@@ -277,6 +336,13 @@ export type Database = {
             columns: ["edition_id"]
             isOneToOne: false
             referencedRelation: "editorial_editions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_submissions_special_issue_id_fkey"
+            columns: ["special_issue_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_special_issues"
             referencedColumns: ["id"]
           },
         ]
@@ -693,6 +759,10 @@ export type Database = {
         Returns: boolean
       }
       is_curator_of_edition: { Args: { _edition_id: string }; Returns: boolean }
+      is_guest_editor_of_special_issue: {
+        Args: { _special_issue_id: string }
+        Returns: boolean
+      }
       publish_scheduled_posts: { Args: never; Returns: number }
     }
     Enums: {

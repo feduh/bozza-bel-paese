@@ -24,7 +24,7 @@
     "about": "Chi Siamo",
     "what": "Cosa Facciamo",
     "map": "Mappatura",
-    "magazine": "Magazine",
+    "magazine": "Bollettino",
     "voice": "La vostra voce",
     "network": "La nostra rete",
     "contacts": "Contatti",
@@ -200,12 +200,10 @@
   },
   "magazine": {
     "title": "Il",
-    "titleAccent": "Magazine",
-    "lead": "Interviste, saggi e dibattiti sulla scena artistica indipendente italiana (e non solo).",
-    "back": "Torna al magazine",
+    "titleAccent": "Bollettino",
+    "lead": "Comunicazioni, notizie, recensioni e interviste dalla scena indipendente: forma libera, sguardo curato.",
+    "back": "Torna al Bollettino",
     "notFound": "Articolo non trovato.",
-    "readReply": "Leggi la replica",
-    "readThesis": "Leggi la tesi iniziale",
     "newArticle": "Nuovo articolo",
     "searchPlaceholder": "Cerca per titolo o autore…",
     "filterAuthor": "Filtra per autore",
@@ -222,7 +220,6 @@
     "articleOther": "articoli",
     "emptyAll": "Nessun articolo pubblicato ancora.",
     "emptyFiltered": "Nessun articolo trovato con questi filtri.",
-    "replyTag": "Risposta",
     "read": "Leggi"
   },
   "reality": {
