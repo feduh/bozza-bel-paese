@@ -18,8 +18,7 @@ const staticEntries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/mappatura", changefreq: "weekly", priority: "0.9" },
   { path: "/la-rete", changefreq: "weekly", priority: "0.8" },
-  { path: "/magazine", changefreq: "weekly", priority: "0.8" },
-  { path: "/blog", changefreq: "weekly", priority: "0.7" },
+  { path: "/bollettino", changefreq: "weekly", priority: "0.8" },
   { path: "/cosa-facciamo", changefreq: "monthly", priority: "0.7" },
   { path: "/la-vostra-voce", changefreq: "monthly", priority: "0.6" },
   { path: "/segnala-realta", changefreq: "monthly", priority: "0.6" },
@@ -58,7 +57,7 @@ async function fetchDynamicEntries(): Promise<SitemapEntry[]> {
     .limit(5000);
   posts?.forEach((p: { slug: string; published_at?: string }) => {
     entries.push({
-      path: `/magazine/${p.slug}`,
+      path: `/bollettino/${p.slug}`,
       lastmod: p.published_at?.slice(0, 10),
       changefreq: "monthly",
       priority: "0.6",

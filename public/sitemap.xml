@@ -16,14 +16,9 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://il-bel-paese.lovable.app/blog</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://il-bel-paese.lovable.app/cosa-facciamo</loc>
@@ -133,73 +128,73 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/provincia-laboratorio-geografie-minori</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/provincia-laboratorio-geografie-minori</loc>
     <lastmod>2026-07-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/contro-progetto-vetrina-residenze-italia</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/contro-progetto-vetrina-residenze-italia</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/archivio-memoria-sparizione-mappare</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/archivio-memoria-sparizione-mappare</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/sette-giorni-a-favara</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/sette-giorni-a-favara</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/aprire-spazio-800-metri</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/aprire-spazio-800-metri</loc>
     <lastmod>2026-07-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/radura-recensione</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/radura-recensione</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/cosa-sta-cambiando-spazi-indipendenti</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/cosa-sta-cambiando-spazi-indipendenti</loc>
     <lastmod>2026-07-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/comune-curatore-due-amministrazioni</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/comune-curatore-due-amministrazioni</loc>
     <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/ex-tipografia-via-padova</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/ex-tipografia-via-padova</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/la-periferia-come-laboratorio-2025</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/la-periferia-come-laboratorio-2025</loc>
     <lastmod>2025-04-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/capannoni-e-poi-2025</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/capannoni-e-poi-2025</loc>
     <lastmod>2025-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://il-bel-paese.lovable.app/magazine/il-pubblico-che-manca-2025</loc>
+    <loc>https://il-bel-paese.lovable.app/bollettino/il-pubblico-che-manca-2025</loc>
     <lastmod>2025-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

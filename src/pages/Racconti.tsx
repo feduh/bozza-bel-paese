@@ -6,7 +6,7 @@ const Racconti = () => (
   <div className="bg-background py-16 md:py-20">
     <SEO
       title="Racconti — Il Bel Paese"
-      description="Editoriale, magazine e podcast: le tre forme del racconto della scena indipendente italiana."
+      description="Editoriale, bollettino e podcast: le tre forme del racconto della scena indipendente italiana."
       canonicalPath="/racconti"
     />
     <div className="editorial-container space-y-16 md:space-y-20">
@@ -19,7 +19,7 @@ const Racconti = () => (
           <p>
             Tre voci per raccontare la scena artistica indipendente italiana:
             un <strong className="text-foreground">editoriale annuale</strong> curato,
-            un <strong className="text-foreground">magazine</strong> aggiornato durante l'anno
+            un <strong className="text-foreground">bollettino</strong> aggiornato durante l'anno
             e un <strong className="text-foreground">podcast</strong> prodotto con radio
             e piattaforme partner.
           </p>
