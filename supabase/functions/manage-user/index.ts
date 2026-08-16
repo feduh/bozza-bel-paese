@@ -271,33 +271,17 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
-    // ---------- DELETE (SOFT) ----------
+    // ---------- DELETE (HARD) ----------
     if (data.op === "delete_user") {
       if (isSelf) return json({ error: "Non puoi eliminare il tuo account." }, 400);
-      // 1. Anonimizza il profilo (mantiene articoli)
-      await admin
-        .from("profiles")
-        .update({
-          display_name: "Utente rimosso",
-          bio: "",
-          avatar_url: null,
-          website: null,
-          social_instagram: null,
-          social_twitter: null,
-          social_linkedin: null,
-          public_email: null,
-          consent_public: false,
-          affiliation: null,
-          role_collective: null,
-          role_real_life: null,
-          figure_category: null,
-          reality_id: null,
-        })
-        .eq("user_id", data.user_id);
-      // 2. Rimuovi tutti i ruoli
+      // Rimuove definitivamente l'utente: profilo, ruoli, articoli, candidature
+      // e segnalibri vengono eliminati a cascata dal database.
+      const { error } = await admin.auth.admin.deleteUser(data.user_id);
+      if (error) return json({ error: error.message }, 400);
+      // Pulizia difensiva di eventuali record residui
+      await admin.from("profiles").delete().eq("user_id", data.user_id);
       await admin.from("user_roles").delete().eq("user_id", data.user_id);
-      // 3. Banna l'account così non può più loggarsi
-      await admin.auth.admin.updateUserById(data.user_id, { ban_duration: "876000h" });
+      await admin.from("notifications").delete().eq("user_id", data.user_id);
       return json({ ok: true });
     }
 
