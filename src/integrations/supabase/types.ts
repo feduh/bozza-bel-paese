@@ -742,6 +742,10 @@ export type Database = {
     }
     Functions: {
       auto_confirm_pending_realities: { Args: never; Returns: number }
+      can_manage_special_issue: {
+        Args: { _special_issue_id: string }
+        Returns: boolean
+      }
       get_public_stats: {
         Args: never
         Returns: {
@@ -759,6 +763,14 @@ export type Database = {
         Returns: boolean
       }
       is_curator_of_edition: { Args: { _edition_id: string }; Returns: boolean }
+      is_editor_chief_of_edition: {
+        Args: { _edition_id: string }
+        Returns: boolean
+      }
+      is_guest_editor_of_si: {
+        Args: { _special_issue_id: string }
+        Returns: boolean
+      }
       is_guest_editor_of_special_issue: {
         Args: { _special_issue_id: string }
         Returns: boolean
@@ -766,7 +778,14 @@ export type Database = {
       publish_scheduled_posts: { Args: never; Returns: number }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "author" | "coordinatore"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "author"
+        | "coordinatore"
+        | "editor_chief"
+        | "guest_editor"
       editorial_edition_status:
         | "draft"
         | "open_submissions"
@@ -907,7 +926,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "author", "coordinatore"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "author",
+        "coordinatore",
+        "editor_chief",
+        "guest_editor",
+      ],
       editorial_edition_status: [
         "draft",
         "open_submissions",
