@@ -31,7 +31,7 @@ const Navbar = () => {
     { to: "/racconti", label: "Panoramica" },
     { to: "/editoriale", label: "Editoriale" },
     { to: "/bollettino", label: "Bollettino" },
-    { to: "/la-vostra-voce", label: "Podcast / La vostra voce" },
+    { to: "/la-vostra-voce", label: "La vostra voce" },
     { to: "/linee-guida", label: "Linee guida" },
   ];
 
