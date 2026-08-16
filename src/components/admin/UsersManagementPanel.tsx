@@ -133,7 +133,7 @@ const UsersManagementPanel = () => {
   };
 
   const deleteUser = async (u: ManagedUser) => {
-    if (!confirm(`Eliminare definitivamente ${u.profile?.display_name ?? u.email}?\nIl profilo verrà anonimizzato e l'utente non potrà più accedere. Gli articoli scritti restano nel magazine.`)) return;
+    if (!confirm(`Eliminare definitivamente ${u.profile?.display_name ?? u.email}?\nL'account sparirà dalla gestione utenti. Verranno eliminati anche il profilo, i ruoli, gli articoli e le candidature dell'utente. Operazione irreversibile.`)) return;
     await call({ op: "delete_user", user_id: u.id }, "Account eliminato");
   };
 
