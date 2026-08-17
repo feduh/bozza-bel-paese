@@ -85,20 +85,33 @@ const AreaPersonale = () => {
     const rs = (roles ?? []).map((r: { role: string }) => r.role);
     setMyRoles(rs);
 
-    const { data: curatorEditions } = await supabase
-      .from("editorial_editions")
-      .select("id")
-      .eq("curator_user_id", user.id);
-    setIsCurator((curatorEditions?.length ?? 0) > 0);
-    if (curatorEditions && curatorEditions.length > 0) {
-      const ids = curatorEditions.map((e: { id: string }) => e.id);
-      const { count } = await supabase
-        .from("editorial_submissions")
-        .select("id", { count: "exact", head: true })
-        .in("edition_id", ids)
-        .eq("status", "pending");
-      setCuratelaPending(count ?? 0);
+    const [{ data: curatorEditions }, { data: guestIssues }] = await Promise.all([
+      supabase.from("editorial_editions").select("id").eq("curator_user_id", user.id),
+      supabase.from("editorial_special_issues").select("id").eq("guest_editor_user_id", user.id),
+    ]);
+    const editionIds = (curatorEditions ?? []).map((e: { id: string }) => e.id);
+    const issueIds = (guestIssues ?? []).map((s: { id: string }) => s.id);
+    setIsCurator(editionIds.length > 0 || issueIds.length > 0);
+    if (editionIds.length > 0 || issueIds.length > 0) {
+      const counts = await Promise.all([
+        editionIds.length
+          ? supabase
+              .from("editorial_submissions")
+              .select("id", { count: "exact", head: true })
+              .in("edition_id", editionIds)
+              .eq("status", "pending")
+          : Promise.resolve({ count: 0 }),
+        issueIds.length
+          ? supabase
+              .from("editorial_submissions")
+              .select("id", { count: "exact", head: true })
+              .in("special_issue_id", issueIds)
+              .eq("status", "pending")
+          : Promise.resolve({ count: 0 }),
+      ]);
+      setCuratelaPending((counts[0].count ?? 0) + (counts[1].count ?? 0));
     }
+
 
     const { data: mySubs } = await supabase
       .from("editorial_submissions")
