@@ -46,6 +46,9 @@ const ArticoloEditor = () => {
   const [errs, setErrs] = useState<FieldErrors>({});
   const [globalError, setGlobalError] = useState("");
   const [myRoles, setMyRoles] = useState<string[]>([]);
+  const [postEditionId, setPostEditionId] = useState<string | null>(editionIdParam);
+  const [postSpecialIssueId, setPostSpecialIssueId] = useState<string | null>(specialIssueIdParam);
+  const [hasEditorialControl, setHasEditorialControl] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<"draft" | "pending" | "scheduled" | "published">("draft");
   const [editingId, setEditingId] = useState<string | null>(id ?? null);
   const [autoSaveState, setAutoSaveState] = useState<"idle" | "saving" | "saved">("idle");
@@ -93,6 +96,57 @@ const ArticoloEditor = () => {
     [myRoles]
   );
 
+  // Gli editor editoriali possono pubblicare/programmare gli articoli
+  // della propria annata o del proprio Special Issue.
+  useEffect(() => {
+    if (!user) return;
+    const isChief = myRoles.includes("editor_chief");
+    const isGuest = myRoles.includes("guest_editor");
+    if (!isChief && !isGuest) {
+      setHasEditorialControl(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      let allowed = false;
+      if (isGuest && postSpecialIssueId) {
+        const { data } = await supabase
+          .from("editorial_special_issues")
+          .select("id")
+          .eq("id", postSpecialIssueId)
+          .eq("guest_editor_user_id", user.id)
+          .maybeSingle();
+        allowed = !!data;
+      }
+      if (!allowed && isChief) {
+        let editionId = postEditionId;
+        if (!editionId && postSpecialIssueId) {
+          const { data: si } = await supabase
+            .from("editorial_special_issues")
+            .select("edition_id")
+            .eq("id", postSpecialIssueId)
+            .maybeSingle();
+          editionId = si?.edition_id ?? null;
+        }
+        if (editionId) {
+          const { data } = await supabase
+            .from("editorial_editions")
+            .select("id")
+            .eq("id", editionId)
+            .eq("curator_user_id", user.id)
+            .maybeSingle();
+          allowed = !!data;
+        }
+      }
+      if (!cancelled) setHasEditorialControl(allowed);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, myRoles, postEditionId, postSpecialIssueId]);
+
+  const canPublish = isStaff || hasEditorialControl;
+
   // Load roles
   useEffect(() => {
     if (!user) return;
@@ -129,6 +183,8 @@ const ArticoloEditor = () => {
         coverImageUrl: data.cover_image_url ?? "",
       });
       setCurrentStatus(data.status as "draft" | "pending" | "scheduled" | "published");
+      setPostEditionId((data as { editorial_edition_id: string | null }).editorial_edition_id ?? null);
+      setPostSpecialIssueId((data as { special_issue_id: string | null }).special_issue_id ?? null);
       if (data.status === "scheduled" && data.scheduled_for) {
         const dt = new Date(data.scheduled_for);
         const pad = (n: number) => String(n).padStart(2, "0");
@@ -312,7 +368,7 @@ const ArticoloEditor = () => {
     const targetStatus =
       mode === "draft" ? "draft"
       : mode === "schedule" ? "scheduled"
-      : isStaff ? "published" : "pending";
+      : canPublish ? "published" : "pending";
 
     // Author name from profile
     const { data: prof } = await supabase
@@ -678,7 +734,7 @@ const ArticoloEditor = () => {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-body font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               <Send size={14} />
-              {isStaff ? "Pubblica" : "Invia per pubblicazione"}
+              {canPublish ? "Pubblica" : "Invia per pubblicazione"}
             </button>
             <button
               type="button"
