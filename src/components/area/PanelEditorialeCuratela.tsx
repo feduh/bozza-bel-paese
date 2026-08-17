@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Check, X, RotateCcw, FileText, StickyNote } from "lucide-react";
+import { BookOpen, Check, X, RotateCcw, FileText, StickyNote, Save, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -9,6 +9,9 @@ type Edition = {
   year: number;
   title: string;
   theme_description: string | null;
+  cover_image_url: string | null;
+  submissions_open_at: string | null;
+  submissions_close_at: string | null;
   status: "draft" | "open_submissions" | "closed_submissions" | "published" | "archived";
 };
 
@@ -27,7 +30,41 @@ type Submission = {
   special_issue_id: string | null;
 };
 
-type SpecialIssueRef = { id: string; title: string; edition_id: string };
+type SpecialIssueRef = {
+  id: string;
+  title: string;
+  edition_id: string;
+  theme_description: string | null;
+  cover_image_url: string | null;
+  status: Edition["status"];
+  submissions_open_at: string | null;
+  submissions_close_at: string | null;
+  guest_editor_user_id: string | null;
+};
+
+const EDITION_STATUS: Array<{ v: Edition["status"]; label: string }> = [
+  { v: "draft", label: "Bozza" },
+  { v: "open_submissions", label: "Call aperta" },
+  { v: "closed_submissions", label: "Call chiusa" },
+  { v: "published", label: "Pubblicata" },
+  { v: "archived", label: "Archiviata" },
+];
+
+const toLocalInput = (iso: string | null) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+const fromLocalInput = (v: string) => (v ? new Date(v).toISOString() : null);
+const slugify = (v: string) =>
+  v
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
 
 const STATUS_LABEL: Record<Submission["status"], string> = {
   pending: "In attesa",
@@ -54,6 +91,10 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
   const [activeScope, setActiveScope] = useState<string>("");
   const [filter, setFilter] = useState<"all" | Submission["status"]>("pending");
   const [loading, setLoading] = useState(true);
+  const [isChief, setIsChief] = useState(false);
+  const [guestNameMap, setGuestNameMap] = useState<Record<string, string>>({});
+  const [creatingIssue, setCreatingIssue] = useState(false);
+  const [newIssue, setNewIssue] = useState({ title: "", theme: "" });
 
   const load = async () => {
     setLoading(true);
@@ -65,13 +106,40 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
     const list = (eds as Edition[]) ?? [];
     setEditions(list);
 
-    // Special Issue di cui sono guest editor (in aggiunta alle annate che curo)
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
+    setIsChief(roles.includes("editor_chief") && list.length > 0);
+
+    // Special Issue di cui sono guest editor + quelli delle annate che curo
+    const siCols =
+      "id, title, edition_id, theme_description, cover_image_url, status, submissions_open_at, submissions_close_at, guest_editor_user_id";
+    const orParts = [`guest_editor_user_id.eq.${userId}`];
+    if (list.length > 0) orParts.push(`edition_id.in.(${list.map((e) => e.id).join(",")})`);
     const { data: sis } = await supabase
       .from("editorial_special_issues")
-      .select("id, title, edition_id")
-      .eq("guest_editor_user_id", userId);
+      .select(siCols)
+      .or(orParts.join(","))
+      .order("position", { ascending: true });
     const myIssues = (sis as SpecialIssueRef[]) ?? [];
     setSpecialIssues(myIssues);
+
+    const guestIds = [
+      ...new Set(myIssues.map((i) => i.guest_editor_user_id).filter(Boolean) as string[]),
+    ];
+    if (guestIds.length > 0) {
+      const { data: gp } = await supabase
+        .from("profiles")
+        .select("user_id, display_name")
+        .in("user_id", guestIds);
+      const gmap: Record<string, string> = {};
+      (gp ?? []).forEach((p: { user_id: string; display_name: string }) => {
+        gmap[p.user_id] = p.display_name;
+      });
+      setGuestNameMap(gmap);
+    }
 
     if (list.length > 0 || myIssues.length > 0) {
       const filters: string[] = [];

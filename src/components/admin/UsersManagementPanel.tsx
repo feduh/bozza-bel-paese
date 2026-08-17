@@ -4,13 +4,33 @@ import { invokeFunction } from "@/lib/invokeFunction";
 import { Users, Shield, KeyRound, Ban, Trash2, RefreshCw, Search, Pencil } from "lucide-react";
 import { PASSWORD_RULES, passwordSchema, passwordStrength } from "@/lib/passwordPolicy";
 
-type AppRole = "admin" | "coordinatore" | "author";
-const ALL_ROLES: AppRole[] = ["admin", "coordinatore", "author"];
+type AppRole =
+  | "admin"
+  | "coordinatore"
+  | "author"
+  | "editor_chief"
+  | "guest_editor";
+const ALL_ROLES: AppRole[] = [
+  "admin",
+  "coordinatore",
+  "author",
+  "editor_chief",
+  "guest_editor",
+];
 const ROLE_LABEL: Record<AppRole, string> = {
   admin: "Admin",
   coordinatore: "Coordinatore",
   author: "Autore",
+  editor_chief: "Editor chief",
+  guest_editor: "Guest editor",
 };
+const ROLE_HINT: Partial<Record<AppRole, string>> = {
+  editor_chief:
+    "Cura l'annata dell'Editoriale: tema, deadline, candidature e creazione degli Special Issue. Include automaticamente il ruolo Autore.",
+  guest_editor:
+    "Cura un singolo Special Issue assegnato dall'admin. Include automaticamente il ruolo Autore.",
+};
+const EDITOR_ROLES: AppRole[] = ["editor_chief", "guest_editor"];
 
 type ManagedUser = {
   id: string;
@@ -105,7 +125,12 @@ const UsersManagementPanel = () => {
     !!u.banned_until && new Date(u.banned_until).getTime() > Date.now();
 
   const toggleRole = async (u: ManagedUser, role: AppRole) => {
-    const next = u.roles.includes(role) ? u.roles.filter((r) => r !== role) : [...u.roles, role];
+    const set = new Set<AppRole>(u.roles);
+    if (set.has(role)) set.delete(role);
+    else set.add(role);
+    // Gli editor editoriali sono sempre anche autori
+    if (EDITOR_ROLES.some((r) => set.has(r))) set.add("author");
+    const next = [...set];
     await call(
       { op: "update_roles", user_id: u.id, roles: next },
       `Ruoli aggiornati per ${u.profile?.display_name ?? u.email}`,
@@ -409,14 +434,25 @@ const UsersManagementPanel = () => {
                       <div className="flex flex-wrap gap-2">
                         {ALL_ROLES.map((r) => {
                           const active = u.roles.includes(r);
-                          const lockSelf = self && r === "admin" && active;
+                          const isEditorLinkedAuthor =
+                            r === "author" &&
+                            active &&
+                            EDITOR_ROLES.some((er) => u.roles.includes(er));
+                          const lockSelf =
+                            (self && r === "admin" && active) || isEditorLinkedAuthor;
                           return (
                             <button
                               key={r}
                               type="button"
                               disabled={busyId === u.id || lockSelf}
                               onClick={() => toggleRole(u, r)}
-                              title={lockSelf ? "Non puoi rimuovere il tuo ruolo admin" : undefined}
+                              title={
+                                isEditorLinkedAuthor
+                                  ? "Un editor \u00e8 sempre anche autore: rimuovi prima il ruolo editor"
+                                  : lockSelf
+                                    ? "Non puoi rimuovere il tuo ruolo admin"
+                                    : ROLE_HINT[r]
+                              }
                               className={`text-xs font-body px-3 py-1.5 rounded-full border transition-colors ${
                                 active
                                   ? "bg-primary text-primary-foreground border-primary"
