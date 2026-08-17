@@ -826,9 +826,14 @@ const ArticoloEditor = () => {
                 Ultima bozza salvata alle {lastSavedAt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
               </span>
             ) : null}
-            {!isStaff && (
+            {!canPublish && (
               <p className="text-xs text-muted-foreground font-body w-full">
                 Il tuo articolo verrà rivisto da un membro dello staff prima della pubblicazione.
+              </p>
+            )}
+            {!isStaff && hasEditorialControl && (
+              <p className="text-xs text-muted-foreground font-body w-full">
+                Come editor di questa call puoi pubblicare o programmare direttamente questo articolo.
               </p>
             )}
           </div>
