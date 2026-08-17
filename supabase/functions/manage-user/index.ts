@@ -248,6 +248,10 @@ Deno.serve(async (req) => {
         return json({ error: "Non puoi rimuovere il tuo ruolo admin." }, 400);
       }
       const desired = new Set(data.roles);
+      // Gli editor editoriali sono sempre anche autori
+      if (desired.has("editor_chief") || desired.has("guest_editor")) {
+        desired.add("author");
+      }
       const { data: current } = await admin
         .from("user_roles")
         .select("role")
