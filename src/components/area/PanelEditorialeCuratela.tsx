@@ -83,6 +83,121 @@ const FILTERS: Array<{ v: "all" | Submission["status"]; label: string }> = [
   { v: "withdrawn", label: "Ritirate" },
 ];
 
+type ScopeValues = {
+  title: string;
+  theme_description: string;
+  cover_image_url: string;
+  submissions_open_at: string;
+  submissions_close_at: string;
+  status: Edition["status"];
+};
+
+const ScopeSettings = ({
+  kind,
+  title,
+  initial,
+  onSave,
+}: {
+  kind: "edition" | "issue";
+  title: string;
+  initial: ScopeValues;
+  onSave: (v: ScopeValues) => Promise<void>;
+}) => {
+  const [values, setValues] = useState<ScopeValues>(initial);
+  const [saving, setSaving] = useState(false);
+  const set = <K extends keyof ScopeValues>(k: K, v: ScopeValues[K]) =>
+    setValues((prev) => ({ ...prev, [k]: v }));
+
+  return (
+    <div className="p-6 rounded-lg bg-card border border-border space-y-4">
+      <div>
+        <h3 className="font-display font-semibold">Impostazioni della call</h3>
+        <p className="text-xs font-body text-muted-foreground mt-1">{title}</p>
+      </div>
+
+      {kind === "issue" && (
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Titolo</span>
+          <input
+            value={values.title}
+            onChange={(e) => set("title", e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+      )}
+
+      <label className="block space-y-1">
+        <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Tema</span>
+        <textarea
+          value={values.theme_description}
+          onChange={(e) => set("theme_description", e.target.value)}
+          rows={4}
+          className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+        />
+      </label>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Apertura call</span>
+          <input
+            type="datetime-local"
+            value={values.submissions_open_at}
+            onChange={(e) => set("submissions_open_at", e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Deadline</span>
+          <input
+            type="datetime-local"
+            value={values.submissions_close_at}
+            onChange={(e) => set("submissions_close_at", e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Stato</span>
+          <select
+            value={values.status}
+            onChange={(e) => set("status", e.target.value as Edition["status"])}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          >
+            {EDITION_STATUS.map((s) => (
+              <option key={s.v} value={s.v}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Copertina (URL)</span>
+          <input
+            value={values.cover_image_url}
+            onChange={(e) => set("cover_image_url", e.target.value)}
+            placeholder="https://…"
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+      </div>
+
+      <button
+        onClick={async () => {
+          setSaving(true);
+          await onSave(values);
+          setSaving(false);
+        }}
+        disabled={saving}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
+      >
+        <Save size={14} /> Salva impostazioni
+      </button>
+    </div>
+  );
+};
+
 const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
   const [editions, setEditions] = useState<Edition[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -218,6 +333,85 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
     load();
   };
 
+  const activeEdition = useMemo(
+    () => (activeScope.startsWith("ed:") ? editions.find((e) => e.id === activeScope.slice(3)) : undefined),
+    [activeScope, editions],
+  );
+  const activeIssue = useMemo(
+    () => (activeScope.startsWith("si:") ? specialIssues.find((i) => i.id === activeScope.slice(3)) : undefined),
+    [activeScope, specialIssues],
+  );
+
+  const saveEdition = async (
+    values: {
+      theme_description: string;
+      cover_image_url: string;
+      submissions_open_at: string;
+      submissions_close_at: string;
+      status: Edition["status"];
+    },
+  ) => {
+    if (!activeEdition) return;
+    const { error } = await supabase
+      .from("editorial_editions")
+      .update({
+        theme_description: values.theme_description || null,
+        cover_image_url: values.cover_image_url || null,
+        submissions_open_at: fromLocalInput(values.submissions_open_at),
+        submissions_close_at: fromLocalInput(values.submissions_close_at),
+        status: values.status,
+      })
+      .eq("id", activeEdition.id);
+    if (error) return toast.error(error.message);
+    toast.success("Annata aggiornata");
+    load();
+  };
+
+  const saveIssue = async (
+    values: {
+      title: string;
+      theme_description: string;
+      cover_image_url: string;
+      submissions_open_at: string;
+      submissions_close_at: string;
+      status: Edition["status"];
+    },
+  ) => {
+    if (!activeIssue) return;
+    const { error } = await supabase
+      .from("editorial_special_issues")
+      .update({
+        title: values.title,
+        theme_description: values.theme_description || null,
+        cover_image_url: values.cover_image_url || null,
+        submissions_open_at: fromLocalInput(values.submissions_open_at),
+        submissions_close_at: fromLocalInput(values.submissions_close_at),
+        status: values.status,
+      })
+      .eq("id", activeIssue.id);
+    if (error) return toast.error(error.message);
+    toast.success("Special Issue aggiornato");
+    load();
+  };
+
+  const createSpecialIssue = async (editionId: string) => {
+    if (!newIssue.title.trim()) return toast.error("Indica un titolo per lo Special Issue.");
+    const base = slugify(newIssue.title) || "special-issue";
+    const { error } = await supabase.from("editorial_special_issues").insert({
+      edition_id: editionId,
+      title: newIssue.title.trim(),
+      slug: `${base}-${Math.random().toString(36).slice(2, 6)}`,
+      theme_description: newIssue.theme.trim() || null,
+      status: "draft",
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Special Issue creato. L'admin assegnerà il guest editor.");
+    setNewIssue({ title: "", theme: "" });
+    setCreatingIssue(false);
+    load();
+  };
+
+
   if (editions.length === 0 && specialIssues.length === 0 && !loading) {
     return (
       <section className="p-8 rounded-lg bg-card border border-border">
@@ -242,6 +436,91 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
           guest editor. Accetta i pitch in linea con il tema e lascia una nota per gli autori.
         </p>
       </div>
+
+      {(activeEdition || activeIssue) && (
+        <ScopeSettings
+          key={activeScope}
+          kind={activeEdition ? "edition" : "issue"}
+          title={activeEdition ? `Editoriale ${activeEdition.year} — ${activeEdition.title}` : activeIssue!.title}
+          initial={{
+            title: activeIssue?.title ?? "",
+            theme_description: (activeEdition ?? activeIssue)?.theme_description ?? "",
+            cover_image_url: (activeEdition ?? activeIssue)?.cover_image_url ?? "",
+            submissions_open_at: toLocalInput((activeEdition ?? activeIssue)?.submissions_open_at ?? null),
+            submissions_close_at: toLocalInput((activeEdition ?? activeIssue)?.submissions_close_at ?? null),
+            status: (activeEdition ?? activeIssue)!.status,
+          }}
+          onSave={activeEdition ? saveEdition : saveIssue}
+        />
+      )}
+
+      {isChief && activeEdition && (
+        <div className="p-6 rounded-lg bg-card border border-border space-y-4">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <h3 className="font-display font-semibold flex items-center gap-2">
+              <Users size={16} /> Special Issue dell'annata
+            </h3>
+            <button
+              onClick={() => setCreatingIssue((v) => !v)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-border text-xs hover:bg-muted"
+            >
+              <Plus size={12} /> {creatingIssue ? "Annulla" : "Nuovo Special Issue"}
+            </button>
+          </div>
+
+          {creatingIssue && (
+            <div className="space-y-2 p-3 rounded-md border border-border bg-background/40">
+              <input
+                value={newIssue.title}
+                onChange={(e) => setNewIssue((v) => ({ ...v, title: e.target.value }))}
+                placeholder="Titolo del numero speciale"
+                className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+              />
+              <textarea
+                value={newIssue.theme}
+                onChange={(e) => setNewIssue((v) => ({ ...v, theme: e.target.value }))}
+                rows={3}
+                placeholder="Tema e taglio del numero…"
+                className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Il guest editor viene nominato dall'admin: crea il numero e segnala il nome da assegnare.
+              </p>
+              <button
+                onClick={() => createSpecialIssue(activeEdition.id)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs hover:opacity-90"
+              >
+                <Plus size={12} /> Crea Special Issue
+              </button>
+            </div>
+          )}
+
+          <ul className="space-y-2">
+            {specialIssues.filter((si) => si.edition_id === activeEdition.id).length === 0 ? (
+              <li className="text-sm text-muted-foreground">Nessuno Special Issue per questa annata.</li>
+            ) : (
+              specialIssues
+                .filter((si) => si.edition_id === activeEdition.id)
+                .map((si) => (
+                  <li
+                    key={si.id}
+                    className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-md border border-border bg-background/40 text-sm"
+                  >
+                    <span className="font-display font-semibold">{si.title}</span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      guest editor:{" "}
+                      {si.guest_editor_user_id
+                        ? guestNameMap[si.guest_editor_user_id] ?? "assegnato"
+                        : "da nominare (admin)"}
+                    </span>
+                  </li>
+                ))
+            )}
+          </ul>
+        </div>
+      )}
+
+
 
       <div className="p-6 rounded-lg bg-card border border-border space-y-4">
         <div className="flex flex-wrap items-center gap-3">
