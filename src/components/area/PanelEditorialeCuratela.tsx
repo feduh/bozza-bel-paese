@@ -83,6 +83,121 @@ const FILTERS: Array<{ v: "all" | Submission["status"]; label: string }> = [
   { v: "withdrawn", label: "Ritirate" },
 ];
 
+type ScopeValues = {
+  title: string;
+  theme_description: string;
+  cover_image_url: string;
+  submissions_open_at: string;
+  submissions_close_at: string;
+  status: Edition["status"];
+};
+
+const ScopeSettings = ({
+  kind,
+  title,
+  initial,
+  onSave,
+}: {
+  kind: "edition" | "issue";
+  title: string;
+  initial: ScopeValues;
+  onSave: (v: ScopeValues) => Promise<void>;
+}) => {
+  const [values, setValues] = useState<ScopeValues>(initial);
+  const [saving, setSaving] = useState(false);
+  const set = <K extends keyof ScopeValues>(k: K, v: ScopeValues[K]) =>
+    setValues((prev) => ({ ...prev, [k]: v }));
+
+  return (
+    <div className="p-6 rounded-lg bg-card border border-border space-y-4">
+      <div>
+        <h3 className="font-display font-semibold">Impostazioni della call</h3>
+        <p className="text-xs font-body text-muted-foreground mt-1">{title}</p>
+      </div>
+
+      {kind === "issue" && (
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Titolo</span>
+          <input
+            value={values.title}
+            onChange={(e) => set("title", e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+      )}
+
+      <label className="block space-y-1">
+        <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Tema</span>
+        <textarea
+          value={values.theme_description}
+          onChange={(e) => set("theme_description", e.target.value)}
+          rows={4}
+          className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+        />
+      </label>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Apertura call</span>
+          <input
+            type="datetime-local"
+            value={values.submissions_open_at}
+            onChange={(e) => set("submissions_open_at", e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Deadline</span>
+          <input
+            type="datetime-local"
+            value={values.submissions_close_at}
+            onChange={(e) => set("submissions_close_at", e.target.value)}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Stato</span>
+          <select
+            value={values.status}
+            onChange={(e) => set("status", e.target.value as Edition["status"])}
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          >
+            {EDITION_STATUS.map((s) => (
+              <option key={s.v} value={s.v}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-body uppercase tracking-wider text-muted-foreground">Copertina (URL)</span>
+          <input
+            value={values.cover_image_url}
+            onChange={(e) => set("cover_image_url", e.target.value)}
+            placeholder="https://…"
+            className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+          />
+        </label>
+      </div>
+
+      <button
+        onClick={async () => {
+          setSaving(true);
+          await onSave(values);
+          setSaving(false);
+        }}
+        disabled={saving}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
+      >
+        <Save size={14} /> Salva impostazioni
+      </button>
+    </div>
+  );
+};
+
 const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
   const [editions, setEditions] = useState<Edition[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
