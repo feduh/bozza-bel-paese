@@ -218,6 +218,85 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
     load();
   };
 
+  const activeEdition = useMemo(
+    () => (activeScope.startsWith("ed:") ? editions.find((e) => e.id === activeScope.slice(3)) : undefined),
+    [activeScope, editions],
+  );
+  const activeIssue = useMemo(
+    () => (activeScope.startsWith("si:") ? specialIssues.find((i) => i.id === activeScope.slice(3)) : undefined),
+    [activeScope, specialIssues],
+  );
+
+  const saveEdition = async (
+    values: {
+      theme_description: string;
+      cover_image_url: string;
+      submissions_open_at: string;
+      submissions_close_at: string;
+      status: Edition["status"];
+    },
+  ) => {
+    if (!activeEdition) return;
+    const { error } = await supabase
+      .from("editorial_editions")
+      .update({
+        theme_description: values.theme_description || null,
+        cover_image_url: values.cover_image_url || null,
+        submissions_open_at: fromLocalInput(values.submissions_open_at),
+        submissions_close_at: fromLocalInput(values.submissions_close_at),
+        status: values.status,
+      })
+      .eq("id", activeEdition.id);
+    if (error) return toast.error(error.message);
+    toast.success("Annata aggiornata");
+    load();
+  };
+
+  const saveIssue = async (
+    values: {
+      title: string;
+      theme_description: string;
+      cover_image_url: string;
+      submissions_open_at: string;
+      submissions_close_at: string;
+      status: Edition["status"];
+    },
+  ) => {
+    if (!activeIssue) return;
+    const { error } = await supabase
+      .from("editorial_special_issues")
+      .update({
+        title: values.title,
+        theme_description: values.theme_description || null,
+        cover_image_url: values.cover_image_url || null,
+        submissions_open_at: fromLocalInput(values.submissions_open_at),
+        submissions_close_at: fromLocalInput(values.submissions_close_at),
+        status: values.status,
+      })
+      .eq("id", activeIssue.id);
+    if (error) return toast.error(error.message);
+    toast.success("Special Issue aggiornato");
+    load();
+  };
+
+  const createSpecialIssue = async (editionId: string) => {
+    if (!newIssue.title.trim()) return toast.error("Indica un titolo per lo Special Issue.");
+    const base = slugify(newIssue.title) || "special-issue";
+    const { error } = await supabase.from("editorial_special_issues").insert({
+      edition_id: editionId,
+      title: newIssue.title.trim(),
+      slug: `${base}-${Math.random().toString(36).slice(2, 6)}`,
+      theme_description: newIssue.theme.trim() || null,
+      status: "draft",
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Special Issue creato. L'admin assegnerà il guest editor.");
+    setNewIssue({ title: "", theme: "" });
+    setCreatingIssue(false);
+    load();
+  };
+
+
   if (editions.length === 0 && specialIssues.length === 0 && !loading) {
     return (
       <section className="p-8 rounded-lg bg-card border border-border">
