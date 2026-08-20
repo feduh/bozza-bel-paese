@@ -322,6 +322,91 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
         </p>
       </div>
 
+      {(activeEdition || activeIssue) && (
+        <ScopeSettings
+          key={activeScope}
+          kind={activeEdition ? "edition" : "issue"}
+          title={activeEdition ? `Editoriale ${activeEdition.year} — ${activeEdition.title}` : activeIssue!.title}
+          initial={{
+            title: activeIssue?.title ?? "",
+            theme_description: (activeEdition ?? activeIssue)?.theme_description ?? "",
+            cover_image_url: (activeEdition ?? activeIssue)?.cover_image_url ?? "",
+            submissions_open_at: toLocalInput((activeEdition ?? activeIssue)?.submissions_open_at ?? null),
+            submissions_close_at: toLocalInput((activeEdition ?? activeIssue)?.submissions_close_at ?? null),
+            status: (activeEdition ?? activeIssue)!.status,
+          }}
+          onSave={activeEdition ? saveEdition : saveIssue}
+        />
+      )}
+
+      {isChief && activeEdition && (
+        <div className="p-6 rounded-lg bg-card border border-border space-y-4">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <h3 className="font-display font-semibold flex items-center gap-2">
+              <Users size={16} /> Special Issue dell'annata
+            </h3>
+            <button
+              onClick={() => setCreatingIssue((v) => !v)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-border text-xs hover:bg-muted"
+            >
+              <Plus size={12} /> {creatingIssue ? "Annulla" : "Nuovo Special Issue"}
+            </button>
+          </div>
+
+          {creatingIssue && (
+            <div className="space-y-2 p-3 rounded-md border border-border bg-background/40">
+              <input
+                value={newIssue.title}
+                onChange={(e) => setNewIssue((v) => ({ ...v, title: e.target.value }))}
+                placeholder="Titolo del numero speciale"
+                className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+              />
+              <textarea
+                value={newIssue.theme}
+                onChange={(e) => setNewIssue((v) => ({ ...v, theme: e.target.value }))}
+                rows={3}
+                placeholder="Tema e taglio del numero…"
+                className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Il guest editor viene nominato dall'admin: crea il numero e segnala il nome da assegnare.
+              </p>
+              <button
+                onClick={() => createSpecialIssue(activeEdition.id)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs hover:opacity-90"
+              >
+                <Plus size={12} /> Crea Special Issue
+              </button>
+            </div>
+          )}
+
+          <ul className="space-y-2">
+            {specialIssues.filter((si) => si.edition_id === activeEdition.id).length === 0 ? (
+              <li className="text-sm text-muted-foreground">Nessuno Special Issue per questa annata.</li>
+            ) : (
+              specialIssues
+                .filter((si) => si.edition_id === activeEdition.id)
+                .map((si) => (
+                  <li
+                    key={si.id}
+                    className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-md border border-border bg-background/40 text-sm"
+                  >
+                    <span className="font-display font-semibold">{si.title}</span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      guest editor:{" "}
+                      {si.guest_editor_user_id
+                        ? guestNameMap[si.guest_editor_user_id] ?? "assegnato"
+                        : "da nominare (admin)"}
+                    </span>
+                  </li>
+                ))
+            )}
+          </ul>
+        </div>
+      )}
+
+
+
       <div className="p-6 rounded-lg bg-card border border-border space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm font-body flex items-center gap-2">
