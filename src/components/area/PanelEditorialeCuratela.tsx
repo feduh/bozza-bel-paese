@@ -318,7 +318,7 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
       .from("editorial_submissions")
       .update({ status })
       .eq("id", s.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Stato aggiornato");
     load();
   };
@@ -328,7 +328,7 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
       .from("editorial_submissions")
       .update({ curator_notes: notes })
       .eq("id", s.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Note salvate");
     load();
   };
@@ -362,7 +362,7 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
         status: values.status,
       })
       .eq("id", activeEdition.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Annata aggiornata");
     load();
   };
@@ -389,13 +389,13 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
         status: values.status,
       })
       .eq("id", activeIssue.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Special Issue aggiornato");
     load();
   };
 
   const createSpecialIssue = async (editionId: string) => {
-    if (!newIssue.title.trim()) return toast.error("Indica un titolo per lo Special Issue.");
+    if (!newIssue.title.trim()) { toast.error("Indica un titolo per lo Special Issue."); return; }
     const base = slugify(newIssue.title) || "special-issue";
     const { error } = await supabase.from("editorial_special_issues").insert({
       edition_id: editionId,
@@ -404,7 +404,7 @@ const PanelEditorialeCuratela = ({ userId }: { userId: string }) => {
       theme_description: newIssue.theme.trim() || null,
       status: "draft",
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Special Issue creato. L'admin assegnerà il guest editor.");
     setNewIssue({ title: "", theme: "" });
     setCreatingIssue(false);
